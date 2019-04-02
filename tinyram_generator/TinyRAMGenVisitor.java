@@ -68,7 +68,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		Method_t meth = (Method_t) argu;
 		String varName = n.f1.f0.toString();
 		if (meth.comesFrom != null) { 												// is a variable of a function
-			String newTemp = new String("r" + ++symTable.glob_temp_cnt);
+			String newTemp = new String("r" + ++symTable.glob_temp_cnt_);
 			if ((meth = meth.comesFrom.getMethod(meth.getName())) != null) {		// if you found method
 				meth.addTempToVar(varName, newTemp);
 			} else
@@ -339,7 +339,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
 		String label = L.new_label();
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		this.result += new String("MOV " + ret + " r0 " + t1 + "\n" + "CJMP " + t1 + " " + label + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
@@ -377,7 +377,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(PlusExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
@@ -390,7 +390,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(MinusExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
@@ -403,7 +403,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(TimesExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += new String("MUL " + ret + " " + t1 + " " + t2 + "\n");
@@ -418,7 +418,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     public BaseType visit(ExpressionList n, BaseType argu) throws Exception {
         Variable_t expr =  (Variable_t) n.f0.accept(this, argu); //na tsekarw th seira 
         Method_t meth = (Method_t) n.f1.accept(this, argu);
-        meth.methodParams.addLast(expr);
+		
+		meth.methodParamsMap_.put(expr.getName(), expr);
+		
         return meth;
     }
 
@@ -427,9 +429,12 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     */
     public BaseType visit(ExpressionTail n, BaseType argu) throws Exception {
         Method_t meth = new Method_t(null, null);
-        if (n.f0.present())                 // create a linked list of variables. (parameters list)
-            for (int i = 0 ; i < n.f0.size() ; i++)
-                meth.methodParams.addLast( (Variable_t)n.f0.nodes.get(i).accept(this, argu) );
+        if (n.f0.present()) {                // create a linked list of variables. (parameters list)
+            for (int i = 0 ; i < n.f0.size() ; i++) {
+				Variable_t var = (Variable_t)n.f0.nodes.get(i).accept(this, argu);
+				meth.methodParamsMap_.put(var.getName(), var);
+			}
+		}
         return meth;
     }
 
@@ -470,7 +475,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> <INTEGER_LITERAL>
 	*/
 	public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
-		String ret = "r" + ++symTable.glob_temp_cnt;
+		String ret = "r" + ++symTable.glob_temp_cnt_;
 		this.result += "MOV " + ret + " r0 " + n.f0.toString() + "\n";
 		return new Variable_t(ret, null);
 	}
@@ -479,7 +484,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> "true"
 	*/
 	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		this.result += new String("MOV " + ret + " r0 1\n");
 		return new Variable_t(ret, null);
 	}
@@ -488,7 +493,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> "false"
 	*/
 	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		this.result += new String("MOV " + ret + " r0 0\n");
 		return new Variable_t(ret, null);
 	}
@@ -525,7 +530,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				if (cl == null) {  throw new Exception("something went wrong 2"); }
 				var = cl.classContainsVarReverse(id);
 				if (var == null) {  return new Variable_t(null, id);  }
-				String newTemp = "r" + ++symTable.glob_temp_cnt;
+				String newTemp = "r" + ++symTable.glob_temp_cnt_;
 				this.result += "LOAD " + newTemp + " r0 " + var.getVarNum()*4 + "\n";
 				Variable_t v = new Variable_t(newTemp, id);
 				v.var_temp = var.getType();
@@ -539,9 +544,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> Clause()
 	*/
 	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt);
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t = ((Variable_t) n.f1.accept(this, argu)).getType();
-		String one = new String("r" + ++symTable.glob_temp_cnt);
+		String one = new String("r" + ++symTable.glob_temp_cnt_);
 		this.result += "MOV " + one + " r0 1\n";
 		this.result += "MOV " + ret + " MINUS " + one + " " + t + "\n";
 		return new Variable_t(ret, null);

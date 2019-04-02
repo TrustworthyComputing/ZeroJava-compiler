@@ -6,50 +6,65 @@ import visitor.GJDepthFirst;
 import java.util.*;
 
 public class SymbolTable {
-    public LinkedList<Class_t> ST;
-    public int glob_temp_cnt;
+    public int glob_temp_cnt_;
+    public Map<String, Class_t> st_;
 
     public SymbolTable(LinkedList<Class_t> classes) {
-        ST = classes;
-        glob_temp_cnt = 0;
+        glob_temp_cnt_ = 0;
+        
+        st_ = new HashMap<>();
+        for (Class_t c : classes) {
+            st_.put(c.getName(), c);
+        }
+    }
+    
+    public SymbolTable(Map<String, Class_t> classMap) {
+        glob_temp_cnt_ = 0;
+        st_ = classMap;
     }
 
-    public LinkedList<Class_t> getST() { return ST; }
+    public Map<String, Class_t> getST() {
+        return st_;
+    }
 
-    public Class_t contains(String nam) { // returns a class if exists in ST else null
-        int i = 0, size = ST.size();
-        while (i < size)
-            if (ST.get(i++).getName().equals(nam))
-                return ST.get(i-1);
+    public Class_t contains(String cname) { // returns a class if exists in ST else null
+        if (st_.containsKey(cname)) {
+            return st_.get(cname);
+        }
         return null;
     }
 
     public void printST() {
         int i = 0, j = 0;
-        System.out.println("\n____Symbol Table____\n");
-        System.out.println("\n\tClasses:");
-        while (i < ST.size()) {
-            j = 0; 
+        System.out.println("\n________Symbol-Table________");
+        System.out.println("\tClasses:");
+        
+        for (Map.Entry<String, Class_t> st_entry : st_.entrySet()) {
+            Class_t cl = st_entry.getValue();
             System.out.println("___________________________________________________");
-            if (ST.get(i).getDad() == null)
-                System.out.println(ST.get(i).getName() + ":\n\t" +  ST.get(i).var_cnt+ " Vars:");
-            else
-                System.out.println(ST.get(i).getName() + " extends " + ST.get(i).getDad() + ":\n\t" +  ST.get(i).var_cnt+ " Vars:");
-            while (j < ST.get(i).classVars.size()) {
+            if (cl.getDad() == null) {
+                System.out.println(cl.getName() + ":\n\t" +  cl.var_cnt+ " Vars:");
+            } else {
+                System.out.println(cl.getName() + " extends " + cl.getDad() + ":\n\t" +  cl.var_cnt+ " Vars:");
+            }
+            
+            
+            for (Map.Entry<String, Variable_t> cl_entry : cl.classVarsMap_.entrySet()) {
+                Variable_t var = cl_entry.getValue();
                 System.out.print("\t\t");
-                ST.get(i).classVars.get(j).printVar();
+                var.printVar();
                 System.out.println("");
-                j++;
             }
-            j = 0; 
-            System.out.println("\t" + ST.get(i).meth_cnt + " Methods:");
-            while (j < ST.get(i).classMethods.size()) {
+            
+            System.out.println("\t" + cl.meth_cnt + " Methods:");
+            for (Map.Entry<String, Method_t> cl_entry : cl.classMethodsMap_.entrySet()) {
+                Method_t meth = cl_entry.getValue();
                 System.out.print("\t\t");
-                ST.get(i).classMethods.get(j).printMethod();
-                j++;
+                meth.printMethod();
             }
-            i++;
+            
         }
+                
     }
 
 }

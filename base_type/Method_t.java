@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Method_t extends BaseType {
     private String type;
-    public LinkedList<Variable_t> methodParams;
-    public LinkedList<Variable_t> methodVars;
+    public Map<String, Variable_t> methodParamsMap_;
+    public Map<String, Variable_t> methodVarsMap_;
     public Class_t comesFrom;
     public int var_cnt;
     public int par_cnt;
@@ -14,8 +14,8 @@ public class Method_t extends BaseType {
     public Method_t(String type, String name) {
         super(name);
         this.type = type;
-        this.methodParams = new LinkedList<Variable_t>();
-        this.methodVars = new LinkedList<Variable_t>();
+        methodParamsMap_ = new HashMap<>();
+        methodVarsMap_ = new HashMap<>();
         this.comesFrom = null;
     }
 
@@ -23,83 +23,76 @@ public class Method_t extends BaseType {
         return this.type;
     }
 
-    public LinkedList<Variable_t> getParams() {
-        return this.methodParams;
+    public Map<String, Variable_t> getParams() {
+        return this.methodParamsMap_;
     }
 
     public String methContains(String varName) {
-        int i = 0;
-        while (i < methodVars.size()) {
-            if (methodVars.get(i).getName().equals(varName))
-                return methodVars.get(i).getType();
-            i++;
+        if (methodParamsMap_.containsKey(varName)) {
+            return methodParamsMap_.get(varName).getType();
         }
-        i = 0;
-        while (i < methodParams.size()) {
-            if (methodParams.get(i).getName().equals(varName))
-                return methodParams.get(i).getType();
-            i++;
+        if (methodVarsMap_.containsKey(varName)) {
+            return methodVarsMap_.get(varName).getType();
         }
         return null;
     }
 
     public Variable_t methContainsVar(String varName) {
-        for (int i = 0 ; i < methodVars.size() ; i++)
-            if (methodVars.get(i).getName().equals(varName))
-                return methodVars.get(i);
-        for (int i = 0 ; i < methodParams.size() ; i++)
-            if (methodParams.get(i).getName().equals(varName))
-                return methodParams.get(i);
+        if (methodParamsMap_.containsKey(varName)) {
+            return methodParamsMap_.get(varName);
+        }
+        if (methodVarsMap_.containsKey(varName)) {
+            return methodVarsMap_.get(varName);
+        }
         return null;
     }
 
     public boolean addParam(Variable_t param) {
-        int i = 0;
-        while (i < methodParams.size())
-            if (methodParams.get(i++).getName().equals(param.getName()))
-                return false;
-        this.par_cnt++;
+        String pname = param.getName();
+        if (methodParamsMap_.containsKey(pname)) {
+            return false;
+        }
+        
         param.var_num = this.par_cnt;
-        param.var_temp = new String("TEMP " + param.var_num);
-        methodParams.addLast(param);
+        this.par_cnt++;
+        param.var_temp = new String("r" + param.var_num);
+        methodParamsMap_.put(pname, param);
         return true;
     }
 
     public boolean addVar(Variable_t var) {
-        int i = 0;
-        while (i < methodVars.size())
-            if (methodVars.get(i++).getName().equals(var.getName()))
-                return false;
-        for (int j = 0 ; j < methodParams.size() ; j++)
-            if (methodParams.get(j).getName().equals(var.getName()))
-                return false;
-        methodVars.addLast(var);
+        String vname = var.getName();
+        if (methodVarsMap_.containsKey(vname)) {
+            return false;
+        }
+        if (methodParamsMap_.containsKey(vname)) {
+            return false;
+        }
+        methodVarsMap_.put(vname, var);
+        
         return true;
     }
 
     public void printMethod() {
         System.out.print(meth_num + ") " + type + " " + this.getName() + "(");
-        int i = 0;
-        while (i < methodParams.size()) {
-            methodParams.get(i++).printVar();
-            if (i != methodParams.size())
-                System.out.print(", ");
+        for (Map.Entry<String, Variable_t> meth_entry : methodParamsMap_.entrySet()) {
+            Variable_t var = meth_entry.getValue();
+            var.printVar();
+            System.out.print(" ");
         }
         System.out.println(") "+ comesFrom.getName() +"\n\t\t\tMethod Variables:");
-        i = 0;
-        while (i < methodVars.size()) {
+        for (Map.Entry<String, Variable_t> meth_entry : methodVarsMap_.entrySet()) {
+            Variable_t var = meth_entry.getValue();
             System.out.print("\t\t\t\t");
-            methodVars.get(i++).printVar();
+            var.printVar();
             System.out.println("");
         }
     }
 
     public void addTempToVar(String varName, String tempName) {
-        for (int i = 0 ; i < methodVars.size(); i++)
-            if (methodVars.get(i).getName().equals(varName)) {
-                methodVars.get(i).var_temp = tempName;
-                return ;
-            }
+        if (methodVarsMap_.containsKey(varName)) {
+            methodVarsMap_.get(varName).var_temp = tempName;
+        }    
     }
 
 }
