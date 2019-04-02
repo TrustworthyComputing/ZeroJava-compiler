@@ -57,6 +57,7 @@ TOKEN :
    | <PLUS: "+">
    | <MINUS: "-">
    | <AND: "&&">
+   | <OR: "||">
    | <NOT: "!">
    | <BOOLEAN: "boolean">
    | <CLASS: "class">
@@ -772,15 +773,16 @@ Expression Expression() :
 {
    NodeChoice n0;
    AndExpression n1;
-   EqExpression n2;
-   CompareExpression n3;
-   PlusExpression n4;
-   MinusExpression n5;
-   TimesExpression n6;
-   ArrayLookup n7;
-   ArrayLength n8;
-   MessageSend n9;
-   Clause n10;
+   OrExpression n2;
+   EqExpression n3;
+   CompareExpression n4;
+   PlusExpression n5;
+   MinusExpression n6;
+   TimesExpression n7;
+   ArrayLookup n8;
+   ArrayLength n9;
+   MessageSend n10;
+   Clause n11;
 
    
 }
@@ -790,40 +792,44 @@ Expression Expression() :
       n1=AndExpression()
       { n0 = new NodeChoice(n1, 0); }
    |
-      LOOKAHEAD(PrimaryExpression() "==")
-      n2=EqExpression()
+      LOOKAHEAD(Clause() "||")
+      n2=OrExpression()
       { n0 = new NodeChoice(n2, 1); }
    |
-      LOOKAHEAD(PrimaryExpression() ">")
-      n3=CompareExpression()
+      LOOKAHEAD(PrimaryExpression() "==")
+      n3=EqExpression()
       { n0 = new NodeChoice(n3, 2); }
    |
-      LOOKAHEAD(PrimaryExpression() "+")
-      n4=PlusExpression()
+      LOOKAHEAD(PrimaryExpression() ">")
+      n4=CompareExpression()
       { n0 = new NodeChoice(n4, 3); }
    |
-      LOOKAHEAD(PrimaryExpression() "-")
-      n5=MinusExpression()
+      LOOKAHEAD(PrimaryExpression() "+")
+      n5=PlusExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      LOOKAHEAD(PrimaryExpression() "*")
-      n6=TimesExpression()
+      LOOKAHEAD(PrimaryExpression() "-")
+      n6=MinusExpression()
       { n0 = new NodeChoice(n6, 5); }
    |
-      LOOKAHEAD(PrimaryExpression() "[")
-      n7=ArrayLookup()
+      LOOKAHEAD(PrimaryExpression() "*")
+      n7=TimesExpression()
       { n0 = new NodeChoice(n7, 6); }
    |
-      LOOKAHEAD(PrimaryExpression() "." "length")
-      n8=ArrayLength()
+      LOOKAHEAD(PrimaryExpression() "[")
+      n8=ArrayLookup()
       { n0 = new NodeChoice(n8, 7); }
    |
-      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
-      n9=MessageSend()
+      LOOKAHEAD(PrimaryExpression() "." "length")
+      n9=ArrayLength()
       { n0 = new NodeChoice(n9, 8); }
    |
-      n10=Clause()
+      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
+      n10=MessageSend()
       { n0 = new NodeChoice(n10, 9); }
+   |
+      n11=Clause()
+      { n0 = new NodeChoice(n11, 10); }
    )
    
    { return new Expression(n0); }
@@ -844,6 +850,23 @@ AndExpression AndExpression() :
    n3=Clause()
    
    { return new AndExpression(n0,n1,n3); }
+}
+
+OrExpression OrExpression() :
+{
+   Clause n0;
+   NodeToken n1;
+   Token n2;
+   Clause n3;
+
+   
+}
+{
+   n0=Clause()
+   n2="||" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n3=Clause()
+   
+   { return new OrExpression(n0,n1,n3); }
 }
 
 EqExpression EqExpression() :

@@ -43,55 +43,57 @@ public interface TinyJavaParserConstants {
   /** RegularExpression Id. */
   int AND = 22;
   /** RegularExpression Id. */
-  int NOT = 23;
+  int OR = 23;
   /** RegularExpression Id. */
-  int BOOLEAN = 24;
+  int NOT = 24;
   /** RegularExpression Id. */
-  int CLASS = 25;
+  int BOOLEAN = 25;
   /** RegularExpression Id. */
-  int INTERFACE = 26;
+  int CLASS = 26;
   /** RegularExpression Id. */
-  int ELSE = 27;
+  int INTERFACE = 27;
   /** RegularExpression Id. */
-  int EXTENDS = 28;
+  int ELSE = 28;
   /** RegularExpression Id. */
-  int FALSE = 29;
+  int EXTENDS = 29;
   /** RegularExpression Id. */
-  int IF = 30;
+  int FALSE = 30;
   /** RegularExpression Id. */
-  int WHILE = 31;
+  int IF = 31;
   /** RegularExpression Id. */
-  int INTEGER = 32;
+  int WHILE = 32;
   /** RegularExpression Id. */
-  int LENGTH = 33;
+  int INTEGER = 33;
   /** RegularExpression Id. */
-  int MAIN = 34;
+  int LENGTH = 34;
   /** RegularExpression Id. */
-  int NEW = 35;
+  int MAIN = 35;
   /** RegularExpression Id. */
-  int PUBLIC = 36;
+  int NEW = 36;
   /** RegularExpression Id. */
-  int RETURN = 37;
+  int PUBLIC = 37;
   /** RegularExpression Id. */
-  int STATIC = 38;
+  int RETURN = 38;
   /** RegularExpression Id. */
-  int STRING = 39;
+  int STATIC = 39;
   /** RegularExpression Id. */
-  int THIS = 40;
+  int STRING = 40;
   /** RegularExpression Id. */
-  int TRUE = 41;
+  int THIS = 41;
   /** RegularExpression Id. */
-  int PRINT = 42;
+  int TRUE = 42;
   /** RegularExpression Id. */
-  int VOID = 43;
+  int PRINT = 43;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 44;
+  int VOID = 44;
   /** RegularExpression Id. */
-  int IDENTIFIER = 45;
+  int INTEGER_LITERAL = 45;
   /** RegularExpression Id. */
-  int LETTER = 46;
+  int IDENTIFIER = 46;
   /** RegularExpression Id. */
-  int DIGIT = 47;
+  int LETTER = 47;
+  /** RegularExpression Id. */
+  int DIGIT = 48;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -121,6 +123,7 @@ public interface TinyJavaParserConstants {
     "\"+\"",
     "\"-\"",
     "\"&&\"",
+    "\"||\"",
     "\"!\"",
     "\"boolean\"",
     "\"class\"",

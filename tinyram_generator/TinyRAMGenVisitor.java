@@ -365,6 +365,27 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 	
 	/**
+	* f0 -> Clause()
+	* f1 -> "||"
+	* f2 -> Clause()
+	*/
+	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
+		String l1 = L.new_label();
+		String l2 = L.new_label();
+		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		this.result += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+		this.result += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result += new String("JMP r0 r0 " + l2 + "\n");
+		this.result += new String(l1 + "\n");
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
+		this.result += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
+		this.result += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result += new String(l2 + "\n");
+		return new Variable_t(ret, null);
+	}
+	
+	/**
 	* f0 -> PrimaryExpression()
 	* f1 -> ">"
 	* f2 -> PrimaryExpression()

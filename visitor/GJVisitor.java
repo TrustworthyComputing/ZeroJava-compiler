@@ -253,6 +253,7 @@ public interface GJVisitor<R,A> {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -271,6 +272,13 @@ public interface GJVisitor<R,A> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

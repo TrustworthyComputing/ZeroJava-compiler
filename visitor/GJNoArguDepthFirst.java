@@ -470,6 +470,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -490,6 +491,19 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n) throws Exception {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);

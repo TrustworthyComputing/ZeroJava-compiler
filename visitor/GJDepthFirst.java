@@ -470,6 +470,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -490,6 +491,19 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n, A argu) throws Exception {
       R _ret=null;
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);

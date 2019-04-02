@@ -253,6 +253,7 @@ public interface Visitor {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -271,6 +272,13 @@ public interface Visitor {
     * f2 -> Clause()
     */
    public void visit(AndExpression n) throws Exception;
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public void visit(OrExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

@@ -253,6 +253,7 @@ public interface GJVoidVisitor<A> {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -271,6 +272,13 @@ public interface GJVoidVisitor<A> {
     * f2 -> Clause()
     */
    public void visit(AndExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public void visit(OrExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

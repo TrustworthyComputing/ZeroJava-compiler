@@ -416,6 +416,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
 
    /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | EqExpression()
     *       | CompareExpression()
     *       | PlusExpression()
@@ -436,6 +437,17 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     * f2 -> Clause()
     */
    public void visit(AndExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public void visit(OrExpression n, A argu) throws Exception {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);

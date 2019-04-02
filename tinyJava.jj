@@ -39,6 +39,7 @@ TOKEN :
 | < PLUS: "+" >
 | < MINUS: "-" >
 | < AND : "&&" >   
+| < OR : "||" >   
 | < NOT : "!" >   
 | < BOOLEAN: "boolean" >   
 | < CLASS: "class" >
@@ -315,6 +316,9 @@ void Expression() :
   LOOKAHEAD( Clause() "&&" )
   AndExpression()
 |
+  LOOKAHEAD( Clause() "||" )
+  OrExpression()
+|
   LOOKAHEAD( PrimaryExpression() "==" )
   EqExpression()
 |
@@ -347,6 +351,13 @@ void AndExpression() :
 {
   Clause() "&&" Clause()
 }
+
+void OrExpression() :
+{} 
+{
+  Clause() "||" Clause()
+}
+
 
 void EqExpression() :
 {} 

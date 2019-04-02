@@ -9,8 +9,12 @@ class IfElse {
 			x = 4;
 		}
 		
-		if ((x == 3) && (cond > 0)) {
-			x = x * 2;
+		if ((x == 33) || (cond == 1)) {
+			if ((cond > 0) && (x == 3)) {
+				x = x * 2;
+			} else {
+				x = 0;
+			}
 		} else {
 			x = 1;
 		}
