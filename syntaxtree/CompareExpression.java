@@ -7,7 +7,7 @@ package syntaxtree;
 /**
  * Grammar production:
  * f0 -> PrimaryExpression()
- * f1 -> "<"
+ * f1 -> ">"
  * f2 -> PrimaryExpression()
  */
 public class CompareExpression implements Node {
@@ -23,7 +23,7 @@ public class CompareExpression implements Node {
 
    public CompareExpression(PrimaryExpression n0, PrimaryExpression n1) {
       f0 = n0;
-      f1 = new NodeToken("<");
+      f1 = new NodeToken(">");
       f2 = n1;
    }
 

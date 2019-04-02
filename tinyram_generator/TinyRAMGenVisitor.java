@@ -241,7 +241,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return new Variable_t(res, null);
 	}
 	
-	// TODO
 	/**
 	* f0 -> "if"
 	* f1 -> "("
@@ -255,9 +254,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String elselabel = L.new_label();
 		String endlabel = L.new_label();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "CJMP " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
+		this.result += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
 		n.f4.accept(this, argu);
-		this.result += "JMP " + endlabel + "\n" + elselabel + "\n";
+		this.result += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
 		n.f6.accept(this, argu);
 		this.result += endlabel + "\n";
 		return null;
@@ -275,7 +274,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String lend = L.new_label();
 		this.result += "\n" + lstart + "\n";
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "CNJMP r0 r0 " + lend + "\n";
+		this.result += "CNJMP " + expr + " " + expr + " " + lend + "\n";
 		n.f4.accept(this, argu);
 		this.result += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
 		return null;
@@ -354,25 +353,27 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> Clause()
 	*/
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
-		String label = L.new_label();
+		String l1 = L.new_label();
 		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-		this.result += new String("MOV " + ret + " r0 " + t1 + "\n" + "CJMP " + t1 + " " + label + "\n");
+		this.result += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("MOV " + ret + " r0 " + t2 + "\n" + label + "\n");
+		this.result += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
+		this.result += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result += new String(l1 + "\n");
 		return new Variable_t(ret, null);
 	}
-
+	
 	/**
 	* f0 -> PrimaryExpression()
-	* f1 -> "<"
+	* f1 -> ">"
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(CompareExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
-		return new Variable_t("r0", null);
+		this.result += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		return new Variable_t(t1, null);
 	}
 	
 	/**
@@ -384,7 +385,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
-		return new Variable_t("r0", null);
+		return new Variable_t(t1, null);
 	}
 
 	/**
@@ -422,11 +423,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("r" + ++symTable.glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("MUL " + ret + " " + t1 + " " + t2 + "\n");
+		this.result += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
 		return new Variable_t(ret, null);
 	}
 	
-	// TODO
 	/**
 	* f0 -> PrimaryExpression()
 	* f1 -> "["
@@ -436,14 +436,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ArrayLookup n, BaseType argu) throws Exception {
 		String array = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getType();		
-		// this.immediate_ = true;
-		// String expr = ((Variable_t) n.f5.accept(this, argu)).getType();
-		// this.immediate_ = false;
 		String res = new String("r" + ++symTable.glob_temp_cnt_);
-		
 		this.result += "ADD " + array + " " + array + " " + idx + "\n";
-		// this.result += "MOV " + res + " " + res + " " + expr + "\n";
-		// this.result += "STORE " + res + " " + res + " " + array + "\n";
 		this.result += "LOAD " + res + " " + res + " " + array + "\n";
 		this.result += "SUB " + array + " " + array + " " + idx + "\n";
 		this.result += "\n";

@@ -52,6 +52,7 @@ TOKEN :
    | <SEMICOLON: ";">
    | <DOT: ".">
    | <ASSIGN: "=">
+   | <GT: ">">
    | <LT: "<">
    | <PLUS: "+">
    | <MINUS: "-">
@@ -793,7 +794,7 @@ Expression Expression() :
       n2=EqExpression()
       { n0 = new NodeChoice(n2, 1); }
    |
-      LOOKAHEAD(PrimaryExpression() "<")
+      LOOKAHEAD(PrimaryExpression() ">")
       n3=CompareExpression()
       { n0 = new NodeChoice(n3, 2); }
    |
@@ -873,7 +874,7 @@ CompareExpression CompareExpression() :
 }
 {
    n0=PrimaryExpression()
-   n2="<" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n2=">" { n1 = JTBToolkit.makeNodeToken(n2); }
    n3=PrimaryExpression()
    
    { return new CompareExpression(n0,n1,n3); }

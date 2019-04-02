@@ -454,7 +454,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
 
    /**
     * f0 -> PrimaryExpression()
-    * f1 -> "<"
+    * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
    public void visit(CompareExpression n, A argu) throws Exception {

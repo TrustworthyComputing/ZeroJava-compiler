@@ -4,7 +4,7 @@ class Add {
 		int x;
 		int res;
 		j = 0 ;
-		while (j < 5) {
+		while (5 > j) {
 			PrimaryTape.read(x);
 			res = res + x;
 			

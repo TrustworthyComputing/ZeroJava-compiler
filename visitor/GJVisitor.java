@@ -281,7 +281,7 @@ public interface GJVisitor<R,A> {
 
    /**
     * f0 -> PrimaryExpression()
-    * f1 -> "<"
+    * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
    public R visit(CompareExpression n, A argu) throws Exception;

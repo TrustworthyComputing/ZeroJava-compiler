@@ -444,7 +444,7 @@ public class DepthFirstVisitor implements Visitor {
 
    /**
     * f0 -> PrimaryExpression()
-    * f1 -> "<"
+    * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
    public void visit(CompareExpression n) throws Exception {

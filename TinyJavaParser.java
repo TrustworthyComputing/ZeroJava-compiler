@@ -115,9 +115,9 @@ public class TinyJavaParser implements TinyJavaParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
       case 49:
       case 50:
+      case 51:
         ;
         break;
       default:
@@ -362,9 +362,9 @@ public class TinyJavaParser implements TinyJavaParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
       case 49:
       case 50:
+      case 51:
         ;
         break;
       default:
@@ -410,7 +410,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
     label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 47:
+      case 48:
         ;
         break;
       default:
@@ -429,7 +429,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    NodeToken n0;
    Token n1;
    FormalParameter n2;
-    n1 = jj_consume_token(47);
+    n1 = jj_consume_token(48);
             n0 = JTBToolkit.makeNodeToken(n1);
     n2 = FormalParameter();
      {if (true) return new FormalParameterTerm(n0,n2);}
@@ -542,15 +542,15 @@ public class TinyJavaParser implements TinyJavaParserConstants {
           n6 = PrintStatement();
         n0 = new NodeChoice(n6, 5);
           break;
-        case 48:
+        case 49:
           n7 = ReadPrimaryTape();
         n0 = new NodeChoice(n7, 6);
           break;
-        case 49:
+        case 50:
           n8 = ReadPrivateTape();
         n0 = new NodeChoice(n8, 7);
           break;
-        case 50:
+        case 51:
           n9 = AnswerStatement();
         n0 = new NodeChoice(n9, 8);
           break;
@@ -582,9 +582,9 @@ public class TinyJavaParser implements TinyJavaParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
       case 49:
       case 50:
+      case 51:
         ;
         break;
       default:
@@ -726,7 +726,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(48);
+    n1 = jj_consume_token(49);
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -749,7 +749,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(49);
+    n1 = jj_consume_token(50);
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -772,7 +772,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(50);
+    n1 = jj_consume_token(51);
                         n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -866,7 +866,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(51);
+    n2 = jj_consume_token(52);
              n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new EqExpression(n0,n1,n3);}
@@ -879,7 +879,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(LT);
+    n2 = jj_consume_token(GT);
             n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new CompareExpression(n0,n1,n3);}
@@ -918,7 +918,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(52);
+    n2 = jj_consume_token(53);
             n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new TimesExpression(n0,n1,n3);}
@@ -1011,7 +1011,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
     label_13:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 47:
+      case 48:
         ;
         break;
       default:
@@ -1030,7 +1030,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    NodeToken n0;
    Token n1;
    Expression n2;
-    n1 = jj_consume_token(47);
+    n1 = jj_consume_token(48);
             n0 = JTBToolkit.makeNodeToken(n1);
     n2 = Expression();
      {if (true) return new ExpressionTerm(n0,n2);}
@@ -1377,7 +1377,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3R_61() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(52)) return true;
+    if (jj_scan_token(53)) return true;
     if (jj_3R_20()) return true;
     return false;
   }
@@ -1487,7 +1487,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3R_58() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(LT)) return true;
+    if (jj_scan_token(GT)) return true;
     if (jj_3R_20()) return true;
     return false;
   }
@@ -1526,7 +1526,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3R_57() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(51)) return true;
+    if (jj_scan_token(52)) return true;
     if (jj_3R_20()) return true;
     return false;
   }
@@ -1539,7 +1539,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
   }
 
   private boolean jj_3R_69() {
-    if (jj_scan_token(47)) return true;
+    if (jj_scan_token(48)) return true;
     if (jj_3R_45()) return true;
     return false;
   }
@@ -1648,7 +1648,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3_12() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(52)) return true;
+    if (jj_scan_token(53)) return true;
     return false;
   }
 
@@ -1687,7 +1687,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3_9() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(LT)) return true;
+    if (jj_scan_token(GT)) return true;
     return false;
   }
 
@@ -1714,7 +1714,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
 
   private boolean jj_3_8() {
     if (jj_3R_20()) return true;
-    if (jj_scan_token(51)) return true;
+    if (jj_scan_token(52)) return true;
     return false;
   }
 
@@ -1853,10 +1853,10 @@ public class TinyJavaParser implements TinyJavaParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1000000,0x60002000,0x0,0x1000000,0x80800000,0x0,0x80800000,0x0,0x80800000,0x60002000,0x0,0x80800000,0x2000,0x60000000,0x60002000,0x10400200,0x10400200,0x0,0x10400200,0x10000000,0x200,};
+      jj_la1_0 = new int[] {0x2000000,0xc0002000,0x0,0x2000000,0x1000000,0x0,0x1000000,0x0,0x1000000,0xc0002000,0x0,0x1000000,0x2000,0xc0000000,0xc0002000,0x20800200,0x20800200,0x0,0x20800200,0x20000000,0x200,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x71200,0x8,0x0,0x1000,0x8,0x1000,0x8,0x1000,0x71200,0x8000,0x1000,0x0,0x70200,0x71200,0x1984,0x1984,0x8000,0x1984,0x1980,0x4,};
+      jj_la1_1 = new int[] {0x0,0xe2400,0x10,0x0,0x2001,0x10,0x2001,0x10,0x2001,0xe2400,0x10000,0x2001,0x0,0xe0400,0xe2400,0x3308,0x3308,0x10000,0x3308,0x3300,0x8,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[16];
   private boolean jj_rescan = false;
@@ -2045,7 +2045,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[53];
+    boolean[] la1tokens = new boolean[54];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2062,7 +2062,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
         }
       }
     }
-    for (int i = 0; i < 53; i++) {
+    for (int i = 0; i < 54; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
