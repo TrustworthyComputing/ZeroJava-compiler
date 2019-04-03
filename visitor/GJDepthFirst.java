@@ -472,7 +472,10 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f0 -> AndExpression()
     *       | OrExpression()
     *       | EqExpression()
-    *       | CompareExpression()
+    *       | LessThanExpression()
+    *       | GreaterThanExpression()
+    *       | LessEqualThanExpression()
+    *       | GreaterEqualThanExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -526,10 +529,49 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "<"
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(LessThanExpression n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
-   public R visit(CompareExpression n, A argu) throws Exception {
+   public R visit(GreaterThanExpression n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(LessEqualThanExpression n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterEqualThanExpression n, A argu) throws Exception {
       R _ret=null;
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);

@@ -255,7 +255,10 @@ public interface Visitor {
     * f0 -> AndExpression()
     *       | OrExpression()
     *       | EqExpression()
-    *       | CompareExpression()
+    *       | LessThanExpression()
+    *       | GreaterThanExpression()
+    *       | LessEqualThanExpression()
+    *       | GreaterEqualThanExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -289,10 +292,31 @@ public interface Visitor {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "<"
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessThanExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
-   public void visit(CompareExpression n) throws Exception;
+   public void visit(GreaterThanExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessEqualThanExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterEqualThanExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

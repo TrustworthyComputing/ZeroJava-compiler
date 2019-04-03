@@ -65,35 +65,33 @@ public interface TinyJavaParserConstants {
   /** RegularExpression Id. */
   int INTEGER = 33;
   /** RegularExpression Id. */
-  int LENGTH = 34;
+  int MAIN = 34;
   /** RegularExpression Id. */
-  int MAIN = 35;
+  int NEW = 35;
   /** RegularExpression Id. */
-  int NEW = 36;
+  int PUBLIC = 36;
   /** RegularExpression Id. */
-  int PUBLIC = 37;
+  int RETURN = 37;
   /** RegularExpression Id. */
-  int RETURN = 38;
+  int STATIC = 38;
   /** RegularExpression Id. */
-  int STATIC = 39;
+  int STRING = 39;
   /** RegularExpression Id. */
-  int STRING = 40;
+  int THIS = 40;
   /** RegularExpression Id. */
-  int THIS = 41;
+  int TRUE = 41;
   /** RegularExpression Id. */
-  int TRUE = 42;
+  int PRINT = 42;
   /** RegularExpression Id. */
-  int PRINT = 43;
+  int VOID = 43;
   /** RegularExpression Id. */
-  int VOID = 44;
+  int INTEGER_LITERAL = 44;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 45;
+  int IDENTIFIER = 45;
   /** RegularExpression Id. */
-  int IDENTIFIER = 46;
+  int LETTER = 46;
   /** RegularExpression Id. */
-  int LETTER = 47;
-  /** RegularExpression Id. */
-  int DIGIT = 48;
+  int DIGIT = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -134,7 +132,6 @@ public interface TinyJavaParserConstants {
     "\"if\"",
     "\"while\"",
     "\"int\"",
-    "\"length\"",
     "\"main\"",
     "\"new\"",
     "\"public\"",
@@ -154,7 +151,10 @@ public interface TinyJavaParserConstants {
     "\"PrivateTape.read\"",
     "\"Prover.answer\"",
     "\"==\"",
+    "\"<=\"",
+    "\">=\"",
     "\"*\"",
+    "\"length\"",
   };
 
 }

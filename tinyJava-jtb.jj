@@ -68,7 +68,6 @@ TOKEN :
    | <IF: "if">
    | <WHILE: "while">
    | <INTEGER: "int">
-   | <LENGTH: "length">
    | <MAIN: "main">
    | <NEW: "new">
    | <PUBLIC: "public">
@@ -775,14 +774,17 @@ Expression Expression() :
    AndExpression n1;
    OrExpression n2;
    EqExpression n3;
-   CompareExpression n4;
-   PlusExpression n5;
-   MinusExpression n6;
-   TimesExpression n7;
-   ArrayLookup n8;
-   ArrayLength n9;
-   MessageSend n10;
-   Clause n11;
+   LessThanExpression n4;
+   GreaterThanExpression n5;
+   LessEqualThanExpression n6;
+   GreaterEqualThanExpression n7;
+   PlusExpression n8;
+   MinusExpression n9;
+   TimesExpression n10;
+   ArrayLookup n11;
+   ArrayLength n12;
+   MessageSend n13;
+   Clause n14;
 
    
 }
@@ -800,36 +802,48 @@ Expression Expression() :
       n3=EqExpression()
       { n0 = new NodeChoice(n3, 2); }
    |
-      LOOKAHEAD(PrimaryExpression() ">")
-      n4=CompareExpression()
+      LOOKAHEAD(PrimaryExpression() "<")
+      n4=LessThanExpression()
       { n0 = new NodeChoice(n4, 3); }
    |
-      LOOKAHEAD(PrimaryExpression() "+")
-      n5=PlusExpression()
+      LOOKAHEAD(PrimaryExpression() ">")
+      n5=GreaterThanExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      LOOKAHEAD(PrimaryExpression() "-")
-      n6=MinusExpression()
+      LOOKAHEAD(PrimaryExpression() "<=")
+      n6=LessEqualThanExpression()
       { n0 = new NodeChoice(n6, 5); }
    |
-      LOOKAHEAD(PrimaryExpression() "*")
-      n7=TimesExpression()
+      LOOKAHEAD(PrimaryExpression() ">=")
+      n7=GreaterEqualThanExpression()
       { n0 = new NodeChoice(n7, 6); }
    |
-      LOOKAHEAD(PrimaryExpression() "[")
-      n8=ArrayLookup()
+      LOOKAHEAD(PrimaryExpression() "+")
+      n8=PlusExpression()
       { n0 = new NodeChoice(n8, 7); }
    |
-      LOOKAHEAD(PrimaryExpression() "." "length")
-      n9=ArrayLength()
+      LOOKAHEAD(PrimaryExpression() "-")
+      n9=MinusExpression()
       { n0 = new NodeChoice(n9, 8); }
    |
-      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
-      n10=MessageSend()
+      LOOKAHEAD(PrimaryExpression() "*")
+      n10=TimesExpression()
       { n0 = new NodeChoice(n10, 9); }
    |
-      n11=Clause()
+      LOOKAHEAD(PrimaryExpression() "[")
+      n11=ArrayLookup()
       { n0 = new NodeChoice(n11, 10); }
+   |
+      LOOKAHEAD(PrimaryExpression() "." "length")
+      n12=ArrayLength()
+      { n0 = new NodeChoice(n12, 11); }
+   |
+      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
+      n13=MessageSend()
+      { n0 = new NodeChoice(n13, 12); }
+   |
+      n14=Clause()
+      { n0 = new NodeChoice(n14, 13); }
    )
    
    { return new Expression(n0); }
@@ -886,7 +900,24 @@ EqExpression EqExpression() :
    { return new EqExpression(n0,n1,n3); }
 }
 
-CompareExpression CompareExpression() :
+LessThanExpression LessThanExpression() :
+{
+   PrimaryExpression n0;
+   NodeToken n1;
+   Token n2;
+   PrimaryExpression n3;
+
+   
+}
+{
+   n0=PrimaryExpression()
+   n2="<" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n3=PrimaryExpression()
+   
+   { return new LessThanExpression(n0,n1,n3); }
+}
+
+GreaterThanExpression GreaterThanExpression() :
 {
    PrimaryExpression n0;
    NodeToken n1;
@@ -900,7 +931,41 @@ CompareExpression CompareExpression() :
    n2=">" { n1 = JTBToolkit.makeNodeToken(n2); }
    n3=PrimaryExpression()
    
-   { return new CompareExpression(n0,n1,n3); }
+   { return new GreaterThanExpression(n0,n1,n3); }
+}
+
+LessEqualThanExpression LessEqualThanExpression() :
+{
+   PrimaryExpression n0;
+   NodeToken n1;
+   Token n2;
+   PrimaryExpression n3;
+
+   
+}
+{
+   n0=PrimaryExpression()
+   n2="<=" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n3=PrimaryExpression()
+   
+   { return new LessEqualThanExpression(n0,n1,n3); }
+}
+
+GreaterEqualThanExpression GreaterEqualThanExpression() :
+{
+   PrimaryExpression n0;
+   NodeToken n1;
+   Token n2;
+   PrimaryExpression n3;
+
+   
+}
+{
+   n0=PrimaryExpression()
+   n2=">=" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n3=PrimaryExpression()
+   
+   { return new GreaterEqualThanExpression(n0,n1,n3); }
 }
 
 PlusExpression PlusExpression() :

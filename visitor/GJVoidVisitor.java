@@ -255,7 +255,10 @@ public interface GJVoidVisitor<A> {
     * f0 -> AndExpression()
     *       | OrExpression()
     *       | EqExpression()
-    *       | CompareExpression()
+    *       | LessThanExpression()
+    *       | GreaterThanExpression()
+    *       | LessEqualThanExpression()
+    *       | GreaterEqualThanExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -289,10 +292,31 @@ public interface GJVoidVisitor<A> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "<"
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessThanExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
-   public void visit(CompareExpression n, A argu) throws Exception;
+   public void visit(GreaterThanExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessEqualThanExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterEqualThanExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

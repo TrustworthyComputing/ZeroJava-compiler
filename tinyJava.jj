@@ -50,7 +50,7 @@ TOKEN :
 | < IF: "if" >
 | < WHILE: "while" >
 | < INTEGER: "int" >   
-| < LENGTH: "length" >
+// | < LENGTH: "length" >
 | < MAIN: "main" >
 | < NEW: "new" >
 | < PUBLIC: "public" >
@@ -322,8 +322,17 @@ void Expression() :
   LOOKAHEAD( PrimaryExpression() "==" )
   EqExpression()
 |
+  LOOKAHEAD( PrimaryExpression() "<" )
+  LessThanExpression()
+|
   LOOKAHEAD( PrimaryExpression() ">" )
-  CompareExpression()
+  GreaterThanExpression()
+|
+  LOOKAHEAD( PrimaryExpression() "<=" )
+  LessEqualThanExpression()
+|
+  LOOKAHEAD( PrimaryExpression() ">=" )
+  GreaterEqualThanExpression()
 |
   LOOKAHEAD( PrimaryExpression() "+" )
   PlusExpression()
@@ -365,10 +374,28 @@ void EqExpression() :
   PrimaryExpression() "==" PrimaryExpression()
 }
 
-void CompareExpression() :
+void LessThanExpression() :
+{} 
+{
+  PrimaryExpression() "<" PrimaryExpression()
+}
+
+void GreaterThanExpression() :
 {} 
 {
   PrimaryExpression() ">" PrimaryExpression()
+}
+
+void LessEqualThanExpression() :
+{} 
+{
+  PrimaryExpression() "<=" PrimaryExpression()
+}
+
+void GreaterEqualThanExpression() :
+{} 
+{
+  PrimaryExpression() ">=" PrimaryExpression()
 }
 
 void PlusExpression() :

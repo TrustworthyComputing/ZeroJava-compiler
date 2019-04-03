@@ -335,7 +335,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 	/**
 	* f0 -> AndExpression()
-	*       | CompareExpression()
+	*       | LessThanExpression()
+	*       | GreaterThanExpression()
 	*       | PlusExpression()
 	*       | MinusExpression()
 	*       | TimesExpression()
@@ -388,13 +389,49 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	
 	/**
 	* f0 -> PrimaryExpression()
+	* f1 -> "<"
+	* f2 -> PrimaryExpression()
+	*/
+	public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
+		this.result += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
+		return new Variable_t(t2, null);
+	}
+	
+	/**
+	* f0 -> PrimaryExpression()
 	* f1 -> ">"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(CompareExpression n, BaseType argu) throws Exception {
+	public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		return new Variable_t(t1, null);
+	}
+	
+	/**
+	* f0 -> PrimaryExpression()
+	* f1 -> "<="
+	* f2 -> PrimaryExpression()
+	*/
+	public BaseType visit(LessEqualThanExpression n, BaseType argu) throws Exception {
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
+		this.result += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
+		return new Variable_t(t2, null);
+	}
+	
+	/**
+	* f0 -> PrimaryExpression()
+	* f1 -> ">="
+	* f2 -> PrimaryExpression()
+	*/
+	public BaseType visit(GreaterEqualThanExpression n, BaseType argu) throws Exception {
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
+		this.result += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
 		return new Variable_t(t1, null);
 	}
 	
