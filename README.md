@@ -37,9 +37,19 @@ TinyJava supports three types: int, boolean, and int [ ] which is an array of in
 | ANSWER ri rj A | return A                                             |
 
 
+## Compilation & Execution:
+To compile the compiler type `make`.
+
+Then, use the `tjrc` script to compile TinyJava programs to TinyRAM assembly code.
+Below are some usage examples.
+
+
 ### TinyJava Examples:
 
 A simple program that performs addition:
+```
+./tjrc tinyjava-examples/simpleAdd.java
+```
 ```
 class SimpleAdd {
 	public static void main(String[] a){
@@ -61,6 +71,9 @@ ANSWER r3 r3 r3
 ```
 
 A more complex program that reads inputs from the primary tape and adds them all together:
+```
+./tjrc tinyjava-examples/Addloop.java
+```
 ```
 class AddLoop {
 	public static void main(String[] a){
@@ -94,6 +107,8 @@ JMP r0 r0 __L1__
 __L2__
 ANSWER r3 r3 r3
 ```
+
+More TinyJava examples can be found in the [tinyjava-examples](./tinyjava-examples) directory.
 
 
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group

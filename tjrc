@@ -1,0 +1,8 @@
+#!/bin/bash
+
+JVM="java"
+
+for file in $@ 
+do
+	$JVM Main $file
+done
