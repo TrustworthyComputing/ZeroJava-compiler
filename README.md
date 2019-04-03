@@ -5,5 +5,6 @@ A compiler to translate a custom Java-like subset (TinyJava) to TinyRAM.
 
 
 
-[logo]: ./rsz_1dr.jpg
+[logo]: ./logo.jpg
+
 [badge-license]: https://img.shields.io/badge/license-MIT-green.svg?style=flat-square
