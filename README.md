@@ -96,7 +96,7 @@ ANSWER r3 r3 r3
 ```
 
 
-#### An open-source project by Trustworthy Computing Group ![alt text][twc-logo]
+### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group
 
 
 [logo]: ./logos/logo.jpg
