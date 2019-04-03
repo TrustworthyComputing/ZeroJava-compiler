@@ -1,4 +1,4 @@
-# TinyJava to TinyRAM compiler ![alt text][logo] [![License MIT][badge-license]](LICENSE) 
+# ![alt text][logo] TinyJava to TinyRAM compiler [![License MIT][badge-license]](LICENSE) 
 
 A compiler to translate a custom Java-like subset (TinyJava) to TinyRAM. 
 
