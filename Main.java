@@ -25,7 +25,7 @@ public class Main {
                     SymbolTable ST = secondvisit.getSymbolTable();
                     TinyRAMGenVisitor generator = new TinyRAMGenVisitor(ST);
                     root.accept(generator, null);
-                    ST.printST();       // printing the symbol table
+                    // ST.printST();       // printing the symbol table
                     File fp = new File(args[i]);
                     String path = fp.getPath();
                     path = path.substring(0, path.lastIndexOf('.'));

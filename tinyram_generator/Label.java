@@ -7,6 +7,4 @@ public class Label {
 
 	public String new_label() { return new String("__L" + this.cnt++ + "__"); }
 
-	public String new_Class_label(String str) { return new String(str + "_vTable"); }
-
 }

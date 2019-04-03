@@ -74,13 +74,14 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			String newTemp = new String("r" + ++symTable.glob_temp_cnt_);
 			if ((meth = meth.comesFrom.getMethod(meth.getName())) != null) {		// if you found method
 				meth.addTempToVar(varName, newTemp);
-			} else
+			} else {
 				throw new Exception("VarDeclaration Errror 1");
-			// this.result += new String("MOV " + newTemp + " " + newTemp + " 0\n");
+			}
 		} else {																	// is a var (field) of a class
 			Class_t cl = symTable.contains(meth.getName());
-			if (cl == null)															// do nothing for now
+			if (cl == null) {														// do nothing for now
 				throw new Exception("VarDeclaration Errror 2");
+			}
 		}
 		return null;
 	}
@@ -272,7 +273,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
 		String lstart = L.new_label();
 		String lend = L.new_label();
-		this.result += "\n" + lstart + "\n";
+		this.result += lstart + "\n";
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
 		this.result += "CNJMP " + expr + " " + expr + " " + lend + "\n";
 		n.f4.accept(this, argu);
@@ -560,8 +561,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(Identifier n, BaseType argu) throws Exception {
 		String id = n.f0.toString();
-		if (argu == null) 
+		if (argu == null) {
 			return new Variable_t(null, id);
+		}
 		Class_t cl = symTable.contains(argu.getName());
 		Variable_t var;
 		if (cl != null) {									// if argu is a class name
