@@ -420,7 +420,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    /**
     * f0 -> "PrimaryTape.read"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */
@@ -437,7 +437,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    /**
     * f0 -> "PrivateTape.read"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */
@@ -454,7 +454,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    /**
     * f0 -> "Prover.answer"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */

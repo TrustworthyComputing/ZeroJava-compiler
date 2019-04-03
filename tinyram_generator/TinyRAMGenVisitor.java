@@ -297,7 +297,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "PrimaryTape.read"
 	* f1 -> "("
-	* f2 -> Identifier()
+	* f2 -> Expression()
 	* f3 -> ")"
 	* f4 -> ";"
 	*/
@@ -310,7 +310,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "PrivateTape.read"
 	* f1 -> "("
-	* f2 -> Identifier()
+	* f2 -> Expression()
 	* f3 -> ")"
 	* f4 -> ";"
 	*/
@@ -323,7 +323,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "Answer"
 	* f1 -> "("
-	* f2 -> Identifier()
+	* f2 -> Expression()
 	* f3 -> ")"
 	* f4 -> ";"
 	*/

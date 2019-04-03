@@ -721,7 +721,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -730,7 +730,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
-    n4 = Identifier();
+    n4 = Expression();
     n6 = jj_consume_token(RPAREN);
             n5 = JTBToolkit.makeNodeToken(n6);
     n8 = jj_consume_token(SEMICOLON);
@@ -744,7 +744,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -753,7 +753,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
-    n4 = Identifier();
+    n4 = Expression();
     n6 = jj_consume_token(RPAREN);
             n5 = JTBToolkit.makeNodeToken(n6);
     n8 = jj_consume_token(SEMICOLON);
@@ -767,7 +767,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -776,7 +776,7 @@ public class TinyJavaParser implements TinyJavaParserConstants {
                         n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
-    n4 = Identifier();
+    n4 = Expression();
     n6 = jj_consume_token(RPAREN);
             n5 = JTBToolkit.makeNodeToken(n6);
     n8 = jj_consume_token(SEMICOLON);

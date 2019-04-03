@@ -8,18 +8,18 @@ package syntaxtree;
  * Grammar production:
  * f0 -> "Prover.answer"
  * f1 -> "("
- * f2 -> Identifier()
+ * f2 -> Expression()
  * f3 -> ")"
  * f4 -> ";"
  */
 public class AnswerStatement implements Node {
    public NodeToken f0;
    public NodeToken f1;
-   public Identifier f2;
+   public Expression f2;
    public NodeToken f3;
    public NodeToken f4;
 
-   public AnswerStatement(NodeToken n0, NodeToken n1, Identifier n2, NodeToken n3, NodeToken n4) {
+   public AnswerStatement(NodeToken n0, NodeToken n1, Expression n2, NodeToken n3, NodeToken n4) {
       f0 = n0;
       f1 = n1;
       f2 = n2;
@@ -27,7 +27,7 @@ public class AnswerStatement implements Node {
       f4 = n4;
    }
 
-   public AnswerStatement(Identifier n0) {
+   public AnswerStatement(Expression n0) {
       f0 = new NodeToken("Prover.answer");
       f1 = new NodeToken("(");
       f2 = n0;

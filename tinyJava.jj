@@ -294,19 +294,19 @@ void PrintStatement() :
 void ReadPrimaryTape() :
 {}
 {
-  "PrimaryTape.read" "(" Identifier() ")" ";"
+  "PrimaryTape.read" "(" Expression() ")" ";"
 }
 
 void ReadPrivateTape() :
 {}
 {
-  "PrivateTape.read" "(" Identifier() ")" ";"
+  "PrivateTape.read" "(" Expression() ")" ";"
 }
 
 void AnswerStatement() :
 {}
 {
-  "Prover.answer" "(" Identifier() ")" ";"
+  "Prover.answer" "(" Expression() ")" ";"
 }
 
 

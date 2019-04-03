@@ -703,7 +703,7 @@ ReadPrimaryTape ReadPrimaryTape() :
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -714,7 +714,7 @@ ReadPrimaryTape ReadPrimaryTape() :
 {
    n1="PrimaryTape.read" { n0 = JTBToolkit.makeNodeToken(n1); }
    n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
-   n4=Identifier()
+   n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
    n8=";" { n7 = JTBToolkit.makeNodeToken(n8); }
    
@@ -727,7 +727,7 @@ ReadPrivateTape ReadPrivateTape() :
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -738,7 +738,7 @@ ReadPrivateTape ReadPrivateTape() :
 {
    n1="PrivateTape.read" { n0 = JTBToolkit.makeNodeToken(n1); }
    n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
-   n4=Identifier()
+   n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
    n8=";" { n7 = JTBToolkit.makeNodeToken(n8); }
    
@@ -751,7 +751,7 @@ AnswerStatement AnswerStatement() :
    Token n1;
    NodeToken n2;
    Token n3;
-   Identifier n4;
+   Expression n4;
    NodeToken n5;
    Token n6;
    NodeToken n7;
@@ -762,7 +762,7 @@ AnswerStatement AnswerStatement() :
 {
    n1="Prover.answer" { n0 = JTBToolkit.makeNodeToken(n1); }
    n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
-   n4=Identifier()
+   n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
    n8=";" { n7 = JTBToolkit.makeNodeToken(n8); }
    

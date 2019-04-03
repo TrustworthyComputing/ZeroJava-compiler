@@ -372,7 +372,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    /**
     * f0 -> "PrimaryTape.read"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */
@@ -387,7 +387,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    /**
     * f0 -> "PrivateTape.read"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */
@@ -402,7 +402,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    /**
     * f0 -> "Prover.answer"
     * f1 -> "("
-    * f2 -> Identifier()
+    * f2 -> Expression()
     * f3 -> ")"
     * f4 -> ";"
     */

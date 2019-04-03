@@ -13,7 +13,7 @@ class IfElse {
 			if ((cond > 0) && (x == 3)) {
 				x = x * 2;
 			} else {
-				x = 0;
+				x = x * 2;
 			}
 		} else {
 			x = 1;

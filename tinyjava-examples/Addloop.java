@@ -1,14 +1,13 @@
-class Add {
+class AddLoop {
 	public static void main(String[] a){
-		int j;
-		int x;
+		int i;
+		int from_tape;
 		int res;
-		j = 0 ;
-		while (5 > j) {
-			PrimaryTape.read(x);
-			res = res + x;
-			
-			j = j + 1 ;
+		i = 0 ;
+		while (5 > i) {
+			PrimaryTape.read(from_tape);
+			res = res + from_tape;
+			i = i + 1;
 		}
 		Prover.answer(res);
 	}
