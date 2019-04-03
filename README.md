@@ -96,6 +96,11 @@ ANSWER r3 r3 r3
 ```
 
 
-[logo]: ./logo.jpg
+#### An open-source project by Trustworthy Computing Group ![alt text][twc-logo]
+
+
+[logo]: ./logos/logo.jpg
+
+[twc-logo]: ./logos/twc.png
 
 [badge-license]: https://img.shields.io/badge/license-MIT-green.svg?style=flat-square
