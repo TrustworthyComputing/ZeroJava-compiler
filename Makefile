@@ -1,7 +1,7 @@
 all: compile
 
 compile:
-	java -jar jtb132di.jar -te tinyJava.jj
+	java -jar jtb-custom.jar -te tinyJava.jj
 	javacc tinyJava-jtb.jj
 	javac Main.java
 	javac base_type/*.java
