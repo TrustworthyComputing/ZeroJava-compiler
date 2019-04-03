@@ -1,5 +1,9 @@
-# TinyRAM-compiler [![License MIT][badge-license]](LICENSE)
+# TinyJava to TinyRAM compiler ![alt text][logo] [![License MIT][badge-license]](LICENSE) 
 
-Java-like subset to TinyRAM Compiler
+A compiler to translate a custom Java-like subset (TinyJava) to TinyRAM. 
 
+
+
+
+[logo]: ./rsz_1dr.jpg
 [badge-license]: https://img.shields.io/badge/license-MIT-green.svg?style=flat-square
