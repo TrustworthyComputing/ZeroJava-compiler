@@ -409,6 +409,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public R visit(Expression n, A argu) throws Exception {
@@ -580,6 +581,21 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    }
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public R visit(MethodCall n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      return _ret;
+   }
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -621,7 +637,6 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -655,13 +670,6 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f0 -> <IDENTIFIER>
     */
    public R visit(Identifier n, A argu) throws Exception {
-      return n.f0.accept(this, argu);
-   }
-
-   /**
-    * f0 -> "this"
-    */
-   public R visit(ThisExpression n, A argu) throws Exception {
       return n.f0.accept(this, argu);
    }
 

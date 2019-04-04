@@ -6,26 +6,29 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> AndExpression()
- *       | OrExpression()
- *       | EqExpression()
- *       | LessThanExpression()
- *       | GreaterThanExpression()
- *       | LessEqualThanExpression()
- *       | GreaterEqualThanExpression()
- *       | PlusExpression()
- *       | MinusExpression()
- *       | TimesExpression()
- *       | ArrayLookup()
- *       | MessageSend()
- *       | MethodCall()
- *       | Clause()
+ * f0 -> Identifier()
+ * f1 -> "("
+ * f2 -> ( ExpressionList() )?
+ * f3 -> ")"
  */
-public class Expression implements Node {
-   public NodeChoice f0;
+public class MethodCall implements Node {
+   public Identifier f0;
+   public NodeToken f1;
+   public NodeOptional f2;
+   public NodeToken f3;
 
-   public Expression(NodeChoice n0) {
+   public MethodCall(Identifier n0, NodeToken n1, NodeOptional n2, NodeToken n3) {
       f0 = n0;
+      f1 = n1;
+      f2 = n2;
+      f3 = n3;
+   }
+
+   public MethodCall(Identifier n0, NodeOptional n1) {
+      f0 = n0;
+      f1 = new NodeToken("(");
+      f2 = n1;
+      f3 = new NodeToken(")");
    }
 
    public void accept(visitor.Visitor v) throws Exception {

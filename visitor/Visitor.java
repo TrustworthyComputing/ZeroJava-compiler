@@ -225,6 +225,7 @@ public interface Visitor {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public void visit(Expression n) throws Exception;
@@ -318,6 +319,14 @@ public interface Visitor {
    public void visit(MessageSend n) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public void visit(MethodCall n) throws Exception;
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -345,7 +354,6 @@ public interface Visitor {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -371,11 +379,6 @@ public interface Visitor {
     * f0 -> <IDENTIFIER>
     */
    public void visit(Identifier n) throws Exception;
-
-   /**
-    * f0 -> "this"
-    */
-   public void visit(ThisExpression n) throws Exception;
 
    /**
     * f0 -> "new"

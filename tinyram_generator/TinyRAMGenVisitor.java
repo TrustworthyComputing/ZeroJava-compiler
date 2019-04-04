@@ -7,16 +7,21 @@ import symbol_table.*;
 import base_type.*;
 
 public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
-	public String result;
+	public String result_;
 	private Label L;
-	private SymbolTable symTable;
+	private Map<String, Method_t> st_;
 	
-	private int base_addr_ = 1000;
-	private boolean immediate_ = false;
+	private int glob_temp_cnt_;
+	private int base_addr_;
+	private boolean immediate_;
 
-	public TinyRAMGenVisitor(SymbolTable symTable) {
+	public TinyRAMGenVisitor(Map<String, Method_t> st) {
 		this.L = new Label();
-        this.symTable = symTable;   
+        this.st_ = st;
+		this.glob_temp_cnt_ = 0;
+		this.base_addr_ = 1000;
+		this.immediate_ = false;
+		this.result_ = new String();
 	}
 
 
@@ -33,32 +38,49 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	* f0 -> "class"
-	* f1 -> Identifier()
-	* f2 -> "{"
-	* f3 -> "public"
-	* f4 -> "static"
-	* f5 -> "void"
-	* f6 -> "main"
-	* f7 -> "("
-	* f8 -> "String"
-	* f9 -> "["
-	* f10 -> "]"
-	* f11 -> Identifier()
-	* f12 -> ")"
-	* f13 -> "{"
-	* f14 -> ( VarDeclaration() )*
-	* f15 -> ( Statement() )*
-	* f16 -> "}"
-	* f17 -> "}"
-	*/
-	public BaseType visit(MainClass n, BaseType argu) throws Exception {
-		this.result = new String();
-		String id = n.f1.accept(this, argu).getName();
-        Program_t mainclazz = symTable.contains(id);
-        Method_t meth = mainclazz.getMethod("main");
-		n.f14.accept(this, meth);
-		n.f15.accept(this, meth);
+	 * f0 -> "void"
+	 * f1 -> "main"
+	 * f2 -> "("
+	 * f3 -> "void"
+	 * f4 -> ")"
+	 * f5 -> "{"
+	 * f6 -> ( VarDeclaration() )*
+	 * f7 -> ( Statement() )*
+	 * f8 -> "}"
+	 */
+	public BaseType visit(MainMethodDeclaration n, BaseType argu) throws Exception {
+		String methName = new String("main");
+		Method_t meth = this.st_.get(methName);
+		this.result_ += "\n__BEGIN_MAIN__\n";
+		n.f6.accept(this, meth);
+		n.f7.accept(this, meth);
+		this.result_ += "__END_MAIN__\n";
+		return null;
+	}
+	
+	/**
+	 * f0 -> Type()
+	 * f1 -> Identifier()
+	 * f2 -> "("
+	 * f3 -> ( FormalParameterList() )?
+	 * f4 -> ")"
+	 * f5 -> "{"
+	 * f6 -> ( VarDeclaration() )*
+	 * f7 -> ( Statement() )*
+	 * f8 -> "return"
+	 * f9 -> Expression()
+	 * f10 -> ";"
+	 * f11 -> "}"
+	 */
+	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
+		String methName = n.f1.accept(this, argu).getName();
+		Method_t meth = this.st_.get(methName);
+		this.result_ += "\n__BEGIN_" + methName + "__\n";
+		n.f6.accept(this, meth);
+		n.f7.accept(this, meth);
+		Variable_t retType = (Variable_t) n.f9.accept(this, meth);
+		this.result_ += "RETURN " + retType.getType() + "\n";
+		this.result_ += "__END_" + methName + "__\n";
 		return null;
 	}
 
@@ -70,71 +92,16 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(VarDeclaration n, BaseType argu) throws Exception {
 		Method_t meth = (Method_t) argu;
 		String varName = n.f1.f0.toString();
-		if (meth.comesFrom != null) { 												// is a variable of a function
-			String newTemp = new String("r" + ++symTable.glob_temp_cnt_);
-			if ((meth = meth.comesFrom.getMethod(meth.getName())) != null) {		// if you found method
-				meth.addTempToVar(varName, newTemp);
-			} else {
-				throw new Exception("VarDeclaration Errror 1");
-			}
-		} else {																	// is a var (field) of a class
-			Program_t cl = symTable.contains(meth.getName());
-			if (cl == null) {														// do nothing for now
-				throw new Exception("VarDeclaration Errror 2");
-			}
+		String newTemp = new String("r" + ++glob_temp_cnt_);
+		meth = st_.get(meth.getName());
+		if (meth != null) {		// if you found method
+			meth.addTempToVar(varName, newTemp);
+		} else {
+			throw new Exception("VarDeclaration Errror 1");
 		}
 		return null;
 	}
-
-
-	/**
-     * f0 -> "void"
-     * f1 -> "main"
-     * f2 -> "("
-     * f3 -> ( FormalParameterList() )?
-     * f4 -> ")"
-     * f5 -> "{"
-     * f6 -> ( VarDeclaration() )*
-     * f7 -> ( Statement() )*
-     * f8 -> "}"
-     */
-    public void visit(MainMethodDeclaration n) throws Exception {
-		String methName = "main";
-		Method_t meth = ((Program_t) argu).getMethod(methName);
-		this.result += "\n" + ((Program_t) argu).getName()+ "_" + methName + "[" + (meth.par_cnt+1) + "]\nBEGIN\n";
-		n.f6.accept(this, meth);
-		n.f7.accept(this, meth);
-		Variable_t retType = (Variable_t) n.f10.accept(this, meth);
-		this.result += "RETURN " + retType.getType() + "\nEND\n";
-		return null;
-	}
 	
-	/**
-	* f0 -> "public"
-	* f1 -> Type()
-	* f2 -> Identifier()
-	* f3 -> "("
-	* f4 -> ( FormalParameterList() )?
-	* f5 -> ")"
-	* f6 -> "{"
-	* f7 -> ( VarDeclaration() )*
-	* f8 -> ( Statement() )*
-	* f9 -> "return"
-	* f10 -> Expression()
-	* f11 -> ";"
-	* f12 -> "}"
-	*/
-	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
-		String methName = n.f2.accept(this, argu).getName();
-        Method_t meth = ((Program_t) argu).getMethod(methName);
-        this.result += "\n" + ((Program_t) argu).getName()+ "_" + methName + "[" + (meth.par_cnt+1) + "]\nBEGIN\n";
-        n.f7.accept(this, meth);
-        n.f8.accept(this, meth);
-        Variable_t retType = (Variable_t) n.f10.accept(this, meth);
-        this.result += "RETURN " + retType.getType() + "\nEND\n";
-        return null;
-	}
-
 	/**
 	* f0 -> FormalParameter()
 	* f1 -> FormalParameterTail()
@@ -203,7 +170,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | IfStatement()
 	*       | WhileStatement()
 	*       | PrintStatement()
-	*       | PrintStatement2()
+	*       | ReadPrimaryTape()
+	* 		| ReadPrivateTape()
+	* 		| AnswerStatement()
 	*/
 	public BaseType visit(Statement n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
@@ -235,7 +204,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		Method_t meth = (Method_t) argu;
 		if (meth != null) { 
 			var = meth.methContainsVar(id);
-			this.result += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+			this.result_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
 		}
 		return null;
 	}
@@ -255,13 +224,13 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.immediate_ = true;
 		String expr = ((Variable_t) n.f5.accept(this, argu)).getType();
 		this.immediate_ = false;
-		String res = new String("r" + ++symTable.glob_temp_cnt_);
+		String res = new String("r" + ++glob_temp_cnt_);
 		
-		this.result += "ADD " + array + " " + array + " " + idx + "\n";
-		this.result += "MOV " + res + " " + res + " " + expr + "\n";
-		this.result += "STORE " + res + " " + res + " " + array + "\n";
-		this.result += "SUB " + array + " " + array + " " + idx + "\n";
-		this.result += "\n";
+		this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
+		this.result_ += "MOV " + res + " " + res + " " + expr + "\n";
+		this.result_ += "STORE " + res + " " + res + " " + array + "\n";
+		this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
+		this.result_ += "\n";
 		return new Variable_t(res, null);
 	}
 	
@@ -278,11 +247,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String elselabel = L.new_label();
 		String endlabel = L.new_label();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
+		this.result_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
 		n.f4.accept(this, argu);
-		this.result += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
+		this.result_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
 		n.f6.accept(this, argu);
-		this.result += endlabel + "\n";
+		this.result_ += endlabel + "\n";
 		return null;
 	}
 
@@ -296,11 +265,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
 		String lstart = L.new_label();
 		String lend = L.new_label();
-		this.result += lstart + "\n";
+		this.result_ += lstart + "\n";
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "CNJMP " + expr + " " + expr + " " + lend + "\n";
+		this.result_ += "CNJMP " + expr + " " + expr + " " + lend + "\n";
 		n.f4.accept(this, argu);
-		this.result += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
+		this.result_ += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
 		return null;
 	}
 
@@ -313,7 +282,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(PrintStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "PRINT " + t + " " + t + " " + t +"\n";
+		this.result_ += "PRINT " + t + " " + t + " " + t +"\n";
 		return null;
 	}
 	
@@ -326,7 +295,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(ReadPrimaryTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "READ " + t + " " + t + " " + 0 +"\n";
+		this.result_ += "READ " + t + " " + t + " " + 0 +"\n";
 		return null;
 	}
 	
@@ -339,7 +308,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(ReadPrivateTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "READ " + t + " " + t + " " + 1 +"\n";
+		this.result_ += "READ " + t + " " + t + " " + 1 +"\n";
 		return null;
 	}
 	
@@ -352,19 +321,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(AnswerStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += "ANSWER " + t + " " + t + " " + t +"\n";
+		this.result_ += "ANSWER " + t + " " + t + " " + t +"\n";
 		return null;
 	}
 
 	/**
 	* f0 -> AndExpression()
+	* 		| OrExpression()
+	* 		| EqExpression()
 	*       | LessThanExpression()
 	*       | GreaterThanExpression()
+	*		| LessEqualThanExpression()
+	*		| GreaterEqualThanExpression()
 	*       | PlusExpression()
 	*       | MinusExpression()
 	*       | TimesExpression()
 	*       | ArrayLookup()
-	*       | ArrayLength()
 	*       | MessageSend()
 	*       | Clause()
 	*/
@@ -379,13 +351,13 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
 		String l1 = L.new_label();
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-		this.result += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+		this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
-		this.result += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result += new String(l1 + "\n");
+		this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
+		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result_ += new String(l1 + "\n");
 		return new Variable_t(ret, null);
 	}
 	
@@ -397,16 +369,16 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
 		String l1 = L.new_label();
 		String l2 = L.new_label();
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-		this.result += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
-		this.result += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result += new String("JMP r0 r0 " + l2 + "\n");
-		this.result += new String(l1 + "\n");
+		this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result_ += new String("JMP r0 r0 " + l2 + "\n");
+		this.result_ += new String(l1 + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
-		this.result += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result += new String(l2 + "\n");
+		this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
+		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+		this.result_ += new String(l2 + "\n");
 		return new Variable_t(ret, null);
 	}
 	
@@ -418,7 +390,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
+		this.result_ += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
 		return new Variable_t(t2, null);
 	}
 	
@@ -430,7 +402,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		this.result_ += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
 		return new Variable_t(t1, null);
 	}
 	
@@ -442,7 +414,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
+		this.result_ += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
 		return new Variable_t(t2, null);
 	}
 	
@@ -454,7 +426,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
+		this.result_ += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
 		return new Variable_t(t1, null);
 	}
 	
@@ -466,7 +438,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(EqExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
+		this.result_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
 		return new Variable_t(t1, null);
 	}
 
@@ -476,10 +448,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(PlusExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
+		this.result_ += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
 		return new Variable_t(ret, null);
 	}
 
@@ -489,10 +461,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(MinusExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
+		this.result_ += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
 		return new Variable_t(ret, null);
 	}
 
@@ -502,10 +474,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(TimesExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
+		this.result_ += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
 		return new Variable_t(ret, null);
 	}
 	
@@ -518,11 +490,31 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ArrayLookup n, BaseType argu) throws Exception {
 		String array = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getType();		
-		String res = new String("r" + ++symTable.glob_temp_cnt_);
-		this.result += "ADD " + array + " " + array + " " + idx + "\n";
-		this.result += "LOAD " + res + " " + res + " " + array + "\n";
-		this.result += "SUB " + array + " " + array + " " + idx + "\n";
-		this.result += "\n";
+		String res = new String("r" + ++glob_temp_cnt_);
+		this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
+		this.result_ += "LOAD " + res + " " + res + " " + array + "\n";
+		this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
+		this.result_ += "\n";
+		return new Variable_t(res, null);
+	}
+	
+	/**
+	 * f0 -> Identifier()
+	 * f1 -> "("
+	 * f2 -> ( ExpressionList() )?
+	 * f3 -> ")"
+	 */
+	public BaseType visit(MethodCall n, BaseType argu) throws Exception {
+		Variable_t v = (Variable_t) n.f0.accept(this, argu);
+		String mname = v.getName();
+		String mtype = v.getType();
+		Method_t meth = this.st_.get(mname);
+		
+		System.out.println("Going to call " + mtype + " " + mname);
+		
+		n.f2.accept(this, argu);
+		
+		String res = new String("r99");
 		return new Variable_t(res, null);
 	}
 
@@ -577,7 +569,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | TrueLiteral()
 	*       | FalseLiteral()
 	*       | Identifier()
-	*       | ThisExpression()
 	*       | ArrayAllocationExpression()
 	*       | AllocationExpression()
 	*       | BracketExpression()
@@ -591,8 +582,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
 		if (!immediate_) {
-			String ret = "r" + ++symTable.glob_temp_cnt_;
-			this.result += "MOV " + ret + " " + ret + " " + n.f0.toString() + "\n";
+			String ret = "r" + ++glob_temp_cnt_;
+			this.result_ += "MOV " + ret + " " + ret + " " + n.f0.toString() + "\n";
 			return new Variable_t(ret, null);
 		}
 		return new Variable_t(n.f0.toString(), null);
@@ -602,8 +593,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> "true"
 	*/
 	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
-		this.result += new String("MOV " + ret + " " + ret + " 1\n");
+		String ret = new String("r" + ++glob_temp_cnt_);
+		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
 		return new Variable_t(ret, null);
 	}
 
@@ -611,8 +602,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> "false"
 	*/
 	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
-		this.result += new String("MOV " + ret + " " + ret + " 0\n");
+		String ret = new String("r" + ++glob_temp_cnt_);
+		this.result_ += new String("MOV " + ret + " " + ret + " 0\n");
 		return new Variable_t(ret, null);
 	}
 
@@ -624,38 +615,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (argu == null) {
 			return new Variable_t(null, id);
 		}
-		Program_t cl = symTable.contains(argu.getName());
-		Variable_t var;
-		if (cl != null) {									// if argu is a class name
-			var = cl.classContainsVarReverse(id);
-			if (var != null) {								// and id is a field of that class
-				Variable_t v = new Variable_t(var.getTemp(), id);
-				v.var_temp = cl.getName();
-				return v;
-			} else {										// is a method
-				Method_t meth = cl.getMethod(id);
-				if (meth == null) { throw new Exception("something went wrong 1"); }
-				return new Variable_t(null, id);
-			}
-		} else {											// if argu is a method name 
-			Method_t meth = (Method_t) argu;
-			var = meth.methContainsVar(id);				
-			if (var != null) {								// if a parameter or a local var
-				Variable_t v = new Variable_t(var.getTemp(), id);
-				v.var_temp = var.getType();
-				return v;
-			} else {										// a field of class
-				cl = symTable.contains(meth.comesFrom.getName());
-				if (cl == null) {  throw new Exception("something went wrong 2"); }
-				var = cl.classContainsVarReverse(id);
-				if (var == null) {  return new Variable_t(null, id);  }
-				String newTemp = "r" + ++symTable.glob_temp_cnt_;
-				this.result += "LOAD " + newTemp + " r0 " + var.getVarNum()*4 + "\n";
-				Variable_t v = new Variable_t(newTemp, id);
-				v.var_temp = var.getType();
-				return v;
-			}
+		
+		// if argu is a method name -- we are inside method argu.getName()
+		Method_t meth = (Method_t) argu;
+		Variable_t var = meth.methContainsVar(id);				
+		Variable_t v;
+		if (var != null) { // if a parameter or a local var
+			v = new Variable_t(var.getTemp(), id);
+			v.var_temp = var.getType();
+		} else { // if a function name
+			Method_t m = this.st_.get(id);
+			v = new Variable_t(m.getType(), id);
 		}
+		return v;
+		
+		// System.out.println("returning " + id);
+		// return new Variable_t(null, id);
 	}
 
 	/**
@@ -679,11 +654,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> Clause()
 	*/
 	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++symTable.glob_temp_cnt_);
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String t = ((Variable_t) n.f1.accept(this, argu)).getType();
-		String one = new String("r" + ++symTable.glob_temp_cnt_);
-		this.result += "MOV " + one + " " + one + " 1\n";
-		this.result += "SUB " + ret + " " + one + " " + t + "\n";
+		String one = new String("r" + ++glob_temp_cnt_);
+		this.result_ += "MOV " + one + " " + one + " 1\n";
+		this.result_ += "SUB " + ret + " " + one + " " + t + "\n";
 		return new Variable_t(ret, null);
 	}
 

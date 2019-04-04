@@ -349,6 +349,7 @@ public class DepthFirstVisitor implements Visitor {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public void visit(Expression n) throws Exception {
@@ -496,6 +497,19 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public void visit(MethodCall n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+   }
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -533,7 +547,6 @@ public class DepthFirstVisitor implements Visitor {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -567,13 +580,6 @@ public class DepthFirstVisitor implements Visitor {
     * f0 -> <IDENTIFIER>
     */
    public void visit(Identifier n) throws Exception {
-      n.f0.accept(this);
-   }
-
-   /**
-    * f0 -> "this"
-    */
-   public void visit(ThisExpression n) throws Exception {
       n.f0.accept(this);
    }
 

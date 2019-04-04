@@ -359,6 +359,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public void visit(Expression n, A argu) throws Exception {
@@ -506,6 +507,19 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public void visit(MethodCall n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+   }
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -543,7 +557,6 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -577,13 +590,6 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     * f0 -> <IDENTIFIER>
     */
    public void visit(Identifier n, A argu) throws Exception {
-      n.f0.accept(this, argu);
-   }
-
-   /**
-    * f0 -> "this"
-    */
-   public void visit(ThisExpression n, A argu) throws Exception {
       n.f0.accept(this, argu);
    }
 

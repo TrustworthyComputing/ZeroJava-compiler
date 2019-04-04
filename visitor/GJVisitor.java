@@ -225,6 +225,7 @@ public interface GJVisitor<R,A> {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public R visit(Expression n, A argu) throws Exception;
@@ -318,6 +319,14 @@ public interface GJVisitor<R,A> {
    public R visit(MessageSend n, A argu) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public R visit(MethodCall n, A argu) throws Exception;
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -345,7 +354,6 @@ public interface GJVisitor<R,A> {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -371,11 +379,6 @@ public interface GJVisitor<R,A> {
     * f0 -> <IDENTIFIER>
     */
    public R visit(Identifier n, A argu) throws Exception;
-
-   /**
-    * f0 -> "this"
-    */
-   public R visit(ThisExpression n, A argu) throws Exception;
 
    /**
     * f0 -> "new"

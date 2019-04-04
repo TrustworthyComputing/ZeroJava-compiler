@@ -25,10 +25,10 @@ public class Main {
                 try {
                     root.accept(stvisitor);
                     
-                    Map<String, Method_t> ST = stvisitor.getSymbolTable();
+                    Map<String, Method_t> symbol_table = stvisitor.getSymbolTable();
                                         
-                    // TinyRAMGenVisitor generator = new TinyRAMGenVisitor(ST);
-                    // root.accept(generator, null);
+                    TinyRAMGenVisitor generator = new TinyRAMGenVisitor(symbol_table);
+                    root.accept(generator, null);
                     stvisitor.printST();
                     
                     // File fp = new File(args[i]);
@@ -39,7 +39,7 @@ public class Main {
                     // out.close();
                     // // Print it to stdout as well
                     // System.out.println(path + ".asm\n");
-                    // System.out.print(generator.result);
+                    System.out.print(generator.result_);
                 } catch (Exception ex) {
                     System.out.println("\n\nAn Error Occured: " + ex.getMessage() + "\n\n");
                 }

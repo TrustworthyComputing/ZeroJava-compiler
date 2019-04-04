@@ -1,9 +1,9 @@
 void main(void) {
 	int x;
-	int x2;
 	int y;
 	x = 12;
 	y = 13;
+	x = foo();
 	Prover.answer(x + y);
 }
 

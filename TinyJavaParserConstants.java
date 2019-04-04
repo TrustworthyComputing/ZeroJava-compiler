@@ -77,21 +77,19 @@ public interface TinyJavaParserConstants {
   /** RegularExpression Id. */
   int STRING = 39;
   /** RegularExpression Id. */
-  int THIS = 40;
+  int TRUE = 40;
   /** RegularExpression Id. */
-  int TRUE = 41;
+  int PRINT = 41;
   /** RegularExpression Id. */
-  int PRINT = 42;
+  int VOID = 42;
   /** RegularExpression Id. */
-  int VOID = 43;
+  int INTEGER_LITERAL = 43;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 44;
+  int IDENTIFIER = 44;
   /** RegularExpression Id. */
-  int IDENTIFIER = 45;
+  int LETTER = 45;
   /** RegularExpression Id. */
-  int LETTER = 46;
-  /** RegularExpression Id. */
-  int DIGIT = 47;
+  int DIGIT = 46;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -138,7 +136,6 @@ public interface TinyJavaParserConstants {
     "\"return\"",
     "\"static\"",
     "\"String\"",
-    "\"this\"",
     "\"true\"",
     "\"System.out.println\"",
     "\"void\"",

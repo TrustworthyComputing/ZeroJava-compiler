@@ -225,6 +225,7 @@ public interface GJNoArguVisitor<R> {
     *       | TimesExpression()
     *       | ArrayLookup()
     *       | MessageSend()
+    *       | MethodCall()
     *       | Clause()
     */
    public R visit(Expression n) throws Exception;
@@ -318,6 +319,14 @@ public interface GJNoArguVisitor<R> {
    public R visit(MessageSend n) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "("
+    * f2 -> ( ExpressionList() )?
+    * f3 -> ")"
+    */
+   public R visit(MethodCall n) throws Exception;
+
+   /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -345,7 +354,6 @@ public interface GJNoArguVisitor<R> {
     *       | TrueLiteral()
     *       | FalseLiteral()
     *       | Identifier()
-    *       | ThisExpression()
     *       | ArrayAllocationExpression()
     *       | AllocationExpression()
     *       | BracketExpression()
@@ -371,11 +379,6 @@ public interface GJNoArguVisitor<R> {
     * f0 -> <IDENTIFIER>
     */
    public R visit(Identifier n) throws Exception;
-
-   /**
-    * f0 -> "this"
-    */
-   public R visit(ThisExpression n) throws Exception;
 
    /**
     * f0 -> "new"

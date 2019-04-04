@@ -74,7 +74,6 @@ TOKEN :
    | <RETURN: "return">
    | <STATIC: "static">
    | <STRING: "String">
-   | <THIS: "this">
    | <TRUE: "true">
    | <PRINT: "System.out.println">
    | <VOID: "void">
@@ -652,7 +651,8 @@ Expression Expression() :
    TimesExpression n10;
    ArrayLookup n11;
    MessageSend n12;
-   Clause n13;
+   MethodCall n13;
+   Clause n14;
 
    
 }
@@ -706,8 +706,12 @@ Expression Expression() :
       n12=MessageSend()
       { n0 = new NodeChoice(n12, 11); }
    |
-      n13=Clause()
+      LOOKAHEAD(Identifier() "(")
+      n13=MethodCall()
       { n0 = new NodeChoice(n13, 12); }
+   |
+      n14=Clause()
+      { n0 = new NodeChoice(n14, 13); }
    )
    
    { return new Expression(n0); }
@@ -932,6 +936,30 @@ MessageSend MessageSend() :
    { return new MessageSend(n0,n1,n3,n4,n6,n8); }
 }
 
+MethodCall MethodCall() :
+{
+   Identifier n0;
+   NodeToken n1;
+   Token n2;
+   NodeOptional n3 = new NodeOptional();
+   ExpressionList n4;
+   NodeToken n5;
+   Token n6;
+
+   
+}
+{
+   n0=Identifier()
+   n2="(" { n1 = JTBToolkit.makeNodeToken(n2); }
+   (
+      n4=ExpressionList()
+      { n3.addNode(n4); }
+   )?
+   n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
+   
+   { return new MethodCall(n0,n1,n3,n5); }
+}
+
 ExpressionList ExpressionList() :
 {
    Expression n0;
@@ -1005,10 +1033,9 @@ PrimaryExpression PrimaryExpression() :
    TrueLiteral n2;
    FalseLiteral n3;
    Identifier n4;
-   ThisExpression n5;
-   ArrayAllocationExpression n6;
-   AllocationExpression n7;
-   BracketExpression n8;
+   ArrayAllocationExpression n5;
+   AllocationExpression n6;
+   BracketExpression n7;
 
    
 }
@@ -1026,18 +1053,15 @@ PrimaryExpression PrimaryExpression() :
       n4=Identifier()
       { n0 = new NodeChoice(n4, 3); }
    |
-      n5=ThisExpression()
+      LOOKAHEAD(3)
+      n5=ArrayAllocationExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      LOOKAHEAD(3)
-      n6=ArrayAllocationExpression()
+      n6=AllocationExpression()
       { n0 = new NodeChoice(n6, 5); }
    |
-      n7=AllocationExpression()
+      n7=BracketExpression()
       { n0 = new NodeChoice(n7, 6); }
-   |
-      n8=BracketExpression()
-      { n0 = new NodeChoice(n8, 7); }
    )
    
    { return new PrimaryExpression(n0); }
@@ -1093,19 +1117,6 @@ Identifier Identifier() :
    n1=<IDENTIFIER> { n0 = JTBToolkit.makeNodeToken(n1); }
    
    { return new Identifier(n0); }
-}
-
-ThisExpression ThisExpression() :
-{
-   NodeToken n0;
-   Token n1;
-
-   
-}
-{
-   n1="this" { n0 = JTBToolkit.makeNodeToken(n1); }
-   
-   { return new ThisExpression(n0); }
 }
 
 ArrayAllocationExpression ArrayAllocationExpression() :

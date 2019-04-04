@@ -50,14 +50,12 @@ TOKEN :
 | < IF: "if" >
 | < WHILE: "while" >
 | < INTEGER: "int" >   
-// | < LENGTH: "length" >
 | < MAIN: "main" >
 | < NEW: "new" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
 | < STATIC: "static" >
 | < STRING: "String" >
-| < THIS: "this" >
 | < TRUE: "true" >
 | < PRINT: "System.out.println" >
 | < VOID: "void" >         
@@ -319,12 +317,12 @@ void Expression() :
 |
   LOOKAHEAD( PrimaryExpression() "[" )
   ArrayLookup()
-// |
-  // LOOKAHEAD( PrimaryExpression() "." "length" )
-  // ArrayLength()
 |
   LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
   MessageSend()
+|
+  LOOKAHEAD( Identifier() "(" )
+  MethodCall()
 | 
   Clause()
 }
@@ -396,17 +394,17 @@ void ArrayLookup() :
   PrimaryExpression() "[" PrimaryExpression() "]"
 }
 
-// void ArrayLength() :
-// {}
-// {
-//   PrimaryExpression() "." "length"
-// }
-
 void MessageSend() :
 {}
 {
   PrimaryExpression() "." Identifier() 
   "(" ( ExpressionList() )? ")"
+}
+
+void MethodCall() :
+{}
+{
+  Identifier() "(" ( ExpressionList() )? ")"
 }
 
 void ExpressionList() :
@@ -445,8 +443,6 @@ void PrimaryExpression() :
 |
   Identifier()
 |
-  ThisExpression()
-|
   LOOKAHEAD(3)
   ArrayAllocationExpression()
 |
@@ -478,12 +474,6 @@ void Identifier() :
 {}
 {
   <IDENTIFIER>
-}
-
-void ThisExpression() :
-{}
-{
-  "this"
 }
 
 void ArrayAllocationExpression() :

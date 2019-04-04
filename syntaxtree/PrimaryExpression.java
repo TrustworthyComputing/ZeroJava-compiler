@@ -10,7 +10,6 @@ package syntaxtree;
  *       | TrueLiteral()
  *       | FalseLiteral()
  *       | Identifier()
- *       | ThisExpression()
  *       | ArrayAllocationExpression()
  *       | AllocationExpression()
  *       | BracketExpression()
