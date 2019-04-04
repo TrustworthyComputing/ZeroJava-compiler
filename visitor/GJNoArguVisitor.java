@@ -27,62 +27,11 @@ public interface GJNoArguVisitor<R> {
    //
 
    /**
-    * f0 -> MainClass()
-    * f1 -> ( TypeDeclaration() )*
+    * f0 -> MainMethodDeclaration()
+    * f1 -> ( MethodDeclaration() )*
     * f2 -> <EOF>
     */
    public R visit(Goal n) throws Exception;
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> "public"
-    * f4 -> "static"
-    * f5 -> "void"
-    * f6 -> "main"
-    * f7 -> "("
-    * f8 -> "String"
-    * f9 -> "["
-    * f10 -> "]"
-    * f11 -> Identifier()
-    * f12 -> ")"
-    * f13 -> "{"
-    * f14 -> ( VarDeclaration() )*
-    * f15 -> ( Statement() )*
-    * f16 -> "}"
-    * f17 -> ( MethodDeclaration() )*
-    * f18 -> "}"
-    */
-   public R visit(MainClass n) throws Exception;
-
-   /**
-    * f0 -> ClassDeclaration()
-    *       | ClassExtendsDeclaration()
-    */
-   public R visit(TypeDeclaration n) throws Exception;
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> ( VarDeclaration() )*
-    * f4 -> ( MethodDeclaration() )*
-    * f5 -> "}"
-    */
-   public R visit(ClassDeclaration n) throws Exception;
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "extends"
-    * f3 -> Identifier()
-    * f4 -> "{"
-    * f5 -> ( VarDeclaration() )*
-    * f6 -> ( MethodDeclaration() )*
-    * f7 -> "}"
-    */
-   public R visit(ClassExtendsDeclaration n) throws Exception;
 
    /**
     * f0 -> Type()
@@ -92,19 +41,31 @@ public interface GJNoArguVisitor<R> {
    public R visit(VarDeclaration n) throws Exception;
 
    /**
-    * f0 -> "public"
-    * f1 -> Type()
-    * f2 -> Identifier()
-    * f3 -> "("
-    * f4 -> ( FormalParameterList() )?
-    * f5 -> ")"
-    * f6 -> "{"
-    * f7 -> ( VarDeclaration() )*
-    * f8 -> ( Statement() )*
-    * f9 -> "return"
-    * f10 -> Expression()
-    * f11 -> ";"
-    * f12 -> "}"
+    * f0 -> "void"
+    * f1 -> "main"
+    * f2 -> "("
+    * f3 -> "void"
+    * f4 -> ")"
+    * f5 -> "{"
+    * f6 -> ( VarDeclaration() )*
+    * f7 -> ( Statement() )*
+    * f8 -> "}"
+    */
+   public R visit(MainMethodDeclaration n) throws Exception;
+
+   /**
+    * f0 -> Type()
+    * f1 -> Identifier()
+    * f2 -> "("
+    * f3 -> ( FormalParameterList() )?
+    * f4 -> ")"
+    * f5 -> "{"
+    * f6 -> ( VarDeclaration() )*
+    * f7 -> ( Statement() )*
+    * f8 -> "return"
+    * f9 -> Expression()
+    * f10 -> ";"
+    * f11 -> "}"
     */
    public R visit(MethodDeclaration n) throws Exception;
 
@@ -263,7 +224,6 @@ public interface GJNoArguVisitor<R> {
     *       | MinusExpression()
     *       | TimesExpression()
     *       | ArrayLookup()
-    *       | ArrayLength()
     *       | MessageSend()
     *       | Clause()
     */
@@ -346,13 +306,6 @@ public interface GJNoArguVisitor<R> {
     * f3 -> "]"
     */
    public R visit(ArrayLookup n) throws Exception;
-
-   /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "."
-    * f2 -> "length"
-    */
-   public R visit(ArrayLength n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

@@ -6,7 +6,6 @@ public class Method_t extends BaseType {
     private String type;
     public Map<String, Variable_t> methodParamsMap_;
     public Map<String, Variable_t> methodVarsMap_;
-    public Class_t comesFrom;
     public int var_cnt;
     public int par_cnt;
     public int meth_num;
@@ -16,7 +15,6 @@ public class Method_t extends BaseType {
         this.type = type;
         methodParamsMap_ = new HashMap<>();
         methodVarsMap_ = new HashMap<>();
-        this.comesFrom = null;
     }
 
     public String getType() {
@@ -68,6 +66,8 @@ public class Method_t extends BaseType {
         if (methodParamsMap_.containsKey(vname)) {
             return false;
         }
+        // var.var_num = this.var_cnt;
+        // this.var_cnt++;
         methodVarsMap_.put(vname, var);
         
         return true;
@@ -80,7 +80,7 @@ public class Method_t extends BaseType {
             var.printVar();
             System.out.print(" ");
         }
-        System.out.println(") "+ comesFrom.getName() +"\n\t\t\tMethod Variables:");
+        System.out.println(") "+"\n\t\t\tMethod Variables:");
         for (Map.Entry<String, Variable_t> meth_entry : methodVarsMap_.entrySet()) {
             Variable_t var = meth_entry.getValue();
             System.out.print("\t\t\t\t");

@@ -21,9 +21,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 
 	/**
-	* f0 -> MainClass()
-	* f1 -> ( TypeDeclaration() )*
-	* f2 -> <EOF>
+	* f0 -> MainMethodDeclaration()
+    * f1 -> ( MethodDeclaration() )*
+    * f2 -> <EOF>
 	*/
 	public BaseType visit(Goal n, BaseType argu) throws Exception {
 		n.f0.accept(this, argu);
@@ -55,7 +55,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(MainClass n, BaseType argu) throws Exception {
 		this.result = new String();
 		String id = n.f1.accept(this, argu).getName();
-        Class_t mainclazz = symTable.contains(id);
+        Program_t mainclazz = symTable.contains(id);
         Method_t meth = mainclazz.getMethod("main");
 		n.f14.accept(this, meth);
 		n.f15.accept(this, meth);
@@ -78,7 +78,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				throw new Exception("VarDeclaration Errror 1");
 			}
 		} else {																	// is a var (field) of a class
-			Class_t cl = symTable.contains(meth.getName());
+			Program_t cl = symTable.contains(meth.getName());
 			if (cl == null) {														// do nothing for now
 				throw new Exception("VarDeclaration Errror 2");
 			}
@@ -86,6 +86,29 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return null;
 	}
 
+
+	/**
+     * f0 -> "void"
+     * f1 -> "main"
+     * f2 -> "("
+     * f3 -> ( FormalParameterList() )?
+     * f4 -> ")"
+     * f5 -> "{"
+     * f6 -> ( VarDeclaration() )*
+     * f7 -> ( Statement() )*
+     * f8 -> "}"
+     */
+    public void visit(MainMethodDeclaration n) throws Exception {
+		String methName = "main";
+		Method_t meth = ((Program_t) argu).getMethod(methName);
+		this.result += "\n" + ((Program_t) argu).getName()+ "_" + methName + "[" + (meth.par_cnt+1) + "]\nBEGIN\n";
+		n.f6.accept(this, meth);
+		n.f7.accept(this, meth);
+		Variable_t retType = (Variable_t) n.f10.accept(this, meth);
+		this.result += "RETURN " + retType.getType() + "\nEND\n";
+		return null;
+	}
+	
 	/**
 	* f0 -> "public"
 	* f1 -> Type()
@@ -103,8 +126,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
 		String methName = n.f2.accept(this, argu).getName();
-        Method_t meth = ((Class_t) argu).getMethod(methName);
-        this.result += "\n" + ((Class_t) argu).getName()+ "_" + methName + "[" + (meth.par_cnt+1) + "]\nBEGIN\n";
+        Method_t meth = ((Program_t) argu).getMethod(methName);
+        this.result += "\n" + ((Program_t) argu).getName()+ "_" + methName + "[" + (meth.par_cnt+1) + "]\nBEGIN\n";
         n.f7.accept(this, meth);
         n.f8.accept(this, meth);
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
@@ -601,7 +624,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (argu == null) {
 			return new Variable_t(null, id);
 		}
-		Class_t cl = symTable.contains(argu.getName());
+		Program_t cl = symTable.contains(argu.getName());
 		Variable_t var;
 		if (cl != null) {									// if argu is a class name
 			var = cl.classContainsVarReverse(id);

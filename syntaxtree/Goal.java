@@ -6,22 +6,22 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> MainClass()
- * f1 -> ( TypeDeclaration() )*
+ * f0 -> MainMethodDeclaration()
+ * f1 -> ( MethodDeclaration() )*
  * f2 -> <EOF>
  */
 public class Goal implements Node {
-   public MainClass f0;
+   public MainMethodDeclaration f0;
    public NodeListOptional f1;
    public NodeToken f2;
 
-   public Goal(MainClass n0, NodeListOptional n1, NodeToken n2) {
+   public Goal(MainMethodDeclaration n0, NodeListOptional n1, NodeToken n2) {
       f0 = n0;
       f1 = n1;
       f2 = n2;
    }
 
-   public Goal(MainClass n0, NodeListOptional n1) {
+   public Goal(MainMethodDeclaration n0, NodeListOptional n1) {
       f0 = n0;
       f1 = n1;
       f2 = new NodeToken("");

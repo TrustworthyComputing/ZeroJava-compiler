@@ -4,6 +4,10 @@ import symbol_table.*;
 import tinyram_generator.*;
 import java.io.*;
 
+import java.util.*;
+import base_type.*;
+
+
 public class Main {
     public static void main (String [] args){
         if (args.length < 1){
@@ -17,24 +21,25 @@ public class Main {
                 fis = new FileInputStream(args[i]);
                 TinyJavaParser parser = new TinyJavaParser(fis);
                 Goal root = parser.Goal();
-                FirstVisitor firstvisit = new FirstVisitor();
+                SymbolTableVisitor stvisitor = new SymbolTableVisitor();
                 try {
-                    root.accept(firstvisit);
-                    SecondVisitor secondvisit = new SecondVisitor(firstvisit.getClassMap());
-                    root.accept(secondvisit);
-                    SymbolTable ST = secondvisit.getSymbolTable();
-                    TinyRAMGenVisitor generator = new TinyRAMGenVisitor(ST);
-                    root.accept(generator, null);
-                    // ST.printST();       // printing the symbol table
-                    File fp = new File(args[i]);
-                    String path = fp.getPath();
-                    path = path.substring(0, path.lastIndexOf('.'));
-                    PrintWriter out = new PrintWriter(path + ".asm");
-                    out.print(generator.result);
-                    out.close();
-                    // Print it to stdout as well
-                    System.out.println(path + ".asm\n");
-                    System.out.print(generator.result);
+                    root.accept(stvisitor);
+                    
+                    Map<String, Method_t> ST = stvisitor.getSymbolTable();
+                                        
+                    // TinyRAMGenVisitor generator = new TinyRAMGenVisitor(ST);
+                    // root.accept(generator, null);
+                    stvisitor.printST();
+                    
+                    // File fp = new File(args[i]);
+                    // String path = fp.getPath();
+                    // path = path.substring(0, path.lastIndexOf('.'));
+                    // PrintWriter out = new PrintWriter(path + ".asm");
+                    // out.print(generator.result);
+                    // out.close();
+                    // // Print it to stdout as well
+                    // System.out.println(path + ".asm\n");
+                    // System.out.print(generator.result);
                 } catch (Exception ex) {
                     System.out.println("\n\nAn Error Occured: " + ex.getMessage() + "\n\n");
                 }

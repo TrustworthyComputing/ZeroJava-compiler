@@ -42,103 +42,14 @@ public class DepthFirstVisitor implements Visitor {
    //
 
    /**
-    * f0 -> MainClass()
-    * f1 -> ( TypeDeclaration() )*
+    * f0 -> MainMethodDeclaration()
+    * f1 -> ( MethodDeclaration() )*
     * f2 -> <EOF>
     */
    public void visit(Goal n) throws Exception {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
-   }
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> "public"
-    * f4 -> "static"
-    * f5 -> "void"
-    * f6 -> "main"
-    * f7 -> "("
-    * f8 -> "String"
-    * f9 -> "["
-    * f10 -> "]"
-    * f11 -> Identifier()
-    * f12 -> ")"
-    * f13 -> "{"
-    * f14 -> ( VarDeclaration() )*
-    * f15 -> ( Statement() )*
-    * f16 -> "}"
-    * f17 -> ( MethodDeclaration() )*
-    * f18 -> "}"
-    */
-   public void visit(MainClass n) throws Exception {
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
-      n.f3.accept(this);
-      n.f4.accept(this);
-      n.f5.accept(this);
-      n.f6.accept(this);
-      n.f7.accept(this);
-      n.f8.accept(this);
-      n.f9.accept(this);
-      n.f10.accept(this);
-      n.f11.accept(this);
-      n.f12.accept(this);
-      n.f13.accept(this);
-      n.f14.accept(this);
-      n.f15.accept(this);
-      n.f16.accept(this);
-      n.f17.accept(this);
-      n.f18.accept(this);
-   }
-
-   /**
-    * f0 -> ClassDeclaration()
-    *       | ClassExtendsDeclaration()
-    */
-   public void visit(TypeDeclaration n) throws Exception {
-      n.f0.accept(this);
-   }
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> ( VarDeclaration() )*
-    * f4 -> ( MethodDeclaration() )*
-    * f5 -> "}"
-    */
-   public void visit(ClassDeclaration n) throws Exception {
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
-      n.f3.accept(this);
-      n.f4.accept(this);
-      n.f5.accept(this);
-   }
-
-   /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "extends"
-    * f3 -> Identifier()
-    * f4 -> "{"
-    * f5 -> ( VarDeclaration() )*
-    * f6 -> ( MethodDeclaration() )*
-    * f7 -> "}"
-    */
-   public void visit(ClassExtendsDeclaration n) throws Exception {
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
-      n.f3.accept(this);
-      n.f4.accept(this);
-      n.f5.accept(this);
-      n.f6.accept(this);
-      n.f7.accept(this);
    }
 
    /**
@@ -153,19 +64,41 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
-    * f0 -> "public"
-    * f1 -> Type()
-    * f2 -> Identifier()
-    * f3 -> "("
-    * f4 -> ( FormalParameterList() )?
-    * f5 -> ")"
-    * f6 -> "{"
-    * f7 -> ( VarDeclaration() )*
-    * f8 -> ( Statement() )*
-    * f9 -> "return"
-    * f10 -> Expression()
-    * f11 -> ";"
-    * f12 -> "}"
+    * f0 -> "void"
+    * f1 -> "main"
+    * f2 -> "("
+    * f3 -> "void"
+    * f4 -> ")"
+    * f5 -> "{"
+    * f6 -> ( VarDeclaration() )*
+    * f7 -> ( Statement() )*
+    * f8 -> "}"
+    */
+   public void visit(MainMethodDeclaration n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      n.f6.accept(this);
+      n.f7.accept(this);
+      n.f8.accept(this);
+   }
+
+   /**
+    * f0 -> Type()
+    * f1 -> Identifier()
+    * f2 -> "("
+    * f3 -> ( FormalParameterList() )?
+    * f4 -> ")"
+    * f5 -> "{"
+    * f6 -> ( VarDeclaration() )*
+    * f7 -> ( Statement() )*
+    * f8 -> "return"
+    * f9 -> Expression()
+    * f10 -> ";"
+    * f11 -> "}"
     */
    public void visit(MethodDeclaration n) throws Exception {
       n.f0.accept(this);
@@ -180,7 +113,6 @@ public class DepthFirstVisitor implements Visitor {
       n.f9.accept(this);
       n.f10.accept(this);
       n.f11.accept(this);
-      n.f12.accept(this);
    }
 
    /**
@@ -416,7 +348,6 @@ public class DepthFirstVisitor implements Visitor {
     *       | MinusExpression()
     *       | TimesExpression()
     *       | ArrayLookup()
-    *       | ArrayLength()
     *       | MessageSend()
     *       | Clause()
     */
@@ -545,17 +476,6 @@ public class DepthFirstVisitor implements Visitor {
       n.f1.accept(this);
       n.f2.accept(this);
       n.f3.accept(this);
-   }
-
-   /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "."
-    * f2 -> "length"
-    */
-   public void visit(ArrayLength n) throws Exception {
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
    }
 
    /**

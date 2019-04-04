@@ -17,7 +17,6 @@ package syntaxtree;
  *       | MinusExpression()
  *       | TimesExpression()
  *       | ArrayLookup()
- *       | ArrayLength()
  *       | MessageSend()
  *       | Clause()
  */

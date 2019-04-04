@@ -120,45 +120,9 @@ TOKEN : /* IDENTIFIERS */
 void Goal() :
 {}
 {
-  MainClass()
-  ( TypeDeclaration() )*
-  <EOF>
-}
-
-void MainClass() :
-{}
-{
-  "class" Identifier() "{"
-    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"   
-    "{" ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* "}"
-     ( MethodDeclaration() )* 
-  "}"
-}
-
-void TypeDeclaration() :  
-{}
-{ 
-  LOOKAHEAD(3)
-  ClassDeclaration()
-|
-  ClassExtendsDeclaration()
-}
-
-void ClassDeclaration() :
-{}
-{
-  "class" Identifier() "{" ( VarDeclaration() )* 
-                           ( MethodDeclaration() )* 
-                       "}"
-}
-
-void ClassExtendsDeclaration() :
-{}
-{
-  "class" Identifier() "extends" Identifier()
-                       "{" ( VarDeclaration() )* 
-                           ( MethodDeclaration() )* 
-                       "}"
+    MainMethodDeclaration()
+    ( MethodDeclaration() )*
+    <EOF>
 }
 
 void VarDeclaration() :  
@@ -167,10 +131,20 @@ void VarDeclaration() :
   Type() Identifier() ";"      
 }
 
+
+void MainMethodDeclaration() :  
+{}
+{
+  "void" "main" "(" "void" ")" "{"
+    ( LOOKAHEAD(2) VarDeclaration() )* 
+    ( Statement() )*
+  "}"
+}
+
 void MethodDeclaration() :  
 {}
 {
-  "public" Type() Identifier() 
+  Type() Identifier() 
   "(" ( FormalParameterList() )? ")"   
   "{" ( LOOKAHEAD(2) VarDeclaration() )* 
       ( Statement() )* "return" Expression() ";" "}"
@@ -345,9 +319,9 @@ void Expression() :
 |
   LOOKAHEAD( PrimaryExpression() "[" )
   ArrayLookup()
-|
-  LOOKAHEAD( PrimaryExpression() "." "length" )
-  ArrayLength()
+// |
+  // LOOKAHEAD( PrimaryExpression() "." "length" )
+  // ArrayLength()
 |
   LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
   MessageSend()
@@ -422,11 +396,11 @@ void ArrayLookup() :
   PrimaryExpression() "[" PrimaryExpression() "]"
 }
 
-void ArrayLength() :
-{}
-{
-  PrimaryExpression() "." "length"
-}
+// void ArrayLength() :
+// {}
+// {
+//   PrimaryExpression() "." "length"
+// }
 
 void MessageSend() :
 {}

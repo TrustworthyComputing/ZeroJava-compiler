@@ -154,7 +154,6 @@ public interface TinyJavaParserConstants {
     "\"<=\"",
     "\">=\"",
     "\"*\"",
-    "\"length\"",
   };
 
 }
