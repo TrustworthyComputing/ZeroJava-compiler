@@ -42,8 +42,8 @@ public class DepthFirstVisitor implements Visitor {
    //
 
    /**
-    * f0 -> MainMethodDeclaration()
-    * f1 -> ( MethodDeclaration() )*
+    * f0 -> ( MethodDeclaration() )*
+    * f1 -> MainMethodDeclaration()
     * f2 -> <EOF>
     */
    public void visit(Goal n) throws Exception {

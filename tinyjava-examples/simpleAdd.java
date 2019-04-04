@@ -1,13 +1,17 @@
-void main(void) {
-	int x;
-	int y;
-	x = 12;
-	y = 13;
-	x = foo();
-	Prover.answer(x + y);
+int bar() {
+	return 30;
 }
 
 int foo() {
 	int x;
-	return 1;
+	x = bar();
+	return x + 40;
+}
+
+void main(void) {
+	int x;
+	int y;
+	x = foo();
+	y = bar();
+	Prover.answer(x + y);
 }

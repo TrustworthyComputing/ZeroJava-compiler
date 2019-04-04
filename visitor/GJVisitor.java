@@ -27,8 +27,8 @@ public interface GJVisitor<R,A> {
    //
 
    /**
-    * f0 -> MainMethodDeclaration()
-    * f1 -> ( MethodDeclaration() )*
+    * f0 -> ( MethodDeclaration() )*
+    * f1 -> MainMethodDeclaration()
     * f2 -> <EOF>
     */
    public R visit(Goal n, A argu) throws Exception;

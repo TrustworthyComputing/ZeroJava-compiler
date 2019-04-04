@@ -93,27 +93,27 @@ TOKEN :
 
 Goal Goal() :
 {
-   MainMethodDeclaration n0;
-   NodeListOptional n1 = new NodeListOptional();
-   MethodDeclaration n2;
+   NodeListOptional n0 = new NodeListOptional();
+   MethodDeclaration n1;
+   MainMethodDeclaration n2;
    NodeToken n3;
    Token n4;
 
    
 }
 {
-   n0=MainMethodDeclaration()
    (
-      n2=MethodDeclaration()
-      { n1.addNode(n2); }
+      n1=MethodDeclaration()
+      { n0.addNode(n1); }
    )*
-   { n1.nodes.trimToSize(); }
+   { n0.nodes.trimToSize(); }
+   n2=MainMethodDeclaration()
    n4=<EOF> { 
       n4.beginColumn++; n4.endColumn++;
       n3 = JTBToolkit.makeNodeToken(n4);
    }
    
-   { return new Goal(n0,n1,n3); }
+   { return new Goal(n0,n2,n3); }
 }
 
 VarDeclaration VarDeclaration() :

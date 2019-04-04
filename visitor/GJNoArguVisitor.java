@@ -27,8 +27,8 @@ public interface GJNoArguVisitor<R> {
    //
 
    /**
-    * f0 -> MainMethodDeclaration()
-    * f1 -> ( MethodDeclaration() )*
+    * f0 -> ( MethodDeclaration() )*
+    * f1 -> MainMethodDeclaration()
     * f2 -> <EOF>
     */
    public R visit(Goal n) throws Exception;

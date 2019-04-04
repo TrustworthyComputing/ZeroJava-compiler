@@ -2,9 +2,10 @@ package tinyram_generator;
 
 import syntaxtree.*;
 import visitor.GJDepthFirst;
-import java.util.*;
 import symbol_table.*;
 import base_type.*;
+import java.util.Map;
+import java.util.HashMap;
 
 public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public String result_;
@@ -14,6 +15,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	private int glob_temp_cnt_;
 	private int base_addr_;
 	private boolean immediate_;
+	
+	private boolean is_inline_meth_;
+	private String inline_meth_;
 
 	public TinyRAMGenVisitor(Map<String, Method_t> st) {
 		this.L = new Label();
@@ -22,12 +26,14 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.base_addr_ = 1000;
 		this.immediate_ = false;
 		this.result_ = new String();
+		this.is_inline_meth_ = false;
+		this.inline_meth_ = new String();
 	}
 
 
 	/**
-	* f0 -> MainMethodDeclaration()
-    * f1 -> ( MethodDeclaration() )*
+    * f0 -> ( MethodDeclaration() )*
+	* f1 -> MainMethodDeclaration()
     * f2 -> <EOF>
 	*/
 	public BaseType visit(Goal n, BaseType argu) throws Exception {
@@ -51,10 +57,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(MainMethodDeclaration n, BaseType argu) throws Exception {
 		String methName = new String("main");
 		Method_t meth = this.st_.get(methName);
-		this.result_ += "\n__BEGIN_MAIN__\n";
 		n.f6.accept(this, meth);
 		n.f7.accept(this, meth);
-		this.result_ += "__END_MAIN__\n";
 		return null;
 	}
 	
@@ -73,15 +77,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f11 -> "}"
 	 */
 	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
+		this.is_inline_meth_ = true;
+		
 		String methName = n.f1.accept(this, argu).getName();
 		Method_t meth = this.st_.get(methName);
-		this.result_ += "\n__BEGIN_" + methName + "__\n";
+		// this.inline_meth_ += "\n__BEGIN_" + methName + "__\n";
 		n.f6.accept(this, meth);
 		n.f7.accept(this, meth);
 		Variable_t retType = (Variable_t) n.f9.accept(this, meth);
-		this.result_ += "RETURN " + retType.getType() + "\n";
-		this.result_ += "__END_" + methName + "__\n";
-		return null;
+		meth.return_reg = retType.getType();
+		// this.inline_meth_ += "RETURN " + retType.getType() + "\n";
+		// this.inline_meth_ += "__END_" + methName + "__\n";
+		meth.body_ = this.inline_meth_;
+		this.inline_meth_ = new String();
+		this.is_inline_meth_ = false;
+		
+		return retType;
 	}
 
 	/**
@@ -204,7 +215,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		Method_t meth = (Method_t) argu;
 		if (meth != null) { 
 			var = meth.methContainsVar(id);
-			this.result_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+			} else {
+				this.result_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+			}
 		}
 		return null;
 	}
@@ -226,11 +241,19 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.immediate_ = false;
 		String res = new String("r" + ++glob_temp_cnt_);
 		
-		this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
-		this.result_ += "MOV " + res + " " + res + " " + expr + "\n";
-		this.result_ += "STORE " + res + " " + res + " " + array + "\n";
-		this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
-		this.result_ += "\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "ADD " + array + " " + array + " " + idx + "\n";
+			this.inline_meth_ += "MOV " + res + " " + res + " " + expr + "\n";
+			this.inline_meth_ += "STORE " + res + " " + res + " " + array + "\n";
+			this.inline_meth_ += "SUB " + array + " " + array + " " + idx + "\n";
+			this.inline_meth_ += "\n";
+		} else {
+			this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
+			this.result_ += "MOV " + res + " " + res + " " + expr + "\n";
+			this.result_ += "STORE " + res + " " + res + " " + array + "\n";
+			this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
+			this.result_ += "\n";
+		}
 		return new Variable_t(res, null);
 	}
 	
@@ -247,11 +270,17 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String elselabel = L.new_label();
 		String endlabel = L.new_label();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
 		n.f4.accept(this, argu);
-		this.result_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
 		n.f6.accept(this, argu);
-		this.result_ += endlabel + "\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
+			this.inline_meth_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
+			this.inline_meth_ += endlabel + "\n";
+		} else {
+			this.result_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
+			this.result_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
+			this.result_ += endlabel + "\n";
+		}
 		return null;
 	}
 
@@ -265,11 +294,18 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
 		String lstart = L.new_label();
 		String lend = L.new_label();
-		this.result_ += lstart + "\n";
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "CNJMP " + expr + " " + expr + " " + lend + "\n";
 		n.f4.accept(this, argu);
-		this.result_ += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
+		
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += lstart + "\n";
+			this.inline_meth_ += "CNJMP " + expr + " " + expr + " " + lend + "\n";
+			this.inline_meth_ += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
+		} else {
+			this.result_ += lstart + "\n";
+			this.result_ += "CNJMP " + expr + " " + expr + " " + lend + "\n";
+			this.result_ += "JMP r0 r0 " + lstart + "\n" + lend + "\n";
+		}
 		return null;
 	}
 
@@ -282,7 +318,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(PrintStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "PRINT " + t + " " + t + " " + t +"\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "PRINT " + t + " " + t + " " + t +"\n";
+		} else {
+			this.result_ += "PRINT " + t + " " + t + " " + t +"\n";
+		}
 		return null;
 	}
 	
@@ -295,7 +335,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(ReadPrimaryTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "READ " + t + " " + t + " " + 0 +"\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "READ " + t + " " + t + " " + 0 +"\n";
+		} else {
+			this.result_ += "READ " + t + " " + t + " " + 0 +"\n";
+		}
 		return null;
 	}
 	
@@ -308,7 +352,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(ReadPrivateTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "READ " + t + " " + t + " " + 1 +"\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "READ " + t + " " + t + " " + 1 +"\n";
+		} else {
+			this.result_ += "READ " + t + " " + t + " " + 1 +"\n";
+		}
 		return null;
 	}
 	
@@ -321,7 +369,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(AnswerStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += "ANSWER " + t + " " + t + " " + t +"\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "ANSWER " + t + " " + t + " " + t +"\n";
+		} else {
+			this.result_ += "ANSWER " + t + " " + t + " " + t +"\n";
+		}
 		return null;
 	}
 
@@ -353,11 +405,18 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String l1 = L.new_label();
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-		this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
-		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result_ += new String(l1 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+			this.inline_meth_ += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
+			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.inline_meth_ += new String(l1 + "\n");
+		} else {
+			this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+			this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l1 + "\n");
+			this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.result_ += new String(l1 + "\n");
+		}
 		return new Variable_t(ret, null);
 	}
 	
@@ -371,14 +430,24 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String l2 = L.new_label();
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-		this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
-		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result_ += new String("JMP r0 r0 " + l2 + "\n");
-		this.result_ += new String(l1 + "\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
-		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
-		this.result_ += new String(l2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.inline_meth_ += new String("JMP r0 r0 " + l2 + "\n");
+			this.inline_meth_ += new String(l1 + "\n");
+			this.inline_meth_ += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
+			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.inline_meth_ += new String(l2 + "\n");
+		} else {
+			this.result_ += new String("CNJMP " + t1 + " " + t1 + " " + l1 + "\n");
+			this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.result_ += new String("JMP r0 r0 " + l2 + "\n");
+			this.result_ += new String(l1 + "\n");
+			this.result_ += new String("CNJMP " + t2 + " " + t2 + " " + l2 + "\n");
+			this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+			this.result_ += new String(l2 + "\n");
+		}
 		return new Variable_t(ret, null);
 	}
 	
@@ -390,7 +459,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
+		} else {
+			this.result_ += new String("CMPG " + t2 + " " +  t2 + " " + t1 + "\n");
+		}
 		return new Variable_t(t2, null);
 	}
 	
@@ -402,7 +475,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("CMPG " + t1 + " " +  t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(t1, null);
 	}
 	
@@ -414,7 +491,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
+		} else {
+			this.result_ += new String("CMPGE " + t2 + " " +  t2 + " " + t1 + "\n");
+		}
 		return new Variable_t(t2, null);
 	}
 	
@@ -426,7 +507,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("CMPGE " + t1 + " " +  t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(t1, null);
 	}
 	
@@ -438,7 +523,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(EqExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(t1, null);
 	}
 
@@ -451,7 +540,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("ADD " + ret + " " + t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(ret, null);
 	}
 
@@ -464,7 +557,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("SUB " + ret + " " +  t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(ret, null);
 	}
 
@@ -477,7 +574,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		this.result_ += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("MULL " + ret + " " + t1 + " " + t2 + "\n");
+		}
 		return new Variable_t(ret, null);
 	}
 	
@@ -491,10 +592,17 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String array = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getType();		
 		String res = new String("r" + ++glob_temp_cnt_);
-		this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
-		this.result_ += "LOAD " + res + " " + res + " " + array + "\n";
-		this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
-		this.result_ += "\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "ADD " + array + " " + array + " " + idx + "\n";
+			this.inline_meth_ += "LOAD " + res + " " + res + " " + array + "\n";
+			this.inline_meth_ += "SUB " + array + " " + array + " " + idx + "\n";
+			this.inline_meth_ += "\n";
+		} else {
+			this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
+			this.result_ += "LOAD " + res + " " + res + " " + array + "\n";
+			this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
+			this.result_ += "\n";
+		}
 		return new Variable_t(res, null);
 	}
 	
@@ -509,13 +617,17 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String mname = v.getName();
 		String mtype = v.getType();
 		Method_t meth = this.st_.get(mname);
-		
-		System.out.println("Going to call " + mtype + " " + mname);
-		
 		n.f2.accept(this, argu);
+		String res = new String("r" + ++glob_temp_cnt_);
 		
-		String res = new String("r99");
-		return new Variable_t(res, null);
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += meth.body_;
+		} else {			
+			this.result_ += meth.body_;
+		}
+		
+		// System.out.println("BODY:\n" + meth.body_);
+		return new Variable_t(meth.return_reg, null);
 	}
 
  	/**
@@ -525,9 +637,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     public BaseType visit(ExpressionList n, BaseType argu) throws Exception {
         Variable_t expr =  (Variable_t) n.f0.accept(this, argu); //na tsekarw th seira 
         Method_t meth = (Method_t) n.f1.accept(this, argu);
-		
 		meth.methodParamsMap_.put(expr.getName(), expr);
-		
         return meth;
     }
 
@@ -583,7 +693,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
 		if (!immediate_) {
 			String ret = "r" + ++glob_temp_cnt_;
-			this.result_ += "MOV " + ret + " " + ret + " " + n.f0.toString() + "\n";
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += "MOV " + ret + " " + ret + " " + n.f0.toString() + "\n";
+			} else {			
+				this.result_ += "MOV " + ret + " " + ret + " " + n.f0.toString() + "\n";
+			}
 			return new Variable_t(ret, null);
 		}
 		return new Variable_t(n.f0.toString(), null);
@@ -594,7 +708,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
 		String ret = new String("r" + ++glob_temp_cnt_);
-		this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 1\n");
+		} else {			
+			this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
+		}
 		return new Variable_t(ret, null);
 	}
 
@@ -603,7 +721,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
 		String ret = new String("r" + ++glob_temp_cnt_);
-		this.result_ += new String("MOV " + ret + " " + ret + " 0\n");
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 0\n");
+		} else {			
+			this.result_ += new String("MOV " + ret + " " + ret + " 0\n");
+		}
 		return new Variable_t(ret, null);
 	}
 
@@ -628,9 +750,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			v = new Variable_t(m.getType(), id);
 		}
 		return v;
-		
-		// System.out.println("returning " + id);
-		// return new Variable_t(null, id);
 	}
 
 	/**
@@ -657,8 +776,13 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t = ((Variable_t) n.f1.accept(this, argu)).getType();
 		String one = new String("r" + ++glob_temp_cnt_);
-		this.result_ += "MOV " + one + " " + one + " 1\n";
-		this.result_ += "SUB " + ret + " " + one + " " + t + "\n";
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "MOV " + one + " " + one + " 1\n";
+			this.inline_meth_ += "SUB " + ret + " " + one + " " + t + "\n";
+		} else {			
+			this.result_ += "MOV " + one + " " + one + " 1\n";
+			this.result_ += "SUB " + ret + " " + one + " " + t + "\n";
+		}
 		return new Variable_t(ret, null);
 	}
 

@@ -2,7 +2,8 @@ package symbol_table;
 
 import syntaxtree.*;
 import visitor.GJNoArguDepthFirst;
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
 import base_type.*;
 
 /* Second Visitor Pattern creates the Symbol Table */

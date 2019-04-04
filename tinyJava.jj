@@ -118,8 +118,8 @@ TOKEN : /* IDENTIFIERS */
 void Goal() :
 {}
 {
-    MainMethodDeclaration()
     ( MethodDeclaration() )*
+    MainMethodDeclaration()
     <EOF>
 }
 

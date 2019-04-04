@@ -1,14 +1,18 @@
 package base_type;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Method_t extends BaseType {
     private String type;
     public Map<String, Variable_t> methodParamsMap_;
     public Map<String, Variable_t> methodVarsMap_;
-    public int var_cnt;
-    public int par_cnt;
-    public int meth_num;
+    public String return_reg;   // the register with the result of the method 
+    public int var_cnt;         // number of variables of method
+    public int par_cnt;         // the number of parameters
+    public int meth_num;        // meth-id number
+    
+    public String body_;
 
     public Method_t(String type, String name) {
         super(name);

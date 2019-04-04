@@ -6,12 +6,11 @@ import java.util.Vector;
 public class TinyJavaParser implements TinyJavaParserConstants {
 
   final public Goal Goal() throws ParseException {
-   MainMethodDeclaration n0;
-   NodeListOptional n1 = new NodeListOptional();
-   MethodDeclaration n2;
+   NodeListOptional n0 = new NodeListOptional();
+   MethodDeclaration n1;
+   MainMethodDeclaration n2;
    NodeToken n3;
    Token n4;
-    n0 = MainMethodDeclaration();
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -24,14 +23,15 @@ public class TinyJavaParser implements TinyJavaParserConstants {
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      n2 = MethodDeclaration();
-        n1.addNode(n2);
+      n1 = MethodDeclaration();
+        n0.addNode(n1);
     }
-     n1.nodes.trimToSize();
+     n0.nodes.trimToSize();
+    n2 = MainMethodDeclaration();
     n4 = jj_consume_token(0);
       n4.beginColumn++; n4.endColumn++;
       n3 = JTBToolkit.makeNodeToken(n4);
-     {if (true) return new Goal(n0,n1,n3);}
+     {if (true) return new Goal(n0,n2,n3);}
     throw new Error("Missing return statement in function");
   }
 
