@@ -13,15 +13,45 @@ Variable definitions and variable assignments should be in different lines (i.e.
 Arrays of integers are initialized as follows: `int [ ] arr;`, `arr = new int[10];`.
 Function parameters are always passed by value.
 Zilch program source text is free-format, using the semicolon as a statement terminator and curly braces for grouping blocks of statements, such as while loops and if-else statements.
+Zilch supports comments like C99, where the delimiter `//` is used for a single line comment and delimiters `/*` and `*/` are used for a block of lines.
 Zilch files use the `.zl` extension.
+
+### Zilch Comparison and Logical Operators
+| Operator | Description        	|
+|----------|------------------------|
+| `<`      | Less than				|
+| `<=`     | Less or Equal than		|
+| `>`      | Greater than			|
+| `>=`     | Greater or Equal than	|
+| `&&`     | Logical `AND`			|
+| \|\|     | Logical `OR`			|
+
+
+### Zilch Assignment Operators
+| Operator | Description        						|
+|----------|--------------------------------------------|
+| `=`      | Assignment for `int` and `boolean` types 	|
+| `++`     | Increment of `int` type by one 			|
+| `--`     | Decrement of `int` type by one 			|
+
+
+### Built in Zilch Functions
+| Built in Zilch Function Name       	| Description and corresponding TinyRAM command 			|
+|---------------------------------------|-----------------------------------------------------------|
+| `Prover.answer(int result);`			| `ANSWER`: returns the result 								|
+| `Out.print(int variable);`			| `PRINT`: prints the contents of `variable` 				|
+| `PrimaryTape.read(int dst);`			| `READ dst dst 0`: consumes next word from public tape		|
+| `PrivateTape.read(int dst);`			| `READ dst dst 1`: consumes next word from private tape 	|
+| `PrimaryTape.seek(int dst, int idx);`	| `SEEK dst idx 0`: consumes `idx`th word from public tape	|
+| `PrivateTape.seek(int dst, int idx);` | `SEEK dst idx 1`: consumes `idx`th word from private tape	|
+
 
 
 ## TinyRAM ISA
-
-| Instruction    | Definition                                           |
+| Instruction    | Description                                          |
 |----------------|------------------------------------------------------|
 | AND ri rj A    | ri = rj & A                                          |
-| OR ri rj A     | ri = rj or A                                         |
+| OR ri rj A     | ri = rj \| A                                         |
 | XOR ri rj A    | ri = rj ^ A                                          |
 | NOT ri rj A    | ri = !A                                              |
 | ADD ri rj A    | ri = rj + A                                          |
@@ -34,12 +64,12 @@ Zilch files use the `.zl` extension.
 | CMPGE ri rj A  | flag = rj >= A                                       |
 | MOV ri rj A    | ri = A                                               |
 | READ ri rj A   | ri = (A == 0) ? next from public : next from private |
-| RAREAD ri rj A | ri = (A == 0) ? public[rj] : ri = private[rj]        |
+| SEEK ri rj A   | ri = (A == 0) ? public[rj] : ri = private[rj]        |
 | JMP ri rj A    | goto label A                                         |
 | CJMP ri rj A   | if (flag) then goto label A                          |
 | CNJMP ri rj A  | if (!flag) then goto label A                         |
-| STOREW ri rj A  | [A] = ri                                            |
-| LOADW ri rj A   | ri = [A]                                            |
+| STOREW ri rj A | [A] = ri                                             |
+| LOADW ri rj A  | ri = [A]                                             |
 | ANSWER ri rj A | return A                                             |
 
 
