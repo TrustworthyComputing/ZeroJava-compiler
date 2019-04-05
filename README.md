@@ -1,4 +1,4 @@
-# ![alt text][logo] Zilch to TinyRAM compiler [![License MIT][badge-license]](LICENSE)
+# ![alt text][zilch] Zilch to TinyRAM compiler [![License MIT][badge-license]](LICENSE)
 
 A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to TinyRAM.
 
@@ -189,7 +189,7 @@ Those examples include `if-else` statements, comparisons, `while` loops, example
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group
 
 
-[logo]: ./logos/logo.jpg
+[zilch]: ./logos/zilch_sm.png
 
 [twc-logo]: ./logos/twc.png
 
