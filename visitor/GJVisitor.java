@@ -121,6 +121,8 @@ public interface GJVisitor<R,A> {
     * f0 -> Block()
     *       | AssignmentStatement()
     *       | ArrayAssignmentStatement()
+    *       | PlusPlusExpression()
+    *       | MinusMinusExpression()
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
@@ -287,11 +289,25 @@ public interface GJVisitor<R,A> {
    public R visit(PlusExpression n, A argu) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+   public R visit(PlusPlusExpression n, A argu) throws Exception;
+
+   /**
     * f0 -> PrimaryExpression()
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
    public R visit(MinusExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+   public R visit(MinusMinusExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

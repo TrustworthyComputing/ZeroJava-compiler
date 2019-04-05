@@ -121,6 +121,8 @@ public interface Visitor {
     * f0 -> Block()
     *       | AssignmentStatement()
     *       | ArrayAssignmentStatement()
+    *       | PlusPlusExpression()
+    *       | MinusMinusExpression()
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
@@ -287,11 +289,25 @@ public interface Visitor {
    public void visit(PlusExpression n) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+   public void visit(PlusPlusExpression n) throws Exception;
+
+   /**
     * f0 -> PrimaryExpression()
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
    public void visit(MinusExpression n) throws Exception;
+
+   /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+   public void visit(MinusMinusExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

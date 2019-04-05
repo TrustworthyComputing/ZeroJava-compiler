@@ -230,6 +230,8 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f0 -> Block()
     *       | AssignmentStatement()
     *       | ArrayAssignmentStatement()
+    *       | PlusPlusExpression()
+    *       | MinusMinusExpression()
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
@@ -521,11 +523,37 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    }
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+   public R visit(PlusPlusExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
     * f0 -> PrimaryExpression()
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
    public R visit(MinusExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+   public R visit(MinusMinusExpression n) throws Exception {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);

@@ -6,23 +6,25 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> Block()
- *       | AssignmentStatement()
- *       | ArrayAssignmentStatement()
- *       | PlusPlusExpression()
- *       | MinusMinusExpression()
- *       | IfStatement()
- *       | WhileStatement()
- *       | PrintStatement()
- *       | ReadPrimaryTape()
- *       | ReadPrivateTape()
- *       | AnswerStatement()
+ * f0 -> Identifier()
+ * f1 -> "--"
+ * f2 -> ";"
  */
-public class Statement implements Node {
-   public NodeChoice f0;
+public class MinusMinusExpression implements Node {
+   public Identifier f0;
+   public NodeToken f1;
+   public NodeToken f2;
 
-   public Statement(NodeChoice n0) {
+   public MinusMinusExpression(Identifier n0, NodeToken n1, NodeToken n2) {
       f0 = n0;
+      f1 = n1;
+      f2 = n2;
+   }
+
+   public MinusMinusExpression(Identifier n0) {
+      f0 = n0;
+      f1 = new NodeToken("--");
+      f2 = new NodeToken(";");
    }
 
    public void accept(visitor.Visitor v) throws Exception {

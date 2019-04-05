@@ -121,6 +121,8 @@ public interface GJNoArguVisitor<R> {
     * f0 -> Block()
     *       | AssignmentStatement()
     *       | ArrayAssignmentStatement()
+    *       | PlusPlusExpression()
+    *       | MinusMinusExpression()
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
@@ -287,11 +289,25 @@ public interface GJNoArguVisitor<R> {
    public R visit(PlusExpression n) throws Exception;
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+   public R visit(PlusPlusExpression n) throws Exception;
+
+   /**
     * f0 -> PrimaryExpression()
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
    public R visit(MinusExpression n) throws Exception;
+
+   /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+   public R visit(MinusMinusExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

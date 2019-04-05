@@ -188,6 +188,8 @@ public class DepthFirstVisitor implements Visitor {
     * f0 -> Block()
     *       | AssignmentStatement()
     *       | ArrayAssignmentStatement()
+    *       | PlusPlusExpression()
+    *       | MinusMinusExpression()
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
@@ -445,11 +447,33 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+   public void visit(PlusPlusExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
     * f0 -> PrimaryExpression()
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
    public void visit(MinusExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+   public void visit(MinusMinusExpression n) throws Exception {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);

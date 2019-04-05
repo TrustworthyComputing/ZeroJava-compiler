@@ -39,57 +39,61 @@ public interface ZilchParserConstants {
   /** RegularExpression Id. */
   int PLUS = 20;
   /** RegularExpression Id. */
-  int MINUS = 21;
+  int PLUSPLUS = 21;
   /** RegularExpression Id. */
-  int AND = 22;
+  int MINUS = 22;
   /** RegularExpression Id. */
-  int OR = 23;
+  int MINUSMINUS = 23;
   /** RegularExpression Id. */
-  int NOT = 24;
+  int AND = 24;
   /** RegularExpression Id. */
-  int BOOLEAN = 25;
+  int OR = 25;
   /** RegularExpression Id. */
-  int CLASS = 26;
+  int NOT = 26;
   /** RegularExpression Id. */
-  int INTERFACE = 27;
+  int BOOLEAN = 27;
   /** RegularExpression Id. */
-  int ELSE = 28;
+  int CLASS = 28;
   /** RegularExpression Id. */
-  int EXTENDS = 29;
+  int INTERFACE = 29;
   /** RegularExpression Id. */
-  int FALSE = 30;
+  int ELSE = 30;
   /** RegularExpression Id. */
-  int IF = 31;
+  int EXTENDS = 31;
   /** RegularExpression Id. */
-  int WHILE = 32;
+  int FALSE = 32;
   /** RegularExpression Id. */
-  int INTEGER = 33;
+  int IF = 33;
   /** RegularExpression Id. */
-  int MAIN = 34;
+  int WHILE = 34;
   /** RegularExpression Id. */
-  int NEW = 35;
+  int INTEGER = 35;
   /** RegularExpression Id. */
-  int PUBLIC = 36;
+  int MAIN = 36;
   /** RegularExpression Id. */
-  int RETURN = 37;
+  int NEW = 37;
   /** RegularExpression Id. */
-  int STATIC = 38;
+  int PUBLIC = 38;
   /** RegularExpression Id. */
-  int STRING = 39;
+  int RETURN = 39;
   /** RegularExpression Id. */
-  int TRUE = 40;
+  int STATIC = 40;
   /** RegularExpression Id. */
-  int PRINT = 41;
+  int STRING = 41;
   /** RegularExpression Id. */
-  int VOID = 42;
+  int TRUE = 42;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 43;
+  int PRINT = 43;
   /** RegularExpression Id. */
-  int IDENTIFIER = 44;
+  int VOID = 44;
   /** RegularExpression Id. */
-  int LETTER = 45;
+  int INTEGER_LITERAL = 45;
   /** RegularExpression Id. */
-  int DIGIT = 46;
+  int IDENTIFIER = 46;
+  /** RegularExpression Id. */
+  int LETTER = 47;
+  /** RegularExpression Id. */
+  int DIGIT = 48;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -117,7 +121,9 @@ public interface ZilchParserConstants {
     "\">\"",
     "\"<\"",
     "\"+\"",
+    "\"++\"",
     "\"-\"",
+    "\"--\"",
     "\"&&\"",
     "\"||\"",
     "\"!\"",

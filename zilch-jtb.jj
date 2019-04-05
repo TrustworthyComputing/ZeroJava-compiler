@@ -55,7 +55,9 @@ TOKEN :
    | <GT: ">">
    | <LT: "<">
    | <PLUS: "+">
+   | <PLUSPLUS: "++">
    | <MINUS: "-">
+   | <MINUSMINUS: "--">
    | <AND: "&&">
    | <OR: "||">
    | <NOT: "!">
@@ -374,12 +376,14 @@ Statement Statement() :
    Block n1;
    AssignmentStatement n2;
    ArrayAssignmentStatement n3;
-   IfStatement n4;
-   WhileStatement n5;
-   PrintStatement n6;
-   ReadPrimaryTape n7;
-   ReadPrivateTape n8;
-   AnswerStatement n9;
+   PlusPlusExpression n4;
+   MinusMinusExpression n5;
+   IfStatement n6;
+   WhileStatement n7;
+   PrintStatement n8;
+   ReadPrimaryTape n9;
+   ReadPrivateTape n10;
+   AnswerStatement n11;
 
    
 }
@@ -396,23 +400,31 @@ Statement Statement() :
       n3=ArrayAssignmentStatement()
       { n0 = new NodeChoice(n3, 2); }
    |
-      n4=IfStatement()
+      LOOKAHEAD(Identifier() "++" ";")
+      n4=PlusPlusExpression()
       { n0 = new NodeChoice(n4, 3); }
    |
-      n5=WhileStatement()
+      LOOKAHEAD(Identifier() "--" ";")
+      n5=MinusMinusExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      n6=PrintStatement()
+      n6=IfStatement()
       { n0 = new NodeChoice(n6, 5); }
    |
-      n7=ReadPrimaryTape()
+      n7=WhileStatement()
       { n0 = new NodeChoice(n7, 6); }
    |
-      n8=ReadPrivateTape()
+      n8=PrintStatement()
       { n0 = new NodeChoice(n8, 7); }
    |
-      n9=AnswerStatement()
+      n9=ReadPrimaryTape()
       { n0 = new NodeChoice(n9, 8); }
+   |
+      n10=ReadPrivateTape()
+      { n0 = new NodeChoice(n10, 9); }
+   |
+      n11=AnswerStatement()
+      { n0 = new NodeChoice(n11, 10); }
    )
    
    { return new Statement(n0); }
@@ -853,6 +865,24 @@ PlusExpression PlusExpression() :
    { return new PlusExpression(n0,n1,n3); }
 }
 
+PlusPlusExpression PlusPlusExpression() :
+{
+   Identifier n0;
+   NodeToken n1;
+   Token n2;
+   NodeToken n3;
+   Token n4;
+
+   
+}
+{
+   n0=Identifier()
+   n2="++" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n4=";" { n3 = JTBToolkit.makeNodeToken(n4); }
+   
+   { return new PlusPlusExpression(n0,n1,n3); }
+}
+
 MinusExpression MinusExpression() :
 {
    PrimaryExpression n0;
@@ -868,6 +898,24 @@ MinusExpression MinusExpression() :
    n3=PrimaryExpression()
    
    { return new MinusExpression(n0,n1,n3); }
+}
+
+MinusMinusExpression MinusMinusExpression() :
+{
+   Identifier n0;
+   NodeToken n1;
+   Token n2;
+   NodeToken n3;
+   Token n4;
+
+   
+}
+{
+   n0=Identifier()
+   n2="--" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n4=";" { n3 = JTBToolkit.makeNodeToken(n4); }
+   
+   { return new MinusMinusExpression(n0,n1,n3); }
 }
 
 TimesExpression TimesExpression() :

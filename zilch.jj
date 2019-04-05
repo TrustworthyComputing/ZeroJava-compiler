@@ -37,7 +37,9 @@ TOKEN :
 | < GT: ">" >
 | < LT: "<" >
 | < PLUS: "+" >
+| < PLUSPLUS: "++" >
 | < MINUS: "-" >
+| < MINUSMINUS: "--" >
 | < AND : "&&" >
 | < OR : "||" >
 | < NOT : "!" >
@@ -214,6 +216,12 @@ void Statement() :
   LOOKAHEAD(2)
   ArrayAssignmentStatement()
 |
+  LOOKAHEAD( Identifier() "++" ";" )
+  PlusPlusExpression()
+|
+  LOOKAHEAD( Identifier() "--" ";" )
+  MinusMinusExpression()
+|
   IfStatement()
 |
   WhileStatement()
@@ -376,10 +384,22 @@ void PlusExpression() :
   PrimaryExpression() "+" PrimaryExpression()
 }
 
+void PlusPlusExpression() :
+{}
+{
+  Identifier() "++" ";"
+}
+
 void MinusExpression() :
 {}
 {
   PrimaryExpression() "-" PrimaryExpression()
+}
+
+void MinusMinusExpression() :
+{}
+{
+  Identifier() "--" ";"
 }
 
 void TimesExpression() :

@@ -98,9 +98,9 @@ public class ZilchParser implements ZilchParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
-      case 49:
       case 50:
+      case 51:
+      case 52:
         ;
         break;
       default:
@@ -177,9 +177,9 @@ public class ZilchParser implements ZilchParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
-      case 49:
       case 50:
+      case 51:
+      case 52:
         ;
         break;
       default:
@@ -225,7 +225,7 @@ public class ZilchParser implements ZilchParserConstants {
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 47:
+      case 49:
         ;
         break;
       default:
@@ -244,7 +244,7 @@ public class ZilchParser implements ZilchParserConstants {
    NodeToken n0;
    Token n1;
    FormalParameter n2;
-    n1 = jj_consume_token(47);
+    n1 = jj_consume_token(49);
             n0 = JTBToolkit.makeNodeToken(n1);
     n2 = FormalParameter();
      {if (true) return new FormalParameterTerm(n0,n2);}
@@ -324,12 +324,14 @@ public class ZilchParser implements ZilchParserConstants {
    Block n1;
    AssignmentStatement n2;
    ArrayAssignmentStatement n3;
-   IfStatement n4;
-   WhileStatement n5;
-   PrintStatement n6;
-   ReadPrimaryTape n7;
-   ReadPrivateTape n8;
-   AnswerStatement n9;
+   PlusPlusExpression n4;
+   MinusMinusExpression n5;
+   IfStatement n6;
+   WhileStatement n7;
+   PrintStatement n8;
+   ReadPrimaryTape n9;
+   ReadPrivateTape n10;
+   AnswerStatement n11;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LBRACE:
       n1 = Block();
@@ -343,31 +345,37 @@ public class ZilchParser implements ZilchParserConstants {
       } else if (jj_2_5(2)) {
         n3 = ArrayAssignmentStatement();
         n0 = new NodeChoice(n3, 2);
+      } else if (jj_2_6(2147483647)) {
+        n4 = PlusPlusExpression();
+        n0 = new NodeChoice(n4, 3);
+      } else if (jj_2_7(2147483647)) {
+        n5 = MinusMinusExpression();
+        n0 = new NodeChoice(n5, 4);
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IF:
-          n4 = IfStatement();
-        n0 = new NodeChoice(n4, 3);
-          break;
-        case WHILE:
-          n5 = WhileStatement();
-        n0 = new NodeChoice(n5, 4);
-          break;
-        case PRINT:
-          n6 = PrintStatement();
+          n6 = IfStatement();
         n0 = new NodeChoice(n6, 5);
           break;
-        case 48:
-          n7 = ReadPrimaryTape();
+        case WHILE:
+          n7 = WhileStatement();
         n0 = new NodeChoice(n7, 6);
           break;
-        case 49:
-          n8 = ReadPrivateTape();
+        case PRINT:
+          n8 = PrintStatement();
         n0 = new NodeChoice(n8, 7);
           break;
         case 50:
-          n9 = AnswerStatement();
+          n9 = ReadPrimaryTape();
         n0 = new NodeChoice(n9, 8);
+          break;
+        case 51:
+          n10 = ReadPrivateTape();
+        n0 = new NodeChoice(n10, 9);
+          break;
+        case 52:
+          n11 = AnswerStatement();
+        n0 = new NodeChoice(n11, 10);
           break;
         default:
           jj_la1[7] = jj_gen;
@@ -397,9 +405,9 @@ public class ZilchParser implements ZilchParserConstants {
       case WHILE:
       case PRINT:
       case IDENTIFIER:
-      case 48:
-      case 49:
       case 50:
+      case 51:
+      case 52:
         ;
         break;
       default:
@@ -541,7 +549,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(48);
+    n1 = jj_consume_token(50);
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -564,7 +572,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(49);
+    n1 = jj_consume_token(51);
                            n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -587,7 +595,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n6;
    NodeToken n7;
    Token n8;
-    n1 = jj_consume_token(50);
+    n1 = jj_consume_token(52);
                         n0 = JTBToolkit.makeNodeToken(n1);
     n3 = jj_consume_token(LPAREN);
             n2 = JTBToolkit.makeNodeToken(n3);
@@ -616,43 +624,43 @@ public class ZilchParser implements ZilchParserConstants {
    MessageSend n12;
    MethodCall n13;
    Clause n14;
-    if (jj_2_6(2147483647)) {
+    if (jj_2_8(2147483647)) {
       n1 = AndExpression();
         n0 = new NodeChoice(n1, 0);
-    } else if (jj_2_7(2147483647)) {
+    } else if (jj_2_9(2147483647)) {
       n2 = OrExpression();
         n0 = new NodeChoice(n2, 1);
-    } else if (jj_2_8(2147483647)) {
+    } else if (jj_2_10(2147483647)) {
       n3 = EqExpression();
         n0 = new NodeChoice(n3, 2);
-    } else if (jj_2_9(2147483647)) {
+    } else if (jj_2_11(2147483647)) {
       n4 = LessThanExpression();
         n0 = new NodeChoice(n4, 3);
-    } else if (jj_2_10(2147483647)) {
+    } else if (jj_2_12(2147483647)) {
       n5 = GreaterThanExpression();
         n0 = new NodeChoice(n5, 4);
-    } else if (jj_2_11(2147483647)) {
+    } else if (jj_2_13(2147483647)) {
       n6 = LessEqualThanExpression();
         n0 = new NodeChoice(n6, 5);
-    } else if (jj_2_12(2147483647)) {
+    } else if (jj_2_14(2147483647)) {
       n7 = GreaterEqualThanExpression();
         n0 = new NodeChoice(n7, 6);
-    } else if (jj_2_13(2147483647)) {
+    } else if (jj_2_15(2147483647)) {
       n8 = PlusExpression();
         n0 = new NodeChoice(n8, 7);
-    } else if (jj_2_14(2147483647)) {
+    } else if (jj_2_16(2147483647)) {
       n9 = MinusExpression();
         n0 = new NodeChoice(n9, 8);
-    } else if (jj_2_15(2147483647)) {
+    } else if (jj_2_17(2147483647)) {
       n10 = TimesExpression();
         n0 = new NodeChoice(n10, 9);
-    } else if (jj_2_16(2147483647)) {
+    } else if (jj_2_18(2147483647)) {
       n11 = ArrayLookup();
         n0 = new NodeChoice(n11, 10);
-    } else if (jj_2_17(2147483647)) {
+    } else if (jj_2_19(2147483647)) {
       n12 = MessageSend();
         n0 = new NodeChoice(n12, 11);
-    } else if (jj_2_18(2147483647)) {
+    } else if (jj_2_20(2147483647)) {
       n13 = MethodCall();
         n0 = new NodeChoice(n13, 12);
     } else {
@@ -709,7 +717,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(51);
+    n2 = jj_consume_token(53);
              n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new EqExpression(n0,n1,n3);}
@@ -748,7 +756,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(52);
+    n2 = jj_consume_token(54);
              n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new LessEqualThanExpression(n0,n1,n3);}
@@ -761,7 +769,7 @@ public class ZilchParser implements ZilchParserConstants {
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(53);
+    n2 = jj_consume_token(55);
              n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new GreaterEqualThanExpression(n0,n1,n3);}
@@ -781,6 +789,21 @@ public class ZilchParser implements ZilchParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  final public PlusPlusExpression PlusPlusExpression() throws ParseException {
+   Identifier n0;
+   NodeToken n1;
+   Token n2;
+   NodeToken n3;
+   Token n4;
+    n0 = Identifier();
+    n2 = jj_consume_token(PLUSPLUS);
+             n1 = JTBToolkit.makeNodeToken(n2);
+    n4 = jj_consume_token(SEMICOLON);
+            n3 = JTBToolkit.makeNodeToken(n4);
+     {if (true) return new PlusPlusExpression(n0,n1,n3);}
+    throw new Error("Missing return statement in function");
+  }
+
   final public MinusExpression MinusExpression() throws ParseException {
    PrimaryExpression n0;
    NodeToken n1;
@@ -794,13 +817,28 @@ public class ZilchParser implements ZilchParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  final public MinusMinusExpression MinusMinusExpression() throws ParseException {
+   Identifier n0;
+   NodeToken n1;
+   Token n2;
+   NodeToken n3;
+   Token n4;
+    n0 = Identifier();
+    n2 = jj_consume_token(MINUSMINUS);
+             n1 = JTBToolkit.makeNodeToken(n2);
+    n4 = jj_consume_token(SEMICOLON);
+            n3 = JTBToolkit.makeNodeToken(n4);
+     {if (true) return new MinusMinusExpression(n0,n1,n3);}
+    throw new Error("Missing return statement in function");
+  }
+
   final public TimesExpression TimesExpression() throws ParseException {
    PrimaryExpression n0;
    NodeToken n1;
    Token n2;
    PrimaryExpression n3;
     n0 = PrimaryExpression();
-    n2 = jj_consume_token(54);
+    n2 = jj_consume_token(56);
             n1 = JTBToolkit.makeNodeToken(n2);
     n3 = PrimaryExpression();
      {if (true) return new TimesExpression(n0,n1,n3);}
@@ -909,7 +947,7 @@ public class ZilchParser implements ZilchParserConstants {
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 47:
+      case 49:
         ;
         break;
       default:
@@ -928,7 +966,7 @@ public class ZilchParser implements ZilchParserConstants {
    NodeToken n0;
    Token n1;
    Expression n2;
-    n1 = jj_consume_token(47);
+    n1 = jj_consume_token(49);
             n0 = JTBToolkit.makeNodeToken(n1);
     n2 = Expression();
      {if (true) return new ExpressionTerm(n0,n2);}
@@ -990,7 +1028,7 @@ public class ZilchParser implements ZilchParserConstants {
       break;
     default:
       jj_la1[14] = jj_gen;
-      if (jj_2_19(3)) {
+      if (jj_2_21(3)) {
         n5 = ArrayAllocationExpression();
         n0 = new NodeChoice(n5, 4);
       } else {
@@ -1251,12 +1289,37 @@ public class ZilchParser implements ZilchParserConstants {
     finally { jj_save(18, xla); }
   }
 
-  private boolean jj_3R_16() {
-    if (jj_scan_token(NEW)) return true;
-    if (jj_scan_token(INTEGER)) return true;
+  private boolean jj_2_20(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_20(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(19, xla); }
+  }
+
+  private boolean jj_2_21(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_21(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(20, xla); }
+  }
+
+  private boolean jj_3R_62() {
+    if (jj_3R_15()) return true;
     if (jj_scan_token(LSQPAREN)) return true;
-    if (jj_3R_37()) return true;
+    if (jj_3R_15()) return true;
     if (jj_scan_token(RSQPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    if (jj_3R_14()) return true;
+    if (jj_scan_token(OR)) return true;
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
@@ -1265,32 +1328,27 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_53() {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(OR)) return true;
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_65() {
-    if (jj_3R_67()) return true;
-    return false;
-  }
-
   private boolean jj_3_1() {
     if (jj_3R_9()) return true;
     return false;
   }
 
-  private boolean jj_3R_63() {
+  private boolean jj_3R_30() {
+    if (jj_scan_token(INTEGER_LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_52() {
     if (jj_3R_14()) return true;
-    if (jj_scan_token(DOT)) return true;
+    if (jj_scan_token(AND)) return true;
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_61() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_65()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAREN)) return true;
+    if (jj_scan_token(56)) return true;
+    if (jj_3R_15()) return true;
     return false;
   }
 
@@ -1299,26 +1357,48 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_15() {
-    if (jj_scan_token(IDENTIFIER)) return true;
+  private boolean jj_3_20() {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
-  private boolean jj_3R_52() {
+  private boolean jj_3R_25() {
+    if (jj_3R_34()) return true;
+    return false;
+  }
+
+  private boolean jj_3_19() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(DOT)) return true;
     if (jj_3R_13()) return true;
-    if (jj_scan_token(AND)) return true;
-    if (jj_3R_13()) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_51() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
   private boolean jj_3_18() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(LPAREN)) return true;
+    if (jj_scan_token(LSQPAREN)) return true;
     return false;
   }
 
-  private boolean jj_3R_32() {
-    if (jj_scan_token(FALSE)) return true;
+  private boolean jj_3_21() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_50() {
+    if (jj_3R_64()) return true;
     return false;
   }
 
@@ -1330,45 +1410,13 @@ public class ZilchParser implements ZilchParserConstants {
   }
 
   private boolean jj_3_17() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(DOT)) return true;
     if (jj_3R_15()) return true;
-    if (jj_scan_token(LPAREN)) return true;
+    if (jj_scan_token(56)) return true;
     return false;
   }
 
-  private boolean jj_3R_51() {
+  private boolean jj_3R_23() {
     if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_16() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(LSQPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_50() {
-    if (jj_3R_64()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_62() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(LSQPAREN)) return true;
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(RSQPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(54)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_31() {
-    if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
@@ -1377,14 +1425,14 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3_14() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(MINUS)) return true;
+  private boolean jj_3R_22() {
+    if (jj_3R_32()) return true;
     return false;
   }
 
-  private boolean jj_3R_28() {
+  private boolean jj_3_16() {
     if (jj_3R_15()) return true;
+    if (jj_scan_token(MINUS)) return true;
     return false;
   }
 
@@ -1393,20 +1441,19 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_3R_17()) return true;
-    if (jj_3R_15()) return true;
+  private boolean jj_3R_21() {
+    if (jj_3R_31()) return true;
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_3R_14()) return true;
+  private boolean jj_3_15() {
+    if (jj_3R_15()) return true;
     if (jj_scan_token(PLUS)) return true;
     return false;
   }
 
-  private boolean jj_3R_27() {
-    if (jj_3R_36()) return true;
+  private boolean jj_3R_20() {
+    if (jj_3R_30()) return true;
     return false;
   }
 
@@ -1415,14 +1462,34 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_26() {
-    if (jj_3R_35()) return true;
+  private boolean jj_3_14() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(55)) return true;
     return false;
   }
 
-  private boolean jj_3_12() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(53)) return true;
+  private boolean jj_3R_15() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_20()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_23()) {
+    jj_scanpos = xsp;
+    if (jj_3_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_24()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
     return false;
   }
 
@@ -1431,8 +1498,59 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_30() {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
+  private boolean jj_3R_28() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3_13() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(54)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_60() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_3R_17()) return true;
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_45() {
+    if (jj_3R_59()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  private boolean jj_3_12() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(GT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    if (jj_3R_35()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_44() {
+    if (jj_3R_58()) return true;
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(LT)) return true;
     return false;
   }
 
@@ -1441,21 +1559,14 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3_11() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(52)) return true;
+  private boolean jj_3R_43() {
+    if (jj_3R_57()) return true;
     return false;
   }
 
-  private boolean jj_3R_61() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(54)) return true;
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_45() {
-    if (jj_3R_59()) return true;
+  private boolean jj_3_10() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(53)) return true;
     return false;
   }
 
@@ -1475,57 +1586,19 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3_10() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(GT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_44() {
-    if (jj_3R_58()) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(LT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_43() {
-    if (jj_3R_57()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    if (jj_3R_34()) return true;
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(51)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
   private boolean jj_3R_42() {
     if (jj_3R_56()) return true;
     return false;
   }
 
-  private boolean jj_3_7() {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(OR)) return true;
+  private boolean jj_3R_19() {
+    if (jj_3R_15()) return true;
     return false;
   }
 
-  private boolean jj_3_19() {
-    if (jj_3R_16()) return true;
+  private boolean jj_3_9() {
+    if (jj_3R_14()) return true;
+    if (jj_scan_token(OR)) return true;
     return false;
   }
 
@@ -1534,26 +1607,19 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_60() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_14()) return true;
+  private boolean jj_3R_18() {
+    if (jj_3R_29()) return true;
     return false;
   }
 
-  private boolean jj_3_6() {
-    if (jj_3R_13()) return true;
+  private boolean jj_3_8() {
+    if (jj_3R_14()) return true;
     if (jj_scan_token(AND)) return true;
     return false;
   }
 
-  private boolean jj_3R_23() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
   private boolean jj_3R_12() {
-    if (jj_3R_15()) return true;
+    if (jj_3R_13()) return true;
     if (jj_scan_token(LSQPAREN)) return true;
     return false;
   }
@@ -1563,8 +1629,13 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_22() {
-    if (jj_3R_32()) return true;
+  private boolean jj_3R_14() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_18()) {
+    jj_scanpos = xsp;
+    if (jj_3R_19()) return true;
+    }
     return false;
   }
 
@@ -1573,43 +1644,8 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_21() {
-    if (jj_3R_31()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
-    if (jj_3R_30()) return true;
-    return false;
-  }
-
   private boolean jj_3R_38() {
     if (jj_3R_52()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
-    if (jj_3R_21()) {
-    jj_scanpos = xsp;
-    if (jj_3R_22()) {
-    jj_scanpos = xsp;
-    if (jj_3R_23()) {
-    jj_scanpos = xsp;
-    if (jj_3_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_24()) {
-    jj_scanpos = xsp;
-    if (jj_3R_25()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
     return false;
   }
 
@@ -1660,54 +1696,14 @@ public class ZilchParser implements ZilchParserConstants {
   }
 
   private boolean jj_3R_59() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(PLUS)) return true;
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_58() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(53)) return true;
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_18()) {
-    jj_scanpos = xsp;
-    if (jj_3R_19()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_57() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(52)) return true;
-    if (jj_3R_14()) return true;
+    if (jj_scan_token(PLUS)) return true;
+    if (jj_3R_15()) return true;
     return false;
   }
 
   private boolean jj_3R_70() {
-    if (jj_scan_token(47)) return true;
+    if (jj_scan_token(49)) return true;
     if (jj_3R_37()) return true;
     return false;
   }
@@ -1719,20 +1715,21 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
+  private boolean jj_3R_11() {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    return false;
+  }
+
   private boolean jj_3R_69() {
     if (jj_3R_70()) return true;
     return false;
   }
 
-  private boolean jj_3R_56() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(GT)) return true;
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_9()) return true;
+  private boolean jj_3R_58() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(55)) return true;
+    if (jj_3R_15()) return true;
     return false;
   }
 
@@ -1747,13 +1744,6 @@ public class ZilchParser implements ZilchParserConstants {
 
   private boolean jj_3R_29() {
     if (jj_scan_token(NOT)) return true;
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_55() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(LT)) return true;
     if (jj_3R_14()) return true;
     return false;
   }
@@ -1764,21 +1754,18 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3_5() {
-    if (jj_3R_12()) return true;
+  private boolean jj_3R_57() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(54)) return true;
+    if (jj_3R_15()) return true;
     return false;
   }
 
   private boolean jj_3R_33() {
     if (jj_scan_token(NEW)) return true;
-    if (jj_3R_15()) return true;
+    if (jj_3R_13()) return true;
     if (jj_scan_token(LPAREN)) return true;
     if (jj_scan_token(RPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1787,20 +1774,99 @@ public class ZilchParser implements ZilchParserConstants {
     return false;
   }
 
-  private boolean jj_3R_54() {
-    if (jj_3R_14()) return true;
-    if (jj_scan_token(51)) return true;
-    if (jj_3R_14()) return true;
+  private boolean jj_3R_56() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(GT)) return true;
+    if (jj_3R_15()) return true;
     return false;
   }
 
   private boolean jj_3R_64() {
-    if (jj_3R_15()) return true;
+    if (jj_3R_13()) return true;
     if (jj_scan_token(LPAREN)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_66()) jj_scanpos = xsp;
     if (jj_scan_token(RPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    if (jj_scan_token(NEW)) return true;
+    if (jj_scan_token(INTEGER)) return true;
+    if (jj_scan_token(LSQPAREN)) return true;
+    if (jj_3R_37()) return true;
+    if (jj_scan_token(RSQPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(MINUSMINUS)) return true;
+    if (jj_scan_token(SEMICOLON)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(PLUSPLUS)) return true;
+    if (jj_scan_token(SEMICOLON)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(LT)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_65() {
+    if (jj_3R_67()) return true;
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_63() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_65()) jj_scanpos = xsp;
+    if (jj_scan_token(RPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_54() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(53)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_32() {
+    if (jj_scan_token(FALSE)) return true;
     return false;
   }
 
@@ -1823,12 +1889,12 @@ public class ZilchParser implements ZilchParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x2000000,0x80002000,0x2000000,0x80002000,0x0,0x2000000,0x2000,0x80000000,0x80002000,0x41000200,0x41000200,0x41000200,0x0,0x41000200,0x40000000,0x200,};
+      jj_la1_0 = new int[] {0x8000000,0x2000,0x8000000,0x2000,0x0,0x8000000,0x2000,0x0,0x2000,0x4000200,0x4000200,0x4000200,0x0,0x4000200,0x0,0x200,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x1002,0x71201,0x1002,0x71201,0x8000,0x1002,0x0,0x70201,0x71201,0x1908,0x1908,0x1908,0x8000,0x1908,0x1900,0x8,};
+      jj_la1_1 = new int[] {0x4008,0x1c4806,0x4008,0x1c4806,0x20000,0x4008,0x0,0x1c0806,0x1c4806,0x6421,0x6421,0x6421,0x20000,0x6421,0x6401,0x20,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[19];
+  final private JJCalls[] jj_2_rtns = new JJCalls[21];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -2015,7 +2081,7 @@ public class ZilchParser implements ZilchParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[55];
+    boolean[] la1tokens = new boolean[57];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2032,7 +2098,7 @@ public class ZilchParser implements ZilchParserConstants {
         }
       }
     }
-    for (int i = 0; i < 55; i++) {
+    for (int i = 0; i < 57; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -2059,7 +2125,7 @@ public class ZilchParser implements ZilchParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 19; i++) {
+    for (int i = 0; i < 21; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -2085,6 +2151,8 @@ public class ZilchParser implements ZilchParserConstants {
             case 16: jj_3_17(); break;
             case 17: jj_3_18(); break;
             case 18: jj_3_19(); break;
+            case 19: jj_3_20(); break;
+            case 20: jj_3_21(); break;
           }
         }
         p = p.next;
