@@ -24,7 +24,7 @@ Zilch files use the `.zl` extension.
 | `>`      | Greater than			|
 | `>=`     | Greater or Equal than	|
 | `&&`     | Logical `AND`			|
-| \|\|     | Logical `OR`			|
+| `\|\|`   | Logical `OR`			|
 
 
 ### Zilch Assignment Operators
