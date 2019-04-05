@@ -9,6 +9,8 @@ Below we briefly describe the language.
 Zilch has one main method and also supports arbitrary methods.
 Methods should be defined before they are used (each definition should be before the first invocation).
 Zilch supports three types for both methods and variables; int, boolean, and int [ ] which is an array of ints.
+Variable definitions and variable assignments should be in different lines (i.e., `int x;` and in a following line `x = 4;`).
+Arrays of integers are initialized as follows: `int [ ] arr;`, `arr = new int[10];`.
 Function parameters are always passed by value.
 Zilch program source text is free-format, using the semicolon as a statement terminator and curly braces for grouping blocks of statements, such as while loops and if-else statements.
 Zilch files use the `.zl` extension.
@@ -36,8 +38,8 @@ Zilch files use the `.zl` extension.
 | JMP ri rj A    | goto label A                                         |
 | CJMP ri rj A   | if (flag) then goto label A                          |
 | CNJMP ri rj A  | if (!flag) then goto label A                         |
-| STORE ri rj A  | [A] = ri                                             |
-| LOAD ri rj A   | ri = [A]                                             |
+| STOREW ri rj A  | [A] = ri                                            |
+| LOADW ri rj A   | ri = [A]                                            |
 | ANSWER ri rj A | return A                                             |
 
 
