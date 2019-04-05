@@ -1,13 +1,13 @@
-# ![alt text][logo] TinyJava to TinyRAM compiler [![License MIT][badge-license]](LICENSE) 
+# ![alt text][logo] Zilch to TinyRAM compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate a custom Java-like subset (TinyJava) to TinyRAM. 
+A compiler to translate a custom Java-like subset (Zilch) to TinyRAM.
 
-### TinyJava:
-TinyJava is a custom designed language for easy translation to TinyRAM and thus easy Zero-Knowledge Proofs creation.
+### Zilch:
+Zilch is a custom designed language for easy translation to TinyRAM and thus easy Zero-Knowledge Proofs creation.
 Below we briefly describe the language.
 
-TinyJava has one main class that contains a single main method and no fields. 
-TinyJava supports three types: int, boolean, and int [ ] which is an array of int.
+Zilch has one main class that contains a single main method and no fields.
+Zilch supports three types: int, boolean, and int [ ] which is an array of int.
 
 
 ### TinyRAM ISA
@@ -40,15 +40,15 @@ TinyJava supports three types: int, boolean, and int [ ] which is an array of in
 ## Compilation & Execution:
 To compile the compiler type `make`.
 
-Then, use the `tjrc` script to compile TinyJava programs to TinyRAM assembly code.
+Then, use the `tjrc` script to compile Zilch programs to TinyRAM assembly code.
 Below are some usage examples.
 
 
-### TinyJava Examples:
+### Zilch Examples:
 
 A simple program that performs addition:
 ```
-./tjrc tinyjava-examples/simpleAdd.java
+./tjrc zilch-examples/simpleAdd.java
 ```
 ```
 class SimpleAdd {
@@ -72,7 +72,7 @@ ANSWER r3 r3 r3
 
 A more complex program that reads inputs from the primary tape and adds them all together:
 ```
-./tjrc tinyjava-examples/Addloop.java
+./tjrc zilch-examples/Addloop.java
 ```
 ```
 class AddLoop {
@@ -108,7 +108,7 @@ __L2__
 ANSWER r3 r3 r3
 ```
 
-More TinyJava examples can be found in the [tinyjava-examples](./tinyjava-examples) directory.
+More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
 
 
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group

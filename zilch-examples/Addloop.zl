@@ -3,7 +3,7 @@ void main(void) {
 	int from_tape;
 	int res;
 	i = 0 ;
-	while (5 > i) {
+	while (i < 5) {
 		PrimaryTape.read(from_tape);
 		res = res + from_tape;
 		i = i + 1;

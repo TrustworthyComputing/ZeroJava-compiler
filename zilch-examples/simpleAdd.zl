@@ -1,0 +1,9 @@
+void main(void) {
+	int x;
+	int y;
+	x = foo();
+	y = bar();
+	x = 12;
+	y = 13;
+	Prover.answer(x + y);
+}

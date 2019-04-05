@@ -17,7 +17,7 @@ public class Main {
         for (String arg : args) {
             try {
                 fis = new FileInputStream(arg);
-                TinyJavaParser parser = new TinyJavaParser(fis);
+                ZilchParser parser = new ZilchParser(fis);
                 Goal root = parser.Goal();
                 SymbolTableVisitor stvisitor = new SymbolTableVisitor();
                 try {
@@ -26,7 +26,7 @@ public class Main {
                     TinyRAMGenVisitor generator = new TinyRAMGenVisitor(symbol_table);
                     root.accept(generator, null);
                     // stvisitor.printST();
-                    
+
                     /* Write the generated code to the same directory as .asm file */
                     File fp = new File(arg);
                     String path = fp.getPath();

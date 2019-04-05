@@ -7,12 +7,12 @@ options {
    STATIC = false;
 }
 
-PARSER_BEGIN(TinyJavaParser)
+PARSER_BEGIN(ZilchParser)
 import syntaxtree.*;
 import java.util.Vector;
 
 
-public class TinyJavaParser 
+public class ZilchParser 
 {
 }
 
@@ -23,7 +23,7 @@ class JTBToolkit {
 }
 
 
-PARSER_END(TinyJavaParser)
+PARSER_END(ZilchParser)
 
 SKIP :
 {

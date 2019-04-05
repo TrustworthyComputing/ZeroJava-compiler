@@ -3,9 +3,9 @@ options {
   STATIC = false;
 }
 
-PARSER_BEGIN(TinyJavaParser)
-  public class TinyJavaParser {}
-PARSER_END(TinyJavaParser)
+PARSER_BEGIN(ZilchParser)
+  public class ZilchParser {}
+PARSER_END(ZilchParser)
 
 SKIP : /* WHITE SPACE */
 {
@@ -23,7 +23,7 @@ SPECIAL_TOKEN : /* COMMENTS */
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-TOKEN : 
+TOKEN :
 {
   < LPAREN: "(" >
 | < RPAREN: ")" >
@@ -38,10 +38,10 @@ TOKEN :
 | < LT: "<" >
 | < PLUS: "+" >
 | < MINUS: "-" >
-| < AND : "&&" >   
-| < OR : "||" >   
-| < NOT : "!" >   
-| < BOOLEAN: "boolean" >   
+| < AND : "&&" >
+| < OR : "||" >
+| < NOT : "!" >
+| < BOOLEAN: "boolean" >
 | < CLASS: "class" >
 | < INTERFACE: "interface" >
 | < ELSE: "else" >
@@ -49,7 +49,7 @@ TOKEN :
 | < FALSE: "false" >
 | < IF: "if" >
 | < WHILE: "while" >
-| < INTEGER: "int" >   
+| < INTEGER: "int" >
 | < MAIN: "main" >
 | < NEW: "new" >
 | < PUBLIC: "public" >
@@ -58,7 +58,7 @@ TOKEN :
 | < STRING: "String" >
 | < TRUE: "true" >
 | < PRINT: "System.out.println" >
-| < VOID: "void" >         
+| < VOID: "void" >
 }
 
 TOKEN : /* LITERALS */
@@ -111,7 +111,7 @@ TOKEN : /* IDENTIFIERS */
 
 
 /************************************
- * The TinyJava Grammar Starts Here *
+ * The Zilch Grammar Starts Here *
  ************************************/
 
 
@@ -123,28 +123,28 @@ void Goal() :
     <EOF>
 }
 
-void VarDeclaration() :  
+void VarDeclaration() :
 {}
-{ 
-  Type() Identifier() ";"      
+{
+  Type() Identifier() ";"
 }
 
 
-void MainMethodDeclaration() :  
+void MainMethodDeclaration() :
 {}
 {
   "void" "main" "(" "void" ")" "{"
-    ( LOOKAHEAD(2) VarDeclaration() )* 
+    ( LOOKAHEAD(2) VarDeclaration() )*
     ( Statement() )*
   "}"
 }
 
-void MethodDeclaration() :  
+void MethodDeclaration() :
 {}
 {
-  Type() Identifier() 
-  "(" ( FormalParameterList() )? ")"   
-  "{" ( LOOKAHEAD(2) VarDeclaration() )* 
+  Type() Identifier()
+  "(" ( FormalParameterList() )? ")"
+  "{" ( LOOKAHEAD(2) VarDeclaration() )*
       ( Statement() )* "return" Expression() ";" "}"
 }
 
@@ -182,7 +182,7 @@ void Type() :
 |
   IntegerType()
 |
-  Identifier()     
+  Identifier()
 }
 
 void ArrayType() :
@@ -207,7 +207,7 @@ void Statement() :
 {}
 {
   Block()
-| 
+|
   LOOKAHEAD(2)
   AssignmentStatement()
 |
@@ -248,13 +248,13 @@ void ArrayAssignmentStatement() :
 void IfStatement() :
 {}
 {
-  "if" "(" Expression() ")" Statement() "else" Statement() 
+  "if" "(" Expression() ")" Statement() "else" Statement()
 }
 
 void WhileStatement() :
 {}
 {
-  "while" "(" Expression() ")" Statement() 
+  "while" "(" Expression() ")" Statement()
 }
 
 void PrintStatement() :
@@ -323,49 +323,49 @@ void Expression() :
 |
   LOOKAHEAD( Identifier() "(" )
   MethodCall()
-| 
+|
   Clause()
 }
 
 void AndExpression() :
-{} 
+{}
 {
   Clause() "&&" Clause()
 }
 
 void OrExpression() :
-{} 
+{}
 {
   Clause() "||" Clause()
 }
 
 
 void EqExpression() :
-{} 
+{}
 {
   PrimaryExpression() "==" PrimaryExpression()
 }
 
 void LessThanExpression() :
-{} 
+{}
 {
   PrimaryExpression() "<" PrimaryExpression()
 }
 
 void GreaterThanExpression() :
-{} 
+{}
 {
   PrimaryExpression() ">" PrimaryExpression()
 }
 
 void LessEqualThanExpression() :
-{} 
+{}
 {
   PrimaryExpression() "<=" PrimaryExpression()
 }
 
 void GreaterEqualThanExpression() :
-{} 
+{}
 {
   PrimaryExpression() ">=" PrimaryExpression()
 }
@@ -397,7 +397,7 @@ void ArrayLookup() :
 void MessageSend() :
 {}
 {
-  PrimaryExpression() "." Identifier() 
+  PrimaryExpression() "." Identifier()
   "(" ( ExpressionList() )? ")"
 }
 
@@ -447,7 +447,7 @@ void PrimaryExpression() :
   ArrayAllocationExpression()
 |
   AllocationExpression()
-|   
+|
   BracketExpression()
 }
 
