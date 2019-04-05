@@ -5,4 +5,5 @@ void main(void) {
 	x = 34;
 	arr[22] = x;
 	arr[33] = arr[22];
+	Prover.answer(arr[33]);
 }

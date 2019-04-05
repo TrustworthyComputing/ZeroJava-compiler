@@ -244,15 +244,13 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (this.is_inline_meth_) {
 			this.inline_meth_ += "ADD " + array + " " + array + " " + idx + "\n";
 			this.inline_meth_ += "MOV " + res + " " + res + " " + expr + "\n";
-			this.inline_meth_ += "STORE " + res + " " + res + " " + array + "\n";
+			this.inline_meth_ += "STOREW " + res + " " + res + " " + array + "\n";
 			this.inline_meth_ += "SUB " + array + " " + array + " " + idx + "\n";
-			this.inline_meth_ += "\n";
 		} else {
 			this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
 			this.result_ += "MOV " + res + " " + res + " " + expr + "\n";
-			this.result_ += "STORE " + res + " " + res + " " + array + "\n";
+			this.result_ += "STOREW " + res + " " + res + " " + array + "\n";
 			this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
-			this.result_ += "\n";
 		}
 		return new Variable_t(res, null);
 	}
@@ -601,14 +599,12 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String res = new String("r" + ++glob_temp_cnt_);
 		if (this.is_inline_meth_) {
 			this.inline_meth_ += "ADD " + array + " " + array + " " + idx + "\n";
-			this.inline_meth_ += "LOAD " + res + " " + res + " " + array + "\n";
+			this.inline_meth_ += "LOADW " + res + " " + res + " " + array + "\n";
 			this.inline_meth_ += "SUB " + array + " " + array + " " + idx + "\n";
-			this.inline_meth_ += "\n";
 		} else {
 			this.result_ += "ADD " + array + " " + array + " " + idx + "\n";
-			this.result_ += "LOAD " + res + " " + res + " " + array + "\n";
+			this.result_ += "LOADW " + res + " " + res + " " + array + "\n";
 			this.result_ += "SUB " + array + " " + array + " " + idx + "\n";
-			this.result_ += "\n";
 		}
 		return new Variable_t(res, null);
 	}
