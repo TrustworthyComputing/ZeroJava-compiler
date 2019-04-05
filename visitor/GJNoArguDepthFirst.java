@@ -237,6 +237,8 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public R visit(Statement n) throws Exception {
@@ -378,6 +380,48 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
       n.f2.accept(this);
       n.f3.accept(this);
       n.f4.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrimaryTape n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      n.f6.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrivateTape n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      n.f6.accept(this);
       return _ret;
    }
 

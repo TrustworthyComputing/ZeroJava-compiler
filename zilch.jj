@@ -232,6 +232,10 @@ void Statement() :
 |
   ReadPrivateTape()
 |
+  SeekPrimaryTape()
+|
+  SeekPrivateTape()
+|
   AnswerStatement()
 }
 
@@ -281,6 +285,18 @@ void ReadPrivateTape() :
 {}
 {
   "PrivateTape.read" "(" Expression() ")" ";"
+}
+
+void SeekPrimaryTape() :
+{}
+{
+  "PrimaryTape.seek" "(" Expression() "," Expression() ")" ";"
+}
+
+void SeekPrivateTape() :
+{}
+{
+  "PrivateTape.seek" "(" Expression() "," Expression() ")" ";"
 }
 
 void AnswerStatement() :

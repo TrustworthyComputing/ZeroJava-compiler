@@ -183,6 +183,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | PrintStatement()
 	*       | ReadPrimaryTape()
 	* 		| ReadPrivateTape()
+	*       | SeekPrimaryTape()
+	* 		| SeekPrivateTape()
 	* 		| AnswerStatement()
 	*/
 	public BaseType visit(Statement n, BaseType argu) throws Exception {
@@ -359,6 +361,46 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			this.inline_meth_ += "READ " + t + " " + t + " " + 1 +"\n";
 		} else {
 			this.result_ += "READ " + t + " " + t + " " + 1 +"\n";
+		}
+		return null;
+	}
+	
+	/**
+	* f0 -> "PrimaryTape.seek"
+	* f1 -> "("
+	* f2 -> Expression()
+	* f3 -> ","
+	* f4 -> Expression()
+	* f5 -> ")"
+	* f6 -> ";"
+	*/
+	public BaseType visit(SeekPrimaryTape n, BaseType argu) throws Exception {
+		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
+		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "SEEK " + dst + " " + idx + " " + 0 +"\n";
+		} else {
+			this.result_ += "SEEK " + dst + " " + idx + " " + 0 +"\n";
+		}
+		return null;
+	}
+	
+	/**
+	* f0 -> "PrivateTape.seek"
+	* f1 -> "("
+	* f2 -> Expression()
+	* f3 -> ","
+	* f4 -> Expression()
+	* f5 -> ")"
+	* f6 -> ";"
+	*/
+	public BaseType visit(SeekPrivateTape n, BaseType argu) throws Exception {
+		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
+		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "SEEK " + dst + " " + idx + " " + 1 +"\n";
+		} else {
+			this.result_ += "SEEK " + dst + " " + idx + " " + 1 +"\n";
 		}
 		return null;
 	}

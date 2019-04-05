@@ -383,7 +383,9 @@ Statement Statement() :
    PrintStatement n8;
    ReadPrimaryTape n9;
    ReadPrivateTape n10;
-   AnswerStatement n11;
+   SeekPrimaryTape n11;
+   SeekPrivateTape n12;
+   AnswerStatement n13;
 
    
 }
@@ -423,8 +425,14 @@ Statement Statement() :
       n10=ReadPrivateTape()
       { n0 = new NodeChoice(n10, 9); }
    |
-      n11=AnswerStatement()
+      n11=SeekPrimaryTape()
       { n0 = new NodeChoice(n11, 10); }
+   |
+      n12=SeekPrivateTape()
+      { n0 = new NodeChoice(n12, 11); }
+   |
+      n13=AnswerStatement()
+      { n0 = new NodeChoice(n13, 12); }
    )
    
    { return new Statement(n0); }
@@ -622,6 +630,64 @@ ReadPrivateTape ReadPrivateTape() :
    n8=";" { n7 = JTBToolkit.makeNodeToken(n8); }
    
    { return new ReadPrivateTape(n0,n2,n4,n5,n7); }
+}
+
+SeekPrimaryTape SeekPrimaryTape() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   Expression n4;
+   NodeToken n5;
+   Token n6;
+   Expression n7;
+   NodeToken n8;
+   Token n9;
+   NodeToken n10;
+   Token n11;
+
+   
+}
+{
+   n1="PrimaryTape.seek" { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
+   n4=Expression()
+   n6="," { n5 = JTBToolkit.makeNodeToken(n6); }
+   n7=Expression()
+   n9=")" { n8 = JTBToolkit.makeNodeToken(n9); }
+   n11=";" { n10 = JTBToolkit.makeNodeToken(n11); }
+   
+   { return new SeekPrimaryTape(n0,n2,n4,n5,n7,n8,n10); }
+}
+
+SeekPrivateTape SeekPrivateTape() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   Expression n4;
+   NodeToken n5;
+   Token n6;
+   Expression n7;
+   NodeToken n8;
+   Token n9;
+   NodeToken n10;
+   Token n11;
+
+   
+}
+{
+   n1="PrivateTape.seek" { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
+   n4=Expression()
+   n6="," { n5 = JTBToolkit.makeNodeToken(n6); }
+   n7=Expression()
+   n9=")" { n8 = JTBToolkit.makeNodeToken(n9); }
+   n11=";" { n10 = JTBToolkit.makeNodeToken(n11); }
+   
+   { return new SeekPrivateTape(n0,n2,n4,n5,n7,n8,n10); }
 }
 
 AnswerStatement AnswerStatement() :

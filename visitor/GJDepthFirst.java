@@ -237,6 +237,8 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public R visit(Statement n, A argu) throws Exception {
@@ -378,6 +380,48 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
       n.f2.accept(this, argu);
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrimaryTape n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrivateTape n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
       return _ret;
    }
 

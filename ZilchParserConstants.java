@@ -152,6 +152,8 @@ public interface ZilchParserConstants {
     "\",\"",
     "\"PrimaryTape.read\"",
     "\"PrivateTape.read\"",
+    "\"PrimaryTape.seek\"",
+    "\"PrivateTape.seek\"",
     "\"Prover.answer\"",
     "\"==\"",
     "\"<=\"",

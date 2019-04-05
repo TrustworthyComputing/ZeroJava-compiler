@@ -195,6 +195,8 @@ public class DepthFirstVisitor implements Visitor {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public void visit(Statement n) throws Exception {
@@ -321,6 +323,44 @@ public class DepthFirstVisitor implements Visitor {
       n.f2.accept(this);
       n.f3.accept(this);
       n.f4.accept(this);
+   }
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrimaryTape n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      n.f6.accept(this);
+   }
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrivateTape n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      n.f6.accept(this);
    }
 
    /**

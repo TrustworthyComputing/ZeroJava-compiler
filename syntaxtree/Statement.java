@@ -16,6 +16,8 @@ package syntaxtree;
  *       | PrintStatement()
  *       | ReadPrimaryTape()
  *       | ReadPrivateTape()
+ *       | SeekPrimaryTape()
+ *       | SeekPrivateTape()
  *       | AnswerStatement()
  */
 public class Statement implements Node {

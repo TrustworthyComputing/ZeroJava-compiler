@@ -205,6 +205,8 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public void visit(Statement n, A argu) throws Exception {
@@ -331,6 +333,44 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
       n.f2.accept(this, argu);
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
+   }
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrimaryTape n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
+   }
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrivateTape n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
    }
 
    /**

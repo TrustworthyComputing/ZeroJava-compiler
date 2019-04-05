@@ -128,6 +128,8 @@ public interface GJNoArguVisitor<R> {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public R visit(Statement n) throws Exception;
@@ -204,6 +206,28 @@ public interface GJNoArguVisitor<R> {
     * f4 -> ";"
     */
    public R visit(ReadPrivateTape n) throws Exception;
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrimaryTape n) throws Exception;
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public R visit(SeekPrivateTape n) throws Exception;
 
    /**
     * f0 -> "Prover.answer"

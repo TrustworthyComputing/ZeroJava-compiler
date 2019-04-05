@@ -128,6 +128,8 @@ public interface GJVoidVisitor<A> {
     *       | PrintStatement()
     *       | ReadPrimaryTape()
     *       | ReadPrivateTape()
+    *       | SeekPrimaryTape()
+    *       | SeekPrivateTape()
     *       | AnswerStatement()
     */
    public void visit(Statement n, A argu) throws Exception;
@@ -204,6 +206,28 @@ public interface GJVoidVisitor<A> {
     * f4 -> ";"
     */
    public void visit(ReadPrivateTape n, A argu) throws Exception;
+
+   /**
+    * f0 -> "PrimaryTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrimaryTape n, A argu) throws Exception;
+
+   /**
+    * f0 -> "PrivateTape.seek"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ","
+    * f4 -> Expression()
+    * f5 -> ")"
+    * f6 -> ";"
+    */
+   public void visit(SeekPrivateTape n, A argu) throws Exception;
 
    /**
     * f0 -> "Prover.answer"
