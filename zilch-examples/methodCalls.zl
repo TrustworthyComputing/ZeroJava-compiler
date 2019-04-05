@@ -1,17 +1,17 @@
-int bar() {
-	return 30;
+int bar(int b) {
+	return b * 2;
 }
 
 int foo() {
 	int x;
-	x = bar();
-	return x + 40;
+	x = bar(5);
+	return x + 10;
 }
 
 void main(void) {
 	int x;
 	int y;
 	x = foo();
-	y = bar();
+	y = bar(15);
 	Prover.answer(x + y);
 }

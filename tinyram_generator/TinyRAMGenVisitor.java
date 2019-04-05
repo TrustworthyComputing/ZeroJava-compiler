@@ -649,19 +649,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 */
 	public BaseType visit(MethodCall n, BaseType argu) throws Exception {
 		Variable_t v = (Variable_t) n.f0.accept(this, argu);
-		String mname = v.getName();
-		String mtype = v.getType();
-		Method_t meth = this.st_.get(mname);
-		n.f2.accept(this, argu);
-		String res = new String("r" + ++glob_temp_cnt_);
-		
+		Method_t meth = this.st_.get(v.getName());
+		Method_t params = (Method_t) n.f2.accept(this, argu);
+		// if meth has params
+		if (n.f2.present()) {	
+			for (Map.Entry<String, Variable_t> entry : params.methodParamsMap_.entrySet()) {
+			    Variable_t var = entry.getValue();
+				String param = "r" + var.getVarNum();
+				this.result_ += "MOV " + param + " " + param + " " + var.getType() + "\n";
+			}
+		}
+		// Inline body of the method 
 		if (this.is_inline_meth_) {
 			this.inline_meth_ += meth.body_;
 		} else {			
 			this.result_ += meth.body_;
 		}
-		
-		// System.out.println("BODY:\n" + meth.body_);
 		return new Variable_t(meth.return_reg, null);
 	}
 
@@ -772,7 +775,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (argu == null) {
 			return new Variable_t(null, id);
 		}
-		
 		// if argu is a method name -- we are inside method argu.getName()
 		Method_t meth = (Method_t) argu;
 		Variable_t var = meth.methContainsVar(id);				
