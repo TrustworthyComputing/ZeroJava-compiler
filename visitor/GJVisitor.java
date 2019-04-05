@@ -181,7 +181,7 @@ public interface GJVisitor<R,A> {
    public R visit(WhileStatement n, A argu) throws Exception;
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -395,7 +395,6 @@ public interface GJVisitor<R,A> {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public R visit(PrimaryExpression n, A argu) throws Exception;
@@ -428,14 +427,6 @@ public interface GJVisitor<R,A> {
     * f4 -> "]"
     */
    public R visit(ArrayAllocationExpression n, A argu) throws Exception;
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public R visit(AllocationExpression n, A argu) throws Exception;
 
    /**
     * f0 -> "!"

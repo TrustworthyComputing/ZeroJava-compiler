@@ -333,7 +333,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -710,7 +710,6 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public R visit(PrimaryExpression n) throws Exception {
@@ -759,21 +758,6 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
       n.f2.accept(this);
       n.f3.accept(this);
       n.f4.accept(this);
-      return _ret;
-   }
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public R visit(AllocationExpression n) throws Exception {
-      R _ret=null;
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
-      n.f3.accept(this);
       return _ret;
    }
 

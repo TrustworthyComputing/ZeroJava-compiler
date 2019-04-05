@@ -315,7 +315,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	* f0 -> "System.out.println"
+	* f0 -> "Out.print"
 	* f1 -> "("
 	* f2 -> Expression()
 	* f3 -> ")"

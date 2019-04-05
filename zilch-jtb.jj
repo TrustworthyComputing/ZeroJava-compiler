@@ -77,7 +77,7 @@ TOKEN :
    | <STATIC: "static">
    | <STRING: "String">
    | <TRUE: "true">
-   | <PRINT: "System.out.println">
+   | <PRINT: "Out.print">
    | <VOID: "void">
 }
 
@@ -575,7 +575,7 @@ PrintStatement PrintStatement() :
    
 }
 {
-   n1="System.out.println" { n0 = JTBToolkit.makeNodeToken(n1); }
+   n1="Out.print" { n0 = JTBToolkit.makeNodeToken(n1); }
    n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
    n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
@@ -1148,8 +1148,7 @@ PrimaryExpression PrimaryExpression() :
    FalseLiteral n3;
    Identifier n4;
    ArrayAllocationExpression n5;
-   AllocationExpression n6;
-   BracketExpression n7;
+   BracketExpression n6;
 
    
 }
@@ -1171,11 +1170,8 @@ PrimaryExpression PrimaryExpression() :
       n5=ArrayAllocationExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      n6=AllocationExpression()
+      n6=BracketExpression()
       { n0 = new NodeChoice(n6, 5); }
-   |
-      n7=BracketExpression()
-      { n0 = new NodeChoice(n7, 6); }
    )
    
    { return new PrimaryExpression(n0); }
@@ -1255,27 +1251,6 @@ ArrayAllocationExpression ArrayAllocationExpression() :
    n8="]" { n7 = JTBToolkit.makeNodeToken(n8); }
    
    { return new ArrayAllocationExpression(n0,n2,n4,n6,n7); }
-}
-
-AllocationExpression AllocationExpression() :
-{
-   NodeToken n0;
-   Token n1;
-   Identifier n2;
-   NodeToken n3;
-   Token n4;
-   NodeToken n5;
-   Token n6;
-
-   
-}
-{
-   n1="new" { n0 = JTBToolkit.makeNodeToken(n1); }
-   n2=Identifier()
-   n4="(" { n3 = JTBToolkit.makeNodeToken(n4); }
-   n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
-   
-   { return new AllocationExpression(n0,n2,n3,n5); }
 }
 
 NotExpression NotExpression() :

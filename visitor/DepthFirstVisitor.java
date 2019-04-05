@@ -281,7 +281,7 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -612,7 +612,6 @@ public class DepthFirstVisitor implements Visitor {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public void visit(PrimaryExpression n) throws Exception {
@@ -660,19 +659,6 @@ public class DepthFirstVisitor implements Visitor {
       n.f2.accept(this);
       n.f3.accept(this);
       n.f4.accept(this);
-   }
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public void visit(AllocationExpression n) throws Exception {
-      n.f0.accept(this);
-      n.f1.accept(this);
-      n.f2.accept(this);
-      n.f3.accept(this);
    }
 
    /**

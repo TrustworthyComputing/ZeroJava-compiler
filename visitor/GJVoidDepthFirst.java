@@ -291,7 +291,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -622,7 +622,6 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public void visit(PrimaryExpression n, A argu) throws Exception {
@@ -670,19 +669,6 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
       n.f2.accept(this, argu);
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
-   }
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public void visit(AllocationExpression n, A argu) throws Exception {
-      n.f0.accept(this, argu);
-      n.f1.accept(this, argu);
-      n.f2.accept(this, argu);
-      n.f3.accept(this, argu);
    }
 
    /**

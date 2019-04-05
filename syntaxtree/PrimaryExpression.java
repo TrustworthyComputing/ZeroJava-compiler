@@ -11,7 +11,6 @@ package syntaxtree;
  *       | FalseLiteral()
  *       | Identifier()
  *       | ArrayAllocationExpression()
- *       | AllocationExpression()
  *       | BracketExpression()
  */
 public class PrimaryExpression implements Node {

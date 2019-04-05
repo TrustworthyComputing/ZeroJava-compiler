@@ -143,7 +143,7 @@ public interface ZilchParserConstants {
     "\"static\"",
     "\"String\"",
     "\"true\"",
-    "\"System.out.println\"",
+    "\"Out.print\"",
     "\"void\"",
     "<INTEGER_LITERAL>",
     "<IDENTIFIER>",

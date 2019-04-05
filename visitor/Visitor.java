@@ -181,7 +181,7 @@ public interface Visitor {
    public void visit(WhileStatement n) throws Exception;
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -395,7 +395,6 @@ public interface Visitor {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public void visit(PrimaryExpression n) throws Exception;
@@ -428,14 +427,6 @@ public interface Visitor {
     * f4 -> "]"
     */
    public void visit(ArrayAllocationExpression n) throws Exception;
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public void visit(AllocationExpression n) throws Exception;
 
    /**
     * f0 -> "!"

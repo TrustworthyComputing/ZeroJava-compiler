@@ -181,7 +181,7 @@ public interface GJNoArguVisitor<R> {
    public R visit(WhileStatement n) throws Exception;
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> "Out.print"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -395,7 +395,6 @@ public interface GJNoArguVisitor<R> {
     *       | FalseLiteral()
     *       | Identifier()
     *       | ArrayAllocationExpression()
-    *       | AllocationExpression()
     *       | BracketExpression()
     */
    public R visit(PrimaryExpression n) throws Exception;
@@ -428,14 +427,6 @@ public interface GJNoArguVisitor<R> {
     * f4 -> "]"
     */
    public R visit(ArrayAllocationExpression n) throws Exception;
-
-   /**
-    * f0 -> "new"
-    * f1 -> Identifier()
-    * f2 -> "("
-    * f3 -> ")"
-    */
-   public R visit(AllocationExpression n) throws Exception;
 
    /**
     * f0 -> "!"

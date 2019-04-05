@@ -6,7 +6,7 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> "System.out.println"
+ * f0 -> "Out.print"
  * f1 -> "("
  * f2 -> Expression()
  * f3 -> ")"
@@ -28,7 +28,7 @@ public class PrintStatement implements Node {
    }
 
    public PrintStatement(Expression n0) {
-      f0 = new NodeToken("System.out.println");
+      f0 = new NodeToken("Out.print");
       f1 = new NodeToken("(");
       f2 = n0;
       f3 = new NodeToken(")");

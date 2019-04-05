@@ -59,7 +59,7 @@ TOKEN :
 | < STATIC: "static" >
 | < STRING: "String" >
 | < TRUE: "true" >
-| < PRINT: "System.out.println" >
+| < PRINT: "Out.print" >
 | < VOID: "void" >
 }
 
@@ -272,7 +272,7 @@ void WhileStatement() :
 void PrintStatement() :
 {}
 {
-  "System.out.println" "(" Expression() ")" ";"
+  "Out.print" "(" Expression() ")" ";"
 }
 
 void ReadPrimaryTape() :
@@ -482,8 +482,6 @@ void PrimaryExpression() :
   LOOKAHEAD(3)
   ArrayAllocationExpression()
 |
-  AllocationExpression()
-|
   BracketExpression()
 }
 
@@ -516,12 +514,6 @@ void ArrayAllocationExpression() :
 {}
 {
   "new" "int" "[" Expression() "]"
-}
-
-void AllocationExpression() :
-{}
-{
-  "new" Identifier() "(" ")"
 }
 
 void NotExpression() :
