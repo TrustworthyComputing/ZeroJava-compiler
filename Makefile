@@ -1,7 +1,7 @@
 all: compile
 
 compile:
-	java -jar jtb-custom.jar -te zilch.jj
+	java -jar jtb132.1.jar -te zilch.jj
 	javacc zilch-jtb.jj
 	javac Main.java
 	javac base_type/*.java

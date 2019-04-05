@@ -54,7 +54,6 @@ public class Method_t extends BaseType {
         if (methodParamsMap_.containsKey(pname)) {
             return false;
         }
-        
         param.var_num = this.par_cnt;
         this.par_cnt++;
         param.var_temp = new String("r" + param.var_num);
@@ -70,10 +69,7 @@ public class Method_t extends BaseType {
         if (methodParamsMap_.containsKey(vname)) {
             return false;
         }
-        // var.var_num = this.var_cnt;
-        // this.var_cnt++;
         methodVarsMap_.put(vname, var);
-        
         return true;
     }
 
