@@ -56,7 +56,7 @@ Below are some usage examples.
 
 A simple program that performs addition:
 ```
-./zc zilch-examples/simpleAdd.zl
+./zc ./zilch-examples/simpleAdd.zl
 ```
 ```
 void main(void) {
@@ -80,7 +80,7 @@ ANSWER r3 r3 r3
 
 A more complex program that reads inputs from the primary tape and adds them all together:
 ```
-./zc zilch-examples/Addloop.zl
+./zc ./zilch-examples/Addloop.zl
 ```
 ```
 void main(void) {
@@ -116,6 +116,9 @@ ANSWER r3 r3 r3
 
 A final example that invokes methods is presented below:
 ```
+./zc ./zilch-examples/methodCalls.zl
+```
+```
 int bar() {
 	return 30;
 }
@@ -150,6 +153,7 @@ ANSWER r10 r10 r10
 
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
+Those examples include `if-else` statements, comparisons, `while` loops, examples with `int [ ]` accesses and others that will help getting started with Zilch programming language. 
 
 
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group
