@@ -1,16 +1,20 @@
 # ![alt text][logo] Zilch to TinyRAM compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate a custom Java-like subset (Zilch) to TinyRAM.
+A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to TinyRAM.
 
-### Zilch:
+## Zilch Language
 Zilch is a custom designed language for easy translation to TinyRAM and thus easy Zero-Knowledge Proofs creation.
 Below we briefly describe the language.
 
-Zilch has one main class that contains a single main method and no fields.
-Zilch supports three types: int, boolean, and int [ ] which is an array of int.
+Zilch has one main method and also supports arbitrary methods.
+Methods should be defined before they are used (each definition should be before the first invocation).
+Zilch supports three types for both methods and variables; int, boolean, and int [ ] which is an array of ints.
+Function parameters are always passed by value.
+Zilch program source text is free-format, using the semicolon as a statement terminator and curly braces for grouping blocks of statements, such as while loops and if-else statements.
+Zilch files use the `.zl` extension.
 
 
-### TinyRAM ISA
+## TinyRAM ISA
 
 | Instruction    | Definition                                           |
 |----------------|------------------------------------------------------|
@@ -40,7 +44,9 @@ Zilch supports three types: int, boolean, and int [ ] which is an array of int.
 ## Compilation & Execution:
 To compile the compiler type `make`.
 
-Then, use the `tjrc` script to compile Zilch programs to TinyRAM assembly code.
+In order to make the Zilch compiler script (`zc`) executable type `chmod +x ./zc`.
+
+Then, use the `zc` script to compile Zilch programs to TinyRAM assembly code.
 Below are some usage examples.
 
 
@@ -48,17 +54,17 @@ Below are some usage examples.
 
 A simple program that performs addition:
 ```
-./tjrc zilch-examples/simpleAdd.java
+./zc zilch-examples/simpleAdd.zl
 ```
 ```
-class SimpleAdd {
-	public static void main(String[] a){
-		int x;
-		int y;
-		x = 12;
-		y = 13;
-		Prover.answer(x + y);
-	}
+void main(void) {
+	int x;
+	int y;
+	x = foo();
+	y = bar();
+	x = 12;
+	y = 13;
+	Prover.answer(x + y);
 }
 ```
 
@@ -72,22 +78,20 @@ ANSWER r3 r3 r3
 
 A more complex program that reads inputs from the primary tape and adds them all together:
 ```
-./tjrc zilch-examples/Addloop.java
+./zc zilch-examples/Addloop.zl
 ```
 ```
-class AddLoop {
-	public static void main(String[] a){
-		int i;
-		int from_tape;
-		int res;
-		i = 0 ;
-		while (5 > i) {
-			PrimaryTape.read(from_tape);
-			res = res + from_tape;
-			i = i + 1;
-		}
-		Prover.answer(res);
+void main(void) {
+	int i;
+	int from_tape;
+	int res;
+	i = 0 ;
+	while (i < 5) {
+		PrimaryTape.read(from_tape);
+		res = res + from_tape;
+		i = i + 1;
 	}
+	Prover.answer(res);
 }
 ```
 
@@ -107,6 +111,41 @@ JMP r0 r0 __L1__
 __L2__
 ANSWER r3 r3 r3
 ```
+
+A final example that invokes methods is presented below:
+```
+int bar() {
+	return 30;
+}
+
+int foo() {
+	int x;
+	x = bar();
+	return x + 40;
+}
+
+void main(void) {
+	int x;
+	int y;
+	x = foo();
+	y = bar();
+	Prover.answer(x + y);
+}
+```
+
+Which generates the following TinyRAM code:
+```
+MOV r1 r1 30
+MOV r2 r2 r1
+MOV r5 r5 40
+ADD r4 r2 r5
+MOV r6 r6 r4
+MOV r1 r1 30
+MOV r7 r7 r1
+ADD r10 r6 r7
+ANSWER r10 r10 r10
+```
+
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
 
