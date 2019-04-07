@@ -2,7 +2,9 @@
 
 JVM="java"
 
-for file in $@ 
-do
-	$JVM Main $file
-done
+inputfile=$(pwd)/$1
+cd ./compiler/src/zilch/
+
+$JVM Main $inputfile
+
+cd ../../../

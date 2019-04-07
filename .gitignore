@@ -15,5 +15,14 @@ hs_err_pid*
 *.tar.gz
 *.html
 
+zilch-jtb.jj
+ZilchParser.java
+ZilchParserConstants.java
+ZilchParserTokenManager.java
+ParseException.java
+Token.java
+TokenMgrError.java
+JavaCharStream.java
+
 syntaxtree/*
 visitor/*

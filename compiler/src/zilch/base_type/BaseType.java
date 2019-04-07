@@ -1,3 +1,4 @@
+// package base_type;
 package base_type;
 
 public class BaseType {
