@@ -36,10 +36,10 @@ TOKEN :
 | < ASSIGN: "=" >
 | < GT: ">" >
 | < LT: "<" >
-| < PLUS: "+" >
-| < PLUSPLUS: "++" >
-| < MINUS: "-" >
-| < MINUSMINUS: "--" >
+| < ADD: "+" >
+| < ADDADD: "++" >
+| < SUB: "-" >
+| < SUBSUB: "--" >
 | < AND : "&&" >
 | < OR : "||" >
 | < NOT : "!" >

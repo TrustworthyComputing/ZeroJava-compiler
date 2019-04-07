@@ -23,6 +23,16 @@ compiler/src/zilch/ParseException.java
 compiler/src/zilch/Token.java
 compiler/src/zilch/TokenMgrError.java
 compiler/src/zilch/JavaCharStream.java
-
 compiler/src/zilch/syntaxtree/*
 compiler/src/zilch/visitor/*
+
+optimizer/src/zilch/tinyram-jtb.jj
+optimizer/src/zilch/TinyRAMParser.java
+optimizer/src/zilch/TinyRAMParserConstants.java
+optimizer/src/zilch/TinyRAMParserTokenManager.java
+optimizer/src/zilch/ParseException.java
+optimizer/src/zilch/Token.java
+optimizer/src/zilch/TokenMgrError.java
+optimizer/src/zilch/JavaCharStream.java
+optimizer/src/zilch/syntaxtree/*
+optimizer/src/zilch/visitor/*

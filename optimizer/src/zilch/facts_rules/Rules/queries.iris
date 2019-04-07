@@ -1,0 +1,12 @@
+?- next(?m, ?i, ?j).
+?- live(?m, ?v, ?l).
+?- deadCode(?meth, ?i, ?v).
+
+
+// DO NOT CHANGE FROM HERE
+?- basicBlock(?meth, ?start, ?end).
+?- copyProp(?meth, ?l, ?v1, ?v2).
+?- constProp(?meth, ?l, ?v, ?val).
+// TO HERE
+// (need those queries to be executed for input to bonus part)
+

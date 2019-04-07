@@ -15,7 +15,7 @@ public class Variable_t extends BaseType {
         return this.type;
     }
 
-    public String getTemp() {
+    public String getRegister() {
         return this.var_temp;
     }
 

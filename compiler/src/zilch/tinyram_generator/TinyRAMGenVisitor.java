@@ -218,9 +218,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (meth != null) { 
 			var = meth.methContainsVar(id);
 			if (this.is_inline_meth_) {
-				this.inline_meth_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+				this.inline_meth_ += "MOV " +  var.getRegister() + " " + var.getRegister() + " " + expr +"\n";
 			} else {
-				this.result_ += "MOV " +  var.getTemp() + " " + var.getTemp() + " " + expr +"\n";
+				this.result_ += "MOV " +  var.getRegister() + " " + var.getRegister() + " " + expr +"\n";
 			}
 		}
 		return null;
@@ -822,7 +822,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		Variable_t var = meth.methContainsVar(id);				
 		Variable_t v;
 		if (var != null) { // if a parameter or a local var
-			v = new Variable_t(var.getTemp(), id);
+			v = new Variable_t(var.getRegister(), id);
 			v.var_temp = var.getType();
 		} else { // if a function name
 			Method_t m = this.st_.get(id);

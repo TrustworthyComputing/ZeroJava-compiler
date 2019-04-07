@@ -1,0 +1,2 @@
+varMove("Main", 3, "r3", "r1").
+varMove("Main", 4, "r4", "r2").

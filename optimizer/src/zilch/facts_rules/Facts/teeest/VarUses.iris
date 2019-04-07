@@ -1,0 +1,4 @@
+varUse("Main", 3, "r1").
+varUse("Main", 4, "r2").
+varUse("Main", 5, "r3").
+varUse("Main", 5, "r4").

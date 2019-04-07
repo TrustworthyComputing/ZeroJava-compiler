@@ -1,0 +1,5 @@
+var("Main", "r1").
+var("Main", "r2").
+var("Main", "r3").
+var("Main", "r4").
+var("Main", "r5").
