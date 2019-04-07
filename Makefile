@@ -5,4 +5,4 @@ compile:
 
 clean:
 	cd compiler/src/zilch && $(MAKE) clean
-	./compiler/zilch-examples/*.asm
+	rm ./compiler/zilch-examples/*.asm
