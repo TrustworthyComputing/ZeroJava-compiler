@@ -12,4 +12,4 @@ execute:
 	java Main
 
 clean:
-	rm -f *.class *~ base_type/*.class symbol_table/*.class tinyram_generator/*.class syntaxtree/*.class visitor/*.class ./zilch-examples/*.asm
+	rm -f *.class *~ base_type/*.class symbol_table/*.class tinyram_generator/*.class syntaxtree/* visitor/* ./zilch-examples/*.asm
