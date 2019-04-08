@@ -1,6 +1,0 @@
-instruction("Main", 1, "MOV r1 r1 13").
-instruction("Main", 2, "MOV r2 r2 14").
-instruction("Main", 3, "MOV r3 r3 r1").
-instruction("Main", 4, "MOV r4 r4 r2").
-instruction("Main", 5, "ADD r5 r3 r4").
-instruction("Main", 6, "ANSWER r5 r5 r5").

@@ -1,2 +1,0 @@
-constMOV("Main", 1, "r1", 13).
-constMOV("Main", 2, "r2", 14).

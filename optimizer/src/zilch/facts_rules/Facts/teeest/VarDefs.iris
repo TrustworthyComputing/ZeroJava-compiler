@@ -1,5 +1,0 @@
-varDef("Main", 1, "r1").
-varDef("Main", 2, "r2").
-varDef("Main", 3, "r3").
-varDef("Main", 4, "r4").
-varDef("Main", 5, "r5").

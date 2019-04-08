@@ -1,1 +1,0 @@
-binOpMOV("Main", 5, "r5", "ADD r3 r4").

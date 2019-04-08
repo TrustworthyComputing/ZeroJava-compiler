@@ -36,3 +36,5 @@ optimizer/src/zilch/TokenMgrError.java
 optimizer/src/zilch/JavaCharStream.java
 optimizer/src/zilch/syntaxtree/*
 optimizer/src/zilch/visitor/*
+
+optimizer/src/zilch/facts_rules/Facts/*
