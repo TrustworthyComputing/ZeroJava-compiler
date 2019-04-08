@@ -79,14 +79,16 @@ To compile the compiler type `make`.
 In order to make the Zilch compiler script (`zc`) executable type `chmod +x ./zc`.
 
 Then, use the `zc` script to compile Zilch programs to TinyRAM assembly code.
-Below are some usage examples.
 
+Our compiler also supports TinyRAM analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
+
+Below are some usage examples and we also demonstrate the optimizer.
 
 ### Zilch Examples:
 
 A simple program that performs addition:
 ```
-./zc ./zilch-examples/simpleAdd.zl
+./zc ./compiler/zilch-examples/simpleAdd.zl
 ```
 ```
 void main(void) {
@@ -107,10 +109,19 @@ MOV r2 r2 13
 ADD r3 r1 r2
 ANSWER r3 r3 r3
 ```
+Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
+```
+./zc ./compiler/zilch-examples/simpleAdd.zl -opts
+```
+```
+MOV r1 r1 12
+ADD r3 r1 13
+ANSWER r3 r3 r3
+```
 
 A more complex program that reads inputs from the primary tape and adds them all together:
 ```
-./zc ./zilch-examples/Addloop.zl
+./zc ./compiler/zilch-examples/Addloop.zl
 ```
 ```
 void main(void) {
@@ -146,7 +157,7 @@ ANSWER r3 r3 r3
 
 A final example that invokes methods is presented below:
 ```
-./zc ./zilch-examples/methodCalls.zl
+./zc ./compiler/zilch-examples/methodCalls.zl
 ```
 ```
 int bar() {
@@ -172,14 +183,27 @@ Which generates the following TinyRAM code:
 ```
 MOV r1 r1 30
 MOV r2 r2 r1
-MOV r5 r5 40
-ADD r4 r2 r5
-MOV r6 r6 r4
+MOV r4 r4 40
+ADD r3 r2 r4
+MOV r5 r5 r3
 MOV r1 r1 30
-MOV r7 r7 r1
-ADD r10 r6 r7
-ANSWER r10 r10 r10
+MOV r6 r6 r1
+ADD r7 r5 r6
+ANSWER r7 r7 r7
 ```
+while enabling the optimizations:
+```
+./zc ./compiler/zilch-examples/methodCalls.zl -opts
+```
+```
+MOV r1 r1 30
+ADD r3 r1 40
+MOV r5 r5 r3
+MOV r1 r1 30
+ADD r7 r3 30
+ANSWER r7 r7 r7
+```
+the TinyRAM assembly output is optimized.
 
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
