@@ -116,14 +116,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * f3 -> SimpleExp()
      */
     public String visit(StoreWStmt n, String argu) throws Exception {
-        // String tmp1 = n.f1.accept(this, argu);
-        // String lit = n.f2.accept(this, argu);
-        // String tmp2 = n.f3.accept(this, argu);
-        // String op = "STOREW " + tmp1 + " " + lit + " " + tmp2;
-        // varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tmp1+"\""));
-        // varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tmp2+"\""));
-        // return op;
-        return null;
+        String src = n.f1.accept(this, argu);
+        String reg2 = n.f2.accept(this, argu);
+        String addr = n.f3.accept(this, argu);
+        String op = "STOREW " + src + " " + reg2 + " " + addr;
+        varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
+        if (addr.matches("r(.*)")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
+        }
+        return op;
     }
 
     /**
@@ -133,14 +134,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * f3 -> SimpleExp()
      */
     public String visit(LoadWStmt n, String argu) throws Exception {
-        // String tmp1 = n.f1.accept(this, argu);
-        // String tmp2 = n.f2.accept(this, argu);
-        // String lit = n.f3.accept(this, argu);
-        // String op = "LOADW " + tmp1 + " " + tmp2 + " " + lit;
-        // varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+tmp1+"\""));
-        // varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tmp2+"\""));
-        // return op;
-        return null;
+        String dst = n.f1.accept(this, argu);
+        String reg2 = n.f2.accept(this, argu);
+        String addr = n.f3.accept(this, argu);
+        String op = "LOADW " + dst + " " + reg2 + " " + addr;
+        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        if (addr.matches("r(.*)")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
+        }
+        return op;
     }
 
     /**
