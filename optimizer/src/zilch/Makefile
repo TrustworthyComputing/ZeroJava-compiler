@@ -10,7 +10,7 @@ compile:
 	$(JAVACC) tinyram-jtb.jj
 	$(JAVAC) syntaxtree/*.java
 	$(JAVAC) facts_gen/*.java
-	# $(JAVAC) optimizer/*.java
+	$(JAVAC) optimizer/*.java
 	$(JAVAC) -cp $(CLASSPATH) Main.java 
 
 clean:

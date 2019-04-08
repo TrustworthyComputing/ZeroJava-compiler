@@ -38,6 +38,7 @@ public class Main {
                 Goal root = spigParser.Goal();
                 File fp = new File(args[i]);
                 String path = fp.getName();
+                // String filename = path.substring(0, path.lastIndexOf('.'));
                 path = path.substring(0, path.lastIndexOf('.'));
                 path = "facts_rules/Facts/" + path;
                 Path p = Paths.get(path);
@@ -48,8 +49,9 @@ public class Main {
                     if (!success) {
                         System.err.println("Error creating folder " + path);
                         System.exit(-1);
-                    } else
+                    } else {
                         System.out.println("just created " + path);
+                    }
                 } 
                 FactGeneratorVisitor dlVisitor = new FactGeneratorVisitor();
                 try {
@@ -61,9 +63,9 @@ public class Main {
                     final File factsDirectory = new File(path);
                     if (factsDirectory.isDirectory()) {
                         for (final File fileEntry : factsDirectory.listFiles()) {
-                            if (fileEntry.isDirectory())
+                            if (fileEntry.isDirectory()) {
                                 System.out.println("Omitting directory " + fileEntry.getPath());
-                            else {
+                            } else {
                                 Reader factsReader = new FileReader(fileEntry);
                                 parser.parse(factsReader);
                                 factMap.putAll(parser.getFacts()); // Retrieve the facts and put all of them in factMap
@@ -84,43 +86,63 @@ public class Main {
                     Configuration configuration = new Configuration(); // Create a default configuration.
                     configuration.programOptmimisers.add(new MagicSets()); // Enable Magic Sets together with rule filtering.
                     IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
+                    
                     Map<String, Map<String, String>> optimisationMap = new HashMap<>();
                     for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
                         List<IVariable> variableBindings = new ArrayList<>();
                         IRelation relation = knowledgeBase.execute(query, variableBindings);
                         System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
                         String queryType = null;
-                        if ((query.toString()).equals("?- constProp(?meth, ?l, ?v, ?val)."))
+                        if ((query.toString()).equals("?- constProp(?meth, ?l, ?v, ?val).")) {
                             queryType = "constProp";
-                        else if ((query.toString()).equals("?- copyProp(?meth, ?l, ?v1, ?v2)."))
+                        } else if ((query.toString()).equals("?- copyProp(?meth, ?l, ?v1, ?v2).")) {
                             queryType = "copyProp";
-                        else if ((query.toString()).equals("?- deadCode(?meth, ?i, ?v)."))
+                        } else if ((query.toString()).equals("?- deadCode(?meth, ?i, ?v).")) {
                             queryType = "deadCode";
+                        }
                         if (queryType != null) {
                             Map<String, String> tempOp = new HashMap<>();
+                            String str = null;
                             for (int r = 0; r < relation.size(); r++) {
-                                String str = (relation.get(r)).toString();
+                                str = (relation.get(r)).toString();
                                 System.out.println(relation.get(r));
                                 int line = getLine(str);
                                 String meth = getMeth(str);
-                                if (tempOp.get(meth + line) == null)
+                                if (tempOp.get(meth + line) == null) {
                                     tempOp.put(meth + line, str);
+                                } else if (queryType == "constProp") {
+                                    tempOp.put(meth + "-sec-" + line, str);
+                                }
                             }
                             optimisationMap.put(queryType, tempOp);
                         } else {
-                            for (int r = 0; r < relation.size(); r++)
+                            for (int r = 0; r < relation.size(); r++) {
                                 System.out.println(relation.get(r));
+                            }
                         }
                     }
+                    /* Print optimizations map */
+                    // System.out.println();
+                    // for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
+                    //     System.out.println(entry.getKey() + ":");
+                    //     for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
+                    //         System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
+                    //     }
+                    // }
 
-                    // OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
-                    // root.accept(opt, null);
-                    // PrintWriter writer = new PrintWriter(path + "/../wannabeOpt.spg");
-                    // writer.println(opt.result);
-                    // writer.close();
-
-                    // System.out.println("\nOptimized:\n" + opt.result);
-
+                    OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
+                    root.accept(opt, null);
+                    
+                    if (path.endsWith(".opt")) {
+                        path = path.substring(0, path.length() - 4);
+                    }
+                                        
+                    System.out.println("Optimized output: " + path + ".opt.asm");
+                    PrintWriter writer = new PrintWriter(path + ".opt.asm");
+                    writer.println(opt.result);
+                    writer.close();
+                    
+                    System.out.println("\nOptimized:\n" + opt.result);
                 } catch (Exception ex) {
                     System.out.println("\n\n"+ ex.getMessage() + "\n\n");
                 }
@@ -156,46 +178,49 @@ public class Main {
             for (int k = 0 ; k < dlVisitor.varList.size() ; k++)
                 dlVisitor.varList.get(k).printrec(file);
             file.close();
+            
             file = new PrintWriter(path + "/varMoves.iris");
             System.out.println("\nvarMoves:");
             for (int k = 0 ; k < dlVisitor.varMoveList.size() ; k++)
                 dlVisitor.varMoveList.get(k).printrec(file);
             file.close();
-            file = new PrintWriter(path + "/ConstMOVs.iris");
-            System.out.println("\nConstMOVs:");
+            
+            file = new PrintWriter(path + "/ConstMoves.iris");
+            System.out.println("\nConstMoves:");
             for (int k = 0 ; k < dlVisitor.constMoveList.size() ; k++)
                 dlVisitor.constMoveList.get(k).printrec(file);
             file.close();
-            file = new PrintWriter(path + "/BinOpMOVs.iris");
-            System.out.println("\nBinOpMOVs:");
+            
+            file = new PrintWriter(path + "/BinOpMoves.iris");
+            System.out.println("\nBinOpMoves:");
             for (int k = 0 ; k < dlVisitor.binOpMoveList.size() ; k++)
                 dlVisitor.binOpMoveList.get(k).printrec(file);
             file.close();
+            
             file = new PrintWriter(path + "/Instructions.iris");
             System.out.println("\nInstructions:");
             for (int k = 0 ; k < dlVisitor.instrList.size() ; k++)
                 dlVisitor.instrList.get(k).printrec(file);
             file.close();
+            
             file = new PrintWriter(path + "/VarUses.iris");
             System.out.println("\nVarUses:");
             for (int k = 0 ; k < dlVisitor.varUseList.size() ; k++)
                 dlVisitor.varUseList.get(k).printrec(file);
             file.close();
+            
             file = new PrintWriter(path + "/VarDefs.iris");
             System.out.println("\nVarDefs:");
             for (int k = 0 ; k < dlVisitor.varDefList.size() ; k++)
                 dlVisitor.varDefList.get(k).printrec(file);
             file.close();
-            file = new PrintWriter(path + "/CJumps.iris");
-            System.out.println("\nCJumps:");
-            for (int k = 0 ; k < dlVisitor.cjumpList.size() ; k++)
-                dlVisitor.cjumpList.get(k).printrec(file);
-            file.close();
+            
             file = new PrintWriter(path + "/Jumps.iris");
             System.out.println("\nJumps:");
             for (int k = 0 ; k < dlVisitor.jumpList.size() ; k++)
                 dlVisitor.jumpList.get(k).printrec(file);
             file.close();
+            
             file = new PrintWriter(path + "/Args.iris");
             System.out.println("\nArgs:");
             for (int k = 0 ; k < dlVisitor.argsList.size() ; k++)

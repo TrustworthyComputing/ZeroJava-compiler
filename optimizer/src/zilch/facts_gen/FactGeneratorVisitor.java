@@ -14,7 +14,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<BinOpMove_t> binOpMoveList;
     public LinkedList<VarUse_t> varUseList;
     public LinkedList<VarDef_t> varDefList;
-    public LinkedList<Cjump_t> cjumpList;
+    // public LinkedList<Cjump_t> cjumpList;
     public LinkedList<Jump_t> jumpList;
     public LinkedList<Args_t> argsList;
     public int ic1;
@@ -29,7 +29,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         binOpMoveList =  new LinkedList<BinOpMove_t>();
         varUseList = new LinkedList<VarUse_t>();
         varDefList = new LinkedList<VarDef_t>();
-        cjumpList = new LinkedList<Cjump_t>();
+        // cjumpList = new LinkedList<Cjump_t>();
         jumpList = new LinkedList<Jump_t>();
         argsList = new LinkedList<Args_t>();
         this.ic1 = 0;
@@ -90,8 +90,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Stmt n, String argu) throws Exception {
         this.ic2++;
-        String stmt = n.f0.accept(this, argu);
-        return stmt;
+        return n.f0.accept(this, argu);
     }   
 
     /**
@@ -101,12 +100,13 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * f3 -> Label()
      */
     public String visit(JmpStmts n, String argu) throws Exception {
+        String op = n.f0.accept(this, argu);
         String reg1 = n.f1.accept(this, argu);
         String reg2 = n.f2.accept(this, argu);
         String label = n.f3.accept(this, argu);
-        String op = "JMP " + reg1 + " " + reg2 + " " + label;
+        String instr = op + " " + reg1 + " " + reg2 + " " + label;
         jumpList.addLast(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
-        return op;
+        return instr;
     }
 
     /**
@@ -154,15 +154,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(TwoRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu);
-        String sec_reg = n.f1.accept(this, argu);
-        String third_reg = n.f3.accept(this, argu);
-        if (third_reg == null) { return null; }
-        String instr = op + " " + dst + " " + sec_reg + " " + third_reg;
-        if (third_reg.matches("r(.*)")) {
-            varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+third_reg+"\""));
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
-        } else if (third_reg.matches("[0-9]+")) {
-            constMoveList.addLast(new ConstMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(third_reg) ));
+        String sec_reg = n.f2.accept(this, argu);
+        String src = n.f3.accept(this, argu);
+        if (src == null) { return null; }
+        String instr = op + " " + dst + " " + sec_reg + " " + src;
+        if (src.matches("r(.*)")) {
+            varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
+        } else if (src.matches("[0-9]+")) {
+            constMoveList.addLast(new ConstMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(src) ));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
@@ -177,15 +177,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(ThreeRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu);
-        String sec_reg = n.f2.accept(this, argu);
-        String third_reg = n.f3.accept(this, argu);
-        if (third_reg == null) { return null; }
-        String instr = op + " " + dst + " " + sec_reg + " " + third_reg;
-        varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
-        if (third_reg.matches("r(.*)")) { // if third argument is not immediate
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
+        String src1 = n.f2.accept(this, argu);
+        String src2 = n.f3.accept(this, argu);
+        if (src2 == null) { return null; }
+        String instr = op + " " + dst + " " + src1 + " " + src2;
+        varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src1+"\""));
+        if (src2.matches("r(.*)")) { // if third argument is not immediate
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
-        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+sec_reg+" "+third_reg+"\""));
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
@@ -228,10 +228,10 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(ReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
-        String third_reg = n.f3.accept(this, argu);
-        String op = "READ " + dst + " " + dst + " " + third_reg;
-        if (third_reg != null && third_reg.matches("r(.*)")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
+        String tape = n.f3.accept(this, argu);
+        String op = "READ " + dst + " " + dst + " " + tape;
+        if (tape != null && tape.matches("r(.*)")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
@@ -246,13 +246,13 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(SeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
         String sec_reg = n.f2.accept(this, argu);
-        String third_reg = n.f3.accept(this, argu);
-        String op = "SEEK " + dst + " " + sec_reg + " " + third_reg;
+        String tape = n.f3.accept(this, argu);
+        String op = "SEEK " + dst + " " + sec_reg + " " + tape;
         if (sec_reg != null && sec_reg.matches("r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
-        if (third_reg != null && third_reg.matches("r(.*)")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
+        if (tape != null && tape.matches("r(.*)")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;

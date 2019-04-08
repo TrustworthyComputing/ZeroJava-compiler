@@ -17,10 +17,10 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.optimisationMap = optimisationMap;
     }
 
-    static String getMeth(String fact) {
-        String []parts = fact.split(",");
-        return parts[0].substring(2,  parts[0].length()-1);
-    }
+    // static String getMeth(String fact) {
+    //     String []parts = fact.split(",");
+    //     return parts[0].substring(2,  parts[0].length()-1);
+    // }
 
     static int getLine(String fact) {
         String []parts = fact.split(",");
@@ -35,25 +35,28 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
 
     static String getOpt(String fact, boolean num) {
         String []parts = fact.split(",");
-        if (num)
+        if (num) {
             parts[3] = parts[3].substring(1, parts[3].length()-1);
-        else
+        } else {
             parts[3] = parts[3].substring(2, parts[3].length()-2);
+        }
         return parts[3];
     }
 
     public String visit(NodeSequence n, String argu) throws Exception {
-        if (n.size() == 1)
+        if (n.size() == 1) {
             return n.elementAt(0).accept(this,argu);
+        }
         String _ret = null;
         int _count=0;
         for (Enumeration<Node> e = n.elements() ; e.hasMoreElements() ; ) {
             String ret = e.nextElement().accept(this,argu);
             if (ret != null) {
-                if (_ret == null)
+                if (_ret == null) {
                     _ret = ret;
-                else
+                } else {
                     _ret += " " + ret;
+                }
             }
             _count++;
         }
@@ -61,33 +64,21 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-    * f0 -> "MAIN"
-    * f1 -> StmtList()
-    * f2 -> "END"
-    * f3 -> ( Procedure() )*
-    * f4 -> <EOF>
+    * f0 -> TinyRAMProg()
+    * f1 -> <EOF>
     */
     public String visit(Goal n, String argu) throws Exception {
-        this.result += "MAIN\n";
-        n.f1.accept(this, "MAIN");
-        this.result += "END\n";
-        n.f3.accept(this, argu);
+        n.f0.accept(this, "Main");
         return null;
     }
 
     /**
-    * f0 -> ( ( Label() )? Stmt() )*
-    */
-    public String visit(StmtList n, String argu) throws Exception {
+     * f0 -> ( Stmt() )*
+     */
+    public String visit(TinyRAMProg n, String argu) throws Exception {
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
                 String str = n.f0.elementAt(i).accept(this, argu);
-                if (str.matches("L(.*)")) {
-                    this.result += str + "\n";
-                }
-                if (str.matches("(.*)ERROR(.*)")) {
-                    continue;
-                }
                 this.ic1++;
             }
         }
@@ -95,83 +86,57 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-    * f0 -> Label()
-    * f1 -> "["
-    * f2 -> IntegerLiteral()
-    * f3 -> "]"
-    * f4 -> StmtExp()
-    */
-    public String visit(Procedure n, String argu) throws Exception {
-        this.ic1 = 1;
-        String id = n.f0.accept(this, argu);;
-        String args = n.f2.accept(this, argu);
-        this.result += id + "[" + args + "]\n";
-        n.f4.accept(this, id);
-        return null;
-    }
-
-    /**
-    * f0 -> NoOpStmt()
-    *       | ErrorStmt()
-    *       | CJumpStmt()
-    *       | JumpStmt()
-    *       | StoreWStmt()
-    *       | LoadWStmt()
-    *       | MovStmt()
-    *       | PrintStmt()
-    */
+     * f0 -> Label()
+     *       | TwoRegInstr()
+     *       | ThreeRegInstr()
+     *       | JmpStmts()
+     *       | StoreWStmt()
+     *       | LoadWStmt()
+     *       | PrintStmt()
+     *       | AnswerStmt()
+     *       | ReadStmt()
+     *       | SeekStmt()
+     */
     public String visit(Stmt n, String argu) throws Exception {
-        String stmt = n.f0.accept(this, argu);
-        return stmt;
+        return n.f0.accept(this, argu);
     }   
 
-    /**
-    * f0 -> "NOOP"
-    */
-    public String visit(NoOpStmt n, String argu) throws Exception {
-        return "NOOP";
-    }
+    // /**
+    // * f0 -> "CJMP"
+    // * f1 -> Register()
+    // * f2 -> Label()
+    // */
+    // public String visit(CJumpStmt n, String argu) throws Exception {
+    //     String tmp = n.f1.accept(this, argu);
+    //     String []parts = tmp.split("&");
+    //     tmp = parts[0];
+    //     String label = n.f2.accept(this, argu);
+    //     String op = "CJMP " + tmp + " " + label + "\n";
+    //     String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+    //     if (opt_found == null)
+    //         this.result += op;
+    //     return op;
+    // }
 
     /**
-    * f0 -> "ERROR"
-    */
-    public String visit(ErrorStmt n, String argu) throws Exception {
-        return "ERROR";
-    }
-
-    /**
-    * f0 -> "CJMP"
-    * f1 -> Register()
-    * f2 -> Label()
-    */
-    public String visit(CJumpStmt n, String argu) throws Exception {
-        String tmp = n.f1.accept(this, argu);
-        String []parts = tmp.split("&");
-        tmp = parts[0];
-        String label = n.f2.accept(this, argu);
-        String op = "CJMP " + tmp + " " + label + "\n";
-        String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-        if (str1 == null)
-            this.result += op;
-        else if (!getMeth(str1).equals(argu))
-            this.result += op;
-        return op;
-    }
-
-    /**
-    * f0 -> "JMP"
-    * f1 -> Label()
-    */
-    public String visit(JumpStmt n, String argu) throws Exception {
-        String label = n.f1.accept(this, argu);
-        String op = "JMP " + label + "\n";
-        String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-        if (str1 == null)
-            this.result += op;
-        else if (!getMeth(str1).equals(argu))
-            this.result += op;
-        return op;
-    }
+     * f0 -> JmpOps()
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> Label()
+     */
+     public String visit(JmpStmts n, String argu) throws Exception {
+         String op = n.f0.accept(this, argu);
+         String reg1 = n.f1.accept(this, argu);
+         String reg2 = n.f2.accept(this, argu);
+         String label = n.f3.accept(this, argu);
+         String instr = op + " " + reg1 + " " + reg2 + " " + label;
+         
+         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+         if (opt_found == null) {
+             this.result += instr;
+         }
+         return instr;
+     }
 
     /**
     * f0 -> "STOREW"
@@ -180,20 +145,15 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     * f3 -> Register()
     */
     public String visit(StoreWStmt n, String argu) throws Exception {
-        String tmp1 = n.f1.accept(this, argu);
-        String []parts = tmp1.split("&");
-        tmp1 = parts[0];
-        String lit = n.f2.accept(this, argu);
-        String tmp2 = n.f3.accept(this, argu);
-        parts = tmp2.split("&");
-        tmp2 = parts[0];
-        String op = "STOREW " + tmp1 + " " + lit + " " + tmp2 + "\n";
-        String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-        if (str1 == null)
-            this.result += op;
-        else if (!getMeth(str1).equals(argu))
-            this.result += op;
-        return op;
+        String src = n.f1.accept(this, argu).split("&")[0];
+        String reg2 = n.f2.accept(this, argu);
+        String addr = n.f3.accept(this, argu).split("&")[0];
+        String intsr = "STOREW " + src + " " + reg2 + " " + addr + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null) {
+            this.result += intsr;
+        }
+        return intsr;
     }
 
     /**
@@ -203,235 +163,253 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     * f3 -> IntegerLiteral()
     */
     public String visit(LoadWStmt n, String argu) throws Exception {
-        String tmp1 = n.f1.accept(this, argu);
-        String []parts = tmp1.split("&");
-        tmp1 = parts[0];
-        String tmp2 = n.f2.accept(this, argu);
-        parts = tmp2.split("&");
-        tmp2 = parts[0];
-        String lit = n.f3.accept(this, argu);
-        String op = "LOADW " + tmp1 + " " + tmp2 + " " + lit + "\n";
-        String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-        if (str1 == null)
-            this.result += op;
-        else if (!getMeth(str1).equals(argu))
-            this.result += op;
-        return op;
-    }
-
-    /**
-    * f0 -> "MOV"
-    * f1 -> Register()
-    * f2 -> Exp()
-    */
-    public String visit(MovStmt n, String argu) throws Exception {
-        n.f0.accept(this, argu);
-        String tmp = n.f1.accept(this, argu);
-        String []parts = tmp.split("&");
-        tmp = parts[0];
-        String exp = n.f2.accept(this, argu);
-        String op = null;
-        if (exp != null) {
-            if (exp.matches("r(.*)")) {
-                String []parts2 = new String[2];
-                parts2 = exp.split("&");
-                if (parts2.length == 2)
-                    exp = parts2[1];
-                else
-                    exp = parts2[0];
-                op = "MOV " + tmp + " " + exp + "\n";
-            } else if (exp.matches("[0-9]+")) {
-                op = "MOV " + tmp + " " + Integer.parseInt(exp) + "\n";
-            } else {
-                op = "MOV " + tmp + " " + exp + "\n";
-            }
-            String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-            if (str1 == null){
-                this.result += op;
-            } else if (!getMeth(str1).equals(argu))
-                this.result += op;
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        String reg = n.f2.accept(this, argu).split("&")[0];
+        String addr = n.f3.accept(this, argu);
+        String instr = "LOADW " + dst + " " + reg + " " + addr + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null) {
+            this.result += instr;
         }
-        return op;
+        return instr;
     }
 
     /**
-    * f0 -> "PRINT"
-    * f1 -> SimpleExp()
-    */
-    public String visit(PrintStmt n, String argu) throws Exception {
-        String exp = n.f1.accept(this, argu);
-        String []parts = new String[2];
-        parts = exp.split("&");
-        if (parts.length == 2)
-            exp = parts[1];
-        else
-            exp = parts[0];
-        String op = "PRINT " + exp + "\n";
-        String str1 = optimisationMap.get("deadCode").get(argu + ic1);
-        if (str1 == null)
-            this.result += op;
-        else if (!getMeth(str1).equals(argu))
-            this.result += op;
-        return op;
-    }
-
-    /**
-    * f0 -> Call()
-    *       | HAllocate()
-    *       | BinOp()
-    *       | SimpleExp()
-    */
-    public String visit(Exp n, String argu) throws Exception {
-        return n.f0.accept(this, argu);
-    }
-
-    /**
-    * f0 -> "BEGIN"
-    * f1 -> StmtList()
-    * f2 -> "RETURN"
-    * f3 -> SimpleExp()
-    * f4 -> "END"
-    */
-    public String visit(StmtExp n, String argu) throws Exception {
-        this.result += "BEGIN\n";
-        n.f1.accept(this, argu);
-        String exp = n.f3.accept(this, argu);
-        String []parts = new String[2];
-        parts = exp.split("&");
-        if (parts.length == 2)
-            exp = parts[1];
-        else
-            exp = parts[0];
-        String op = "RETURN " + exp + "\nEND\n";
-        this.result += op;
-        return null;
-    }
-
-    /**
-    * f0 -> "CALL"
-    * f1 -> SimpleExp()
-    * f2 -> "("
-    * f3 -> ( Register() )*
-    * f4 -> ")"
-    */
-    public String visit(Call n, String argu) throws Exception {
-        String exp = n.f1.accept(this, argu);
-        String tmp = "(";
-        if (n.f3.present())
-            for (int i = 0 ; i < n.f3.size() ; i++) {
-                String t = n.f3.nodes.get(i).accept(this, argu);
-                String []parts = t.split("&");
-                t = parts[0];
-                tmp += t;
-                if (i < n.f3.size()-1)
-                    tmp += " ";
-            }
-        tmp += ")";
-        String op = "CALL " + exp + " " + tmp;
-        return op;
-    }
-
-    /**
-    * f0 -> "HALLOCATE"
-    * f1 -> SimpleExp()
-    */
-    public String visit(HAllocate n, String argu) throws Exception {
-        String exp = n.f1.accept(this, argu);
-        String []parts = new String[2];
-        parts = exp.split("&");
-        if (parts.length == 2)
-            exp = parts[1];
-        else
-            exp = parts[0];
-        String op = "HALLOCATE " + exp;
-        return op;
-    }
-
-    /**
-    * f0 -> Operator()
-    * f1 -> Register()
-    * f2 -> SimpleExp()
-    */
-    public String visit(BinOp n, String argu) throws Exception {
+     * f0 -> TwoRegInstrOp()
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> SimpleExp()
+     */
+    public String visit(TwoRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
-        String tmp = n.f1.accept(this, argu);
-        String exp = n.f2.accept(this, argu);
-        String []prts = new String[2];
-        prts = tmp.split("&");
-        tmp = prts[0];
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        String reg2 = n.f2.accept(this, argu);
+        String src = n.f3.accept(this, argu);
+        if (src == null) { return null; }
+        String instr = null;
+        if (src.matches("r(.*)")) {
+            String []parts = new String[2];
+            parts = src.split("&");
+            if (parts.length == 2) {
+                src = parts[1];
+            } else {
+                src = parts[0];
+            }
+            instr = op + " " + dst + " " + reg2 + " " + src + "\n";
+        } else if (src.matches("[0-9]+")) {
+            instr = op + " " + dst + " " + reg2 + " " + Integer.parseInt(src) + "\n";
+        }
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null){
+            this.result += instr;
+        }
+        return instr;
+    }
+    
+    // /**
+    // * f0 -> Operator()
+    // * f1 -> Register()
+    // * f2 -> SimpleExp()
+    // */
+    // public String visit(BinOp n, String argu) throws Exception {
+    //     String op = n.f0.accept(this, argu);
+    //     String dst = n.f1.accept(this, argu);
+    //     String exp = n.f2.accept(this, argu);
+    
+    //     String []prts = new String[2];
+    //     prts = dst.split("&");
+    //     dst = prts[0];
+    //     String []parts = new String[2];
+    //     parts = exp.split("&");
+    //     if (parts.length == 2) exp = parts[1];
+    //     else exp = parts[0];
+    //     String ret = op + " " + dst + " " + exp;
+    //     return ret;
+    // }
+    
+    /**
+     * f0 -> ThreeRegInstrOp()
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> SimpleExp()
+     */
+    public String visit(ThreeRegInstr n, String argu) throws Exception {
+        String op = n.f0.accept(this, argu);
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        String reg2 = n.f2.accept(this, argu).split("&")[0];
+        String reg3 = n.f3.accept(this, argu);
+        
+        System.out.println("\nparts:"+ reg3);
+        
+        if (reg3 == null) { return null; }
+        String instr = null;
+        if (reg3.matches("r(.*)")) {
+            String []parts = new String[2];
+            parts = reg3.split("&");
+            if (parts.length == 2) {
+                reg3 = parts[1];
+            } else {
+                reg3 = parts[0];
+            }
+            instr = op + " " + dst + " " + reg2 + " " + reg3 + "\n";
+        } else if (reg3.matches("[0-9]+")) {
+            instr = op + " " + dst + " " + reg2 + " " + Integer.parseInt(reg3) + "\n";
+        }
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null){
+            this.result += instr;
+        }
+        return instr;
+    }
+    
+
+// TODO
+    /**
+     * f0 -> "PRINT"
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> Register()
+     */
+    public String visit(PrintStmt n, String argu) throws Exception {
+        String reg = n.f3.accept(this, argu);
         String []parts = new String[2];
-        parts = exp.split("&");
-        if (parts.length == 2)
-            exp = parts[1];
-        else
-            exp = parts[0];
-        String ret = op + " " + tmp + " " + exp;
-        return ret;
+        parts = reg.split("&");
+        if (parts.length == 2) {
+            reg = parts[1];
+        } else {
+            reg = parts[0];
+        }
+        String instr = "PRINT " + reg + " " + reg + " " + reg + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null) {
+            this.result += instr;
+        }
+        return instr;
+    }
+    
+    /**
+     * f0 -> "ANSWER"
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> Register()
+     */
+    public String visit(AnswerStmt n, String argu) throws Exception {
+        String reg = n.f3.accept(this, argu);
+        String []parts = new String[2];
+        parts = reg.split("&");
+        if (parts.length == 2) {
+            reg = parts[1];
+        } else {
+            reg = parts[0];
+        }
+        String instr = "ANSWER " + reg + " " + reg + " " + reg + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null) {
+            this.result += instr;
+        }
+        return instr;
     }
 
     /**
-    * f0 -> "LT"
-    *       | "ADD"
-    *       | "SUB"
-    *       | "MULL"
-    */
-    public String visit(Operator n, String argu) throws Exception {
+     * f0 -> "MOV"
+     *       | "NOT"
+     */
+    public String visit(TwoRegInstrOp n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
 
     /**
-    * f0 -> Register()
-    *       | IntegerLiteral()
-    *       | Label()
-    */
+     * f0 -> "AND"
+     *       | "OR"
+     *       | "XOR"
+     *       | "ADD"
+     *       | "SUB"
+     *       | "MULL"
+     *       | "SHL"
+     *       | "SHR"
+     */
+    public String visit(ThreeRegInstrOp n, String argu) throws Exception {
+        return n.f0.choice.toString();
+    }
+    
+    /**
+     * f0 -> "JMP"
+     *       | "CJMP"
+     *       | "CNJMP"
+     */
+    public String visit(JmpOps n, String argu) throws Exception {
+        return n.f0.choice.toString();
+    }
+    
+    /**
+     * f0 -> Register()
+     *       | IntegerLiteral()
+     *       | Label()
+     */
     public String visit(SimpleExp n, String argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
     /**
-    * f0 -> "r"
-    * f1 -> IntegerLiteral()
-    */
-    public String visit(Temp n, String argu) throws Exception {
-        String t = n.f1.accept(this, argu);
-        String ret = "r" + t;
+     * f0 -> <REGISTER>
+     */
+    // public String visit(Register n, String argu) throws Exception {
+    //     String reg = n.f0.toString();
+    //     String copy_opt_found = optimisationMap.get("copyProp").get(argu + ic1);
+    //     String const_opt_found = optimisationMap.get("constProp").get(argu + ic1);
+    //     if (copy_opt_found != null && getTemp(copy_opt_found).equals(reg)) {
+    //         return getOpt(copy_opt_found, false);
+    //     }
+    //     if (const_opt_found != null && getTemp(const_opt_found).equals(reg)) {
+    //         if (copy_opt_found != null && getTemp(copy_opt_found).equals(getTemp(const_opt_found))) {
+    //             return getOpt(copy_opt_found, false);
+    //         }
+    //         return reg + "&" + getOpt(const_opt_found, true);
+    //     }
+    //     return reg;
+    // }
+    
+    public String visit(Register n, String argu) throws Exception {
+        String reg = n.f0.toString();
         String str1 = optimisationMap.get("copyProp").get(argu + ic1);
         String str2 = optimisationMap.get("constProp").get(argu + ic1);
+        String str2_2 = optimisationMap.get("constProp").get(argu + "-sec-" +  ic1);
+        if (str2_2 != null) { // if two constant propagations in the same line
+            str2 = str2_2;
+            System.out.println("PROP : " + str2);
+        }
         if (str1 != null) { // copy
-            if (getMeth(str1).equals(argu) && getTemp(str1).equals(ret))
+            System.out.println("str1:" + str1);
+            if (getTemp(str1).equals(reg))
                 return getOpt(str1, false);
         }
-        // if (ret.matches("r493(.*)")) {
-        //     System.out.println("dsajhdjashkn\n" + str2 + ic1);
-        //     if (str2 == null)
-        //         System.out.println("aspote: " + optimisationMap.get("constProp").get(255) + optimisationMap.get("constProp").get(256) + optimisationMap.get("constProp").get(254));
-        // }
         if (str2 != null) { // constant
-            if (getMeth(str2).equals(argu)) { 
-                if (str1 != null && getTemp(str1).equals(getTemp(str2))) {
-                    if (getTemp(str1).equals(ret) && getMeth(str1).equals(argu))
-                        return getOpt(str1, false);
-                }
-                if (getTemp(str2).equals(ret)) {
-                    return ret + "&" + getOpt(str2, true);
-                } 
+            
+            System.out.println("str2:" + str2);
+            if (getTemp(str2).equals(reg)) {
+                return reg + "&" + getOpt(str2, true);
+            } 
+            if (str1 != null && getTemp(str1).equals(getTemp(str2))) {
+                if (getTemp(str1).equals(reg))
+                    return getOpt(str1, false);
             }
         }
-        return ret;
+        return reg;
     }
 
+    
     /**
-    * f0 -> <INTEGER_LITERAL>
-    */
+     * f0 -> <INTEGER_LITERAL>
+     */
     public String visit(IntegerLiteral n, String argu) throws Exception {
         return n.f0.toString();
     }
 
     /**
-    * f0 -> <IDENTIFIER>
-    */
+     * f0 -> <IDENTIFIER>
+     */
     public String visit(Label n, String argu) throws Exception {
         return n.f0.toString();
-    }   
+    }
 
 }
