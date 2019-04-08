@@ -27,12 +27,12 @@ Zilch files use the `.zl` extension.
 | `\|\|`   | Logical `OR`			|
 
 
-### Zilch Assignment Operators
+<!-- ### Zilch Assignment Operators
 | Operator | Description        						|
 |----------|--------------------------------------------|
-| `=`      | Assignment for `int` and `boolean` types 	|
-| `++`     | Increment of `int` type by one 			|
-| `--`     | Decrement of `int` type by one 			|
+| `=`      | Assignment for `int` and `boolean` types 	| -->
+<!-- | `++`     | Increment of `int` type by one 			|
+| `--`     | Decrement of `int` type by one 			| -->
 
 
 ### Built in Zilch Functions
