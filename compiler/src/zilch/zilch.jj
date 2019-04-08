@@ -215,12 +215,12 @@ void Statement() :
 |
   LOOKAHEAD(2)
   ArrayAssignmentStatement()
-|
-  LOOKAHEAD( Identifier() "++" ";" )
-  PlusPlusExpression()
-|
-  LOOKAHEAD( Identifier() "--" ";" )
-  MinusMinusExpression()
+// |
+//   LOOKAHEAD( Identifier() "++" ";" )
+//   PlusPlusExpression()
+// |
+//   LOOKAHEAD( Identifier() "--" ";" )
+//   MinusMinusExpression()
 |
   IfStatement()
 |
@@ -400,11 +400,11 @@ void PlusExpression() :
   PrimaryExpression() "+" PrimaryExpression()
 }
 
-void PlusPlusExpression() :
-{}
-{
-  Identifier() "++" ";"
-}
+// void PlusPlusExpression() :
+// {}
+// {
+//   Identifier() "++" ";"
+// }
 
 void MinusExpression() :
 {}
@@ -412,11 +412,11 @@ void MinusExpression() :
   PrimaryExpression() "-" PrimaryExpression()
 }
 
-void MinusMinusExpression() :
-{}
-{
-  Identifier() "--" ";"
-}
+// void MinusMinusExpression() :
+// {}
+// {
+//   Identifier() "--" ";"
+// }
 
 void TimesExpression() :
 {}

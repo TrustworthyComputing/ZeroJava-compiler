@@ -6,7 +6,7 @@ void main(void) {
 	while (i < 5) {
 		PrimaryTape.read(from_tape);
 		res = res + from_tape;
-		i ++;
+		i = i + 1;
 	}
 	Prover.answer(res);
 }
