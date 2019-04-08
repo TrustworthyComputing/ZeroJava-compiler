@@ -231,6 +231,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (third_reg != null && third_reg.matches("r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
         }
+        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
     
@@ -251,6 +252,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (third_reg != null && third_reg.matches("r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+third_reg+"\""));
         }
+        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
 
