@@ -8,8 +8,8 @@ public class dl_t {
 		this.meth_name = meth_name;
 	}
 
-	public void printrec() {
-		System.out.println("(" + this.meth_name + ").");
+	public void writerec() {
+		// System.out.println("(" + this.meth_name + ").");
 	}
 
 }

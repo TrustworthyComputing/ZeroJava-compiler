@@ -1,10 +1,26 @@
 #!/bin/bash
 
 JVM="java"
+CLASSPATH="lib/iris-0.60.jar:lib/iris-parser-0.60.jar:."
 
 inputfile=$(pwd)/$1
 cd ./compiler/src/zilch/
 
-$JVM Main $inputfile
+ASM="$($JVM Main $inputfile | sed -n 1p)"
+# echo "ASM:" $ASM
 
 cd ../../../
+cd ./optimizer/src/zilch/
+
+OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
+
+# Do optimizations util reaching a fixed point
+DIFF=$(diff $ASM $OPT)
+while [[ "$DIFF" != "" ]] ; do
+    ASM=$OPT
+    OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
+    DIFF=$(diff $ASM $OPT)
+done
+
+echo -e "TinyRAM output:" $OPT "\n"
+cat $OPT

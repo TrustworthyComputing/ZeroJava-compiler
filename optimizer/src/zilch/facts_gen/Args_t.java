@@ -10,9 +10,9 @@ public class Args_t extends dl_t {
 		this.temp = temp;
 	}
 
-	public void printrec(PrintWriter writer) {
+	public void writerec(PrintWriter writer) {
 		String ret = "arg(" + this.meth_name + ", " + this.temp + ").";
-		System.out.println(ret);
+		// System.out.println(ret);
 		writer.println(ret);
 	}
 

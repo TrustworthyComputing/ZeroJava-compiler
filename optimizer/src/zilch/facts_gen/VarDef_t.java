@@ -10,9 +10,9 @@ public class VarDef_t extends Var_t {
 		this.ic = ic;
 	}
 
-	public void printrec(PrintWriter writer) {
+	public void writerec(PrintWriter writer) {
 		String ret = "varDef(" + this.meth_name + ", " + this.ic + ", " + this.temp + ").";
-		System.out.println(ret);
+		// System.out.println(ret);
 		writer.println(ret);
 	}
 

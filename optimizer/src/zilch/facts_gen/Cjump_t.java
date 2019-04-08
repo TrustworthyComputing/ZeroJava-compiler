@@ -12,9 +12,9 @@ public class Cjump_t extends dl_t {
 		this.label = label;
 	}
 
-	public void printrec(PrintWriter writer) {
+	public void writerec(PrintWriter writer) {
 		String ret = "cjumpInstr(" + this.meth_name + ", " + this.ic + ", " + this.label + ").";
-		System.out.println(ret);
+		// System.out.println(ret);
 		writer.println(ret);
 	}
 
