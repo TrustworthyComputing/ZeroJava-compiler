@@ -90,9 +90,9 @@ noCopyProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								?val1 != ?val2.
 noCopyProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								prop(?meth, ?k2, ?l, ?var2),
-		 								varMove(?meth, ?k1, ?var, ?val1).
-		 								// % binOpMOV(?meth, ?k2, ?var, ?val2),
-		 								// % ?val1 != ?val2.
+		 								varMove(?meth, ?k1, ?var, ?val1),
+		 								binOpMOV(?meth, ?k2, ?var, ?val2),
+		 								?val1 != ?val2.
 // Cannot propagate if u have 2 different values for 1 var at line k
 noBothProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								prop(?meth, ?k2, ?l, ?var2),

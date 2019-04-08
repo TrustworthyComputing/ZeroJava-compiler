@@ -10,17 +10,14 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String result;
     public int ic1;
     private Map<String, Map<String, String>> optimisationMap;
+    private boolean label_from_stmt;
     
     public OptimizerVisitor(Map<String, Map<String, String>> optimisationMap) {
         result = new String();
         this.ic1 = 1;
         this.optimisationMap = optimisationMap;
+        this.label_from_stmt = true;
     }
-
-    // static String getMeth(String fact) {
-    //     String []parts = fact.split(",");
-    //     return parts[0].substring(2,  parts[0].length()-1);
-    // }
 
     static int getLine(String fact) {
         String []parts = fact.split(",");
@@ -111,8 +108,10 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
          String op = n.f0.accept(this, argu);
          String reg1 = n.f1.accept(this, argu);
          String reg2 = n.f2.accept(this, argu);
+         this.label_from_stmt = false;
          String label = n.f3.accept(this, argu);
-         String instr = op + " " + reg1 + " " + reg2 + " " + label;
+         this.label_from_stmt = true;
+         String instr = op + " " + reg1 + " " + reg2 + " " + label + "\n";
          
          String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
          if (opt_found == null) {
@@ -120,17 +119,58 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
          }
          return instr;
      }
+     
+     /**
+      * f0 -> ComparisonOps()
+      * f1 -> Register()
+      * f2 -> Register()
+      * f3 -> SimpleExp()
+      */
+      public String visit(ComparisonStmts n, String argu) throws Exception {
+          String op = n.f0.accept(this, argu);
+          String reg1 = n.f1.accept(this, argu).split("&")[0];
+          String reg2 = n.f2.accept(this, argu);
+          this.label_from_stmt = false;
+          String reg3 = n.f3.accept(this, argu);
+          this.label_from_stmt = true;
+          if (reg3 == null) { return null; }
+          String instr = null;
+          if (reg3.matches("r(.*)")) {
+              String []parts = new String[2];
+              parts = reg3.split("&");
+              if (parts.length == 2) {
+                  reg3 = parts[1];
+              } else {
+                  reg3 = parts[0];
+              }
+          }
+          if (reg2.matches("r(.*)")) {
+              String []parts = new String[2];
+              parts = reg2.split("&");
+              reg2 = parts[0];
+          }
+          instr = op + " " + reg1 + " " + reg2 + " " + reg3 + "\n";
+          String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+          if (opt_found == null){
+              this.result += instr;
+          }
+          return instr;
+      }
 
     /**
     * f0 -> "STOREW"
     * f1 -> Register()
-    * f2 -> IntegerLiteral()
-    * f3 -> Register()
+    * f2 -> Register()
+    * f3 -> SimpleExp()
     */
     public String visit(StoreWStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu);
+
+        this.label_from_stmt = false;
         String addr = n.f3.accept(this, argu).split("&")[0];
+        this.label_from_stmt = true;
+        
         String intsr = "STOREW " + src + " " + reg2 + " " + addr + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
@@ -143,12 +183,16 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     * f0 -> "LOADW"
     * f1 -> Register()
     * f2 -> Register()
-    * f3 -> IntegerLiteral()
+    * f3 -> SimpleExp()
     */
     public String visit(LoadWStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg = n.f2.accept(this, argu).split("&")[0];
+        
+        this.label_from_stmt = false;
         String addr = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        
         String instr = "LOADW " + dst + " " + reg + " " + addr + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
@@ -167,7 +211,11 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu);
+
+        this.label_from_stmt = false;
         String src = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        
         if (src == null) { return null; }
         String instr = null;
         if (src.matches("r(.*)")) {
@@ -178,10 +226,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             } else {
                 src = parts[0];
             }
-            instr = op + " " + dst + " " + reg2 + " " + src + "\n";
-        } else if (src.matches("[0-9]+")) {
-            instr = op + " " + dst + " " + reg2 + " " + Integer.parseInt(src) + "\n";
         }
+        instr = op + " " + dst + " " + reg2 + " " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -199,7 +245,11 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu).split("&")[0];
+        
+        this.label_from_stmt = false;
         String reg3 = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        
         if (reg3 == null) { return null; }
         String instr = null;
         if (reg3.matches("r(.*)")) {
@@ -210,10 +260,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             } else {
                 reg3 = parts[0];
             }
-            instr = op + " " + dst + " " + reg2 + " " + reg3 + "\n";
-        } else if (reg3.matches("[0-9]+")) {
-            instr = op + " " + dst + " " + reg2 + " " + Integer.parseInt(reg3) + "\n";
         }
+        instr = op + " " + dst + " " + reg2 + " " + reg3 + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -276,7 +324,11 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String visit(ReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu);
+        
+        this.label_from_stmt = false;
         String src = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        
         if (src == null) { return null; }
         String instr = null;
         if (src.matches("r(.*)")) {
@@ -287,10 +339,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             } else {
                 src = parts[0];
             }
-            instr = "READ " + dst + " " + reg2 + " " + src + "\n";
-        } else if (src.matches("[0-9]+")) {
-            instr = "READ " + dst + " " + reg2 + " " + Integer.parseInt(src) + "\n";
         }
+        instr = "READ " + dst + " " + reg2 + " " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -306,11 +356,17 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(SeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
+        
+        this.label_from_stmt = false;
         String reg2 = n.f2.accept(this, argu);
+        this.label_from_stmt = true;
+
+        this.label_from_stmt = false;
         String src = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        
         if (src == null) { return null; }
         String instr = null;
-        
         if (src.matches("r(.*)")) {
             String []parts = new String[2];
             parts = src.split("&");
@@ -320,7 +376,6 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 src = parts[0];
             }
         }
-        
         if (reg2.matches("r(.*)")) {
             String []parts = new String[2];
             parts = reg2.split("&");
@@ -330,9 +385,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 reg2 = parts[0];
             }
         }
-        
         instr = "SEEK " + dst + " " + reg2 + " " + src + "\n";
-        
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -367,6 +420,16 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      *       | "CNJMP"
      */
     public String visit(JmpOps n, String argu) throws Exception {
+        return n.f0.choice.toString();
+    }
+    
+    
+    /**
+     * f0 -> "JMP"
+     *       | "CJMP"
+     *       | "CNJMP"
+     */
+    public String visit(ComparisonOps n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
     
@@ -421,7 +484,11 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      * f0 -> <IDENTIFIER>
      */
     public String visit(Label n, String argu) throws Exception {
-        return n.f0.toString();
+        String ret = n.f0.toString();
+        if (this.label_from_stmt) {
+            this.result += ret + "\n";
+        }
+        return ret;
     }
 
 }

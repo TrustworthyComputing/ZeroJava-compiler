@@ -110,6 +110,23 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
+     * f0 -> ComparisonOps()
+     * f1 -> Register()
+     * f2 -> Register()
+     * f3 -> SimpleExp()
+     */
+     public String visit(ComparisonStmts n, String argu) throws Exception {
+         String op = n.f0.accept(this, argu);
+         String reg1 = n.f1.accept(this, argu);
+         String reg2 = n.f2.accept(this, argu);
+         String reg3 = n.f3.accept(this, argu);
+         String instr = op + " " + reg1 + " " + reg2 + " " + reg3;
+         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg2+"\""));
+         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg3+"\""));
+         return instr;
+     }
+
+    /**
      * f0 -> "STOREW"
      * f1 -> Register()
      * f2 -> Register()
@@ -185,7 +202,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src2.matches("r(.*)")) { // if third argument is not immediate
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
-        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
+        // binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\""));
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src2+"\""));
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
@@ -286,6 +305,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      *       | "CNJMP"
      */
     public String visit(JmpOps n, String argu) throws Exception {
+        return n.f0.choice.toString();
+    }
+    
+    /**
+     * f0 -> "JMP"
+     *       | "CJMP"
+     *       | "CNJMP"
+     */
+    public String visit(ComparisonOps n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
     

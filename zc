@@ -10,17 +10,20 @@ ASM="$($JVM Main $inputfile | sed -n 1p)"
 # echo "ASM:" $ASM
 
 cd ../../../
-cd ./optimizer/src/zilch/
 
-OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
 
-# Do optimizations util reaching a fixed point
-DIFF=$(diff $ASM $OPT)
-while [[ "$DIFF" != "" ]] ; do
-    ASM=$OPT
+if [ "$2" == "-opts" ]; then
+    cd ./optimizer/src/zilch/
     OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
+    # Do optimizations util reaching a fixed point
     DIFF=$(diff $ASM $OPT)
-done
+    while [[ "$DIFF" != "" ]] ; do
+        ASM=$OPT
+        OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
+        DIFF=$(diff $ASM $OPT)
+    done
+    ASM=$OPT
+fi
 
-echo -e "TinyRAM output:" $OPT "\n"
-cat $OPT
+echo -e "TinyRAM output:" $ASM "\n"
+cat $ASM

@@ -132,6 +132,7 @@ Label()
 | TwoRegInstr()
 | ThreeRegInstr()
 | JmpStmts()
+| ComparisonStmts()
 | StoreWStmt()
 | LoadWStmt()
 | PrintStmt()
@@ -152,6 +153,20 @@ void JmpOps():
   "JMP"
 | "CJMP"
 | "CNJMP"
+}
+
+void ComparisonStmts() :
+{}
+{
+  ComparisonOps() Register() Register() SimpleExp()
+}
+
+void ComparisonOps():
+{}
+{
+  "CMPE"
+| "CMPG"
+| "CMPGE"
 }
 
 void StoreWStmt() :
