@@ -597,20 +597,19 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return new Variable_t(ret, null);
 	}
 	
-	// /**
-	// * f0 -> PrimaryExpression()
-	// * f1 -> "++"
-	// */
-	// public BaseType visit(PlusPlusExpression n, BaseType argu) throws Exception {
-	// 	String ret = new String("r" + ++glob_temp_cnt_);
-	// 	String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-	// 	if (this.is_inline_meth_) {
-	// 		this.inline_meth_ += new String("ADD " + ret + " " + t1 + " 1\n");
-	// 	} else {
-	// 		this.result_ += new String("ADD " + ret + " " + t1 + " 1\n");
-	// 	}
-	// 	return new Variable_t(ret, null);
-	// }
+	/**
+	* f0 -> Identifier()
+	* f1 -> "++"
+	*/
+	public BaseType visit(PlusPlusExpression n, BaseType argu) throws Exception {
+		String reg = ((Variable_t) n.f0.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("ADD " + reg + " " + reg + " 1\n");
+		} else {
+			this.result_ += new String("ADD " + reg + " " + reg + " 1\n");
+		}
+		return new Variable_t(reg, null);
+	}
 
 	/**
 	* f0 -> PrimaryExpression()
@@ -629,20 +628,19 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return new Variable_t(ret, null);
 	}
 	
-	// /**
-	// * f0 -> PrimaryExpression()
-	// * f1 -> "--"
-	// */
-	// public BaseType visit(MinusMinusExpression n, BaseType argu) throws Exception {
-	// 	String ret = new String("r" + ++glob_temp_cnt_);
-	// 	String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
-	// 	if (this.is_inline_meth_) {
-	// 		this.inline_meth_ += new String("SUB " + ret + " " +  t1 + " 1\n");
-	// 	} else {
-	// 		this.result_ += new String("SUB " + ret + " " +  t1 + " 1\n");
-	// 	}
-	// 	return new Variable_t(ret, null);
-	// }
+	/**
+	* f0 -> PrimaryExpression()
+	* f1 -> "--"
+	*/
+	public BaseType visit(MinusMinusExpression n, BaseType argu) throws Exception {
+		String reg = ((Variable_t) n.f0.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("SUB " + reg + " " +  reg + " 1\n");
+		} else {
+			this.result_ += new String("SUB " + reg + " " +  reg + " 1\n");
+		}
+		return new Variable_t(reg, null);
+	}
 
 	/**
 	* f0 -> PrimaryExpression()
