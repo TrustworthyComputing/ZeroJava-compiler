@@ -228,6 +228,54 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	
 	/**
 	* f0 -> Identifier()
+	* f1 -> OpAssignmentOperator()
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public BaseType visit(OpAssignmentStatement n, BaseType argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String op = n.f1.accept(this, argu).getName();
+		this.immediate_ = true;
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
+		this.immediate_ = false;
+		Variable_t var;
+		Method_t meth = (Method_t) argu;
+		if (meth != null) { 
+			var = meth.methContainsVar(id);
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += op + " " +  var.getRegister() + " " + var.getRegister() + " " + expr +"\n";
+			} else {
+				this.result_ += op + " " +  var.getRegister() + " " + var.getRegister() + " " + expr +"\n";
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * f0 ->  "+="
+	 * 		| "-="
+	 * 		| "*="
+	 * 		| "/="
+	 * 		| "%=" 
+	 */
+	public BaseType visit(OpAssignmentOperator n, BaseType argu) throws Exception {
+		String op = n.f0.choice.toString();
+		if (op == "+=") {
+			return new Variable_t("ADD", "ADD");
+		} else if (op == "-=") {
+			return new Variable_t("SUB", "SUB");
+		} else if (op == "*=") {
+			return new Variable_t("MULL", "MULL");
+		} else if (op == "/=") {
+			return new Variable_t("DIV", "DIV");
+		} else if (op == "%=") {
+			return new Variable_t("MOD", "MOD");
+		}
+		return null;
+	}
+	
+	/**
+	* f0 -> Identifier()
 	* f1 -> "["
 	* f2 -> Expression()
 	* f3 -> "]"

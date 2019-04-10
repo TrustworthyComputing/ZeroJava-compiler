@@ -34,12 +34,20 @@ TOKEN :
 | < SEMICOLON: ";" >
 | < DOT: "." >
 | < ASSIGN: "=" >
+| < PLUSPLUS: "++" >
+| < MINUSMINUS: "--" >
+| < PLUSEQUAL: "+=" >
+| < MINUSEQUAL: "-=" >
+| < MULLEQUAL: "*=" >
+| < DIVEQUAL: "/=" >
+| < MODEQUAL: "%=" >
 | < GT: ">" >
 | < LT: "<" >
 | < PLUS: "+" >
-| < PLUSPLUS: "++" >
 | < MINUS: "-" >
-| < MINUSMINUS: "--" >
+| < MULL: "*" >
+| < DIV: "/" >
+| < MOD: "%" >
 | < AND : "&&" >
 | < OR : "||" >
 | < NOT : "!" >
@@ -214,6 +222,9 @@ void Statement() :
   AssignmentStatement()
 |
   LOOKAHEAD(2)
+  OpAssignmentStatement()
+|
+  LOOKAHEAD(2)
   ArrayAssignmentStatement()
 |
   LOOKAHEAD( Identifier() "++" ";" )
@@ -249,6 +260,22 @@ void AssignmentStatement() :
 {}
 {
   Identifier() "=" Expression() ";"
+}
+
+void OpAssignmentStatement() :
+{}
+{
+  Identifier() OpAssignmentOperator() Expression() ";"
+}
+
+void OpAssignmentOperator() :
+{}
+{ 
+  "+="
+| "-="
+| "*="
+| "/="
+| "%="
 }
 
 void ArrayAssignmentStatement() :
