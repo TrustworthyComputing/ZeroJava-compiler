@@ -46,7 +46,7 @@ TOKEN :
 | < PLUS: "+" >
 | < MINUS: "-" >
 | < MULL: "*" >
-| < DIV: "/" >
+| < UDIV: "/" >
 | < MOD: "%" >
 | < AND : "&&" >
 | < OR : "||" >
@@ -357,25 +357,26 @@ void Expression() :
   LOOKAHEAD( PrimaryExpression() ">=" )
   GreaterEqualThanExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "+" )
-  PlusExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "-" )
-  MinusExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "*" )
-  TimesExpression()
+  LOOKAHEAD( PrimaryExpression() SingleOp() )
+  SingleOpExpression()
 |
   LOOKAHEAD( PrimaryExpression() "[" )
   ArrayLookup()
-|
-  LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
-  MessageSend()
 |
   LOOKAHEAD( Identifier() "(" )
   MethodCall()
 |
   Clause()
+}
+
+void SingleOp() :
+{}
+{ 
+  "+"
+| "-"
+| "*"
+| "/"
+| "%"
 }
 
 void AndExpression() :
@@ -421,22 +422,10 @@ void GreaterEqualThanExpression() :
   PrimaryExpression() ">=" PrimaryExpression()
 }
 
-void PlusExpression() :
-{}
-{
-  PrimaryExpression() "+" PrimaryExpression()
-}
-
 void PlusPlusExpression() :
 {}
 {
   Identifier() "++" ";"
-}
-
-void MinusExpression() :
-{}
-{
-  PrimaryExpression() "-" PrimaryExpression()
 }
 
 void MinusMinusExpression() :
@@ -445,23 +434,16 @@ void MinusMinusExpression() :
   Identifier() "--" ";"
 }
 
-void TimesExpression() :
+void SingleOpExpression() :
 {}
 {
-  PrimaryExpression() "*" PrimaryExpression()
+  PrimaryExpression() SingleOp() PrimaryExpression()
 }
 
 void ArrayLookup() :
 {}
 {
   PrimaryExpression() "[" PrimaryExpression() "]"
-}
-
-void MessageSend() :
-{}
-{
-  PrimaryExpression() "." Identifier()
-  "(" ( ExpressionList() )? ")"
 }
 
 void MethodCall() :
