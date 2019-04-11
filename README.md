@@ -16,24 +16,55 @@ Zilch program source text is free-format, using the semicolon as a statement ter
 Zilch supports comments like C99, where the delimiter `//` is used for a single line comment and delimiters `/*` and `*/` are used for a block of lines.
 Zilch files use the `.zl` extension.
 
+### Zilch Arithmetic Operators
+| Operator | Description        											|
+|----------|----------------------------------------------------------------|
+| `+`      | Adds two operands.			 									|
+| `-`      | Subtracts second operand from the first.				 		|
+| `*`      | Multiplies both operands.			 							|
+| `/`      | Divides numerator by de-numerator.			 					|
+| `%`      | Modulus Operator and remainder of after an integer division.	|
+| `++`     | Increment operator increases the integer value by one. 		|
+| `--`     | Decrement operator decreases the integer value by one. 		|
+
+
 ### Zilch Comparison and Logical Operators
 | Operator | Description        	|
 |----------|------------------------|
 | `==`     | Equal 					|
+| `!=`     | Not Equal				|
 | `<`      | Less than				|
-| `<=`     | Less or Equal than		|
 | `>`      | Greater than			|
+| `<=`     | Less or Equal than		|
 | `>=`     | Greater or Equal than	|
 | `&&`     | Logical `AND`			|
 | `\|\|`   | Logical `OR`			|
 
 
-<!-- ### Zilch Assignment Operators
-| Operator | Description        						|
-|----------|--------------------------------------------|
-| `=`      | Assignment for `int` and `boolean` types 	| -->
-<!-- | `++`     | Increment of `int` type by one 			|
-| `--`     | Decrement of `int` type by one 			| -->
+### Zilch Bitwise Operators
+| Operator | Description        			|
+|----------|--------------------------------|
+| `&`      | Binary AND 					|
+| `|`      | Binary OR						|
+| `^`      | Binary XOR						|
+| `<<`     | Binary Left shift operator. 	|
+| `>>`     | Binary Right shift operator. 	|
+
+
+### Zilch Assignment Operators
+| Operator | Description        					|
+|----------|----------------------------------------|
+| `=`      | Simple assignment operator. 			|
+| `+=`     | Add and assignment operator.  			|
+| `-=`     | Subtract and assignment operator. 		|
+| `*=`     | Multiply and assignment operator. 		|
+| `/=`     | Divide and assignment operator. 		|
+| `%=`     | Modulo and assignment operator. 		|
+| `<<=`    | Left shift AND assignment operator.	|
+| `>>=`    | Right shift AND assignment operator. 	|
+| `&=`     | Bitwise AND assignment operator. 		|
+| `^=`     | Bitwise XOR and assignment operator.	|
+| `|=`     | Bitwise OR and assignment operator. 	|
 
 
 ### Built in Zilch Functions

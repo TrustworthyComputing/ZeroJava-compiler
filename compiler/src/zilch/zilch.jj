@@ -40,6 +40,11 @@ TOKEN :
 | < MULLEQUAL: "*=" >
 | < DIVEQUAL: "/=" >
 | < MODEQUAL: "%=" >
+| < LSHIFTEQUAL: "<<=" >
+| < RSHIFTEQUAL: ">>=" >
+| < ANDEQUAL: "&=" >
+| < OREQUAL: "|=" >
+| < XOREQUAL: "^=" >
 | < LSHIFT: "<<" >
 | < RSHIFT: ">>" >
 | < GT: ">" >
@@ -208,7 +213,7 @@ void Statement() :
   Block()
 | LOOKAHEAD(2)
   AssignmentStatement()
-| LOOKAHEAD(2)
+| LOOKAHEAD(3)
   OpAssignmentStatement()
 | LOOKAHEAD(2)
   ArrayAssignmentStatement()
@@ -255,8 +260,11 @@ void OpAssignmentOperator() :
 | <MULLEQUAL>
 | <DIVEQUAL>
 | <MODEQUAL>
-| <LSHIFT>
-| <RSHIFT>
+| <LSHIFTEQUAL>
+| <RSHIFTEQUAL>
+| <ANDEQUAL>
+| <OREQUAL>
+| <XOREQUAL>
 }
 
 void ArrayAssignmentStatement() :
@@ -361,6 +369,8 @@ void BinaryOperator() :
 | <OR>
 | <AND>
 | <XOR>
+| <LSHIFT>
+| <RSHIFT>
 }
 
 void AndExpression() :

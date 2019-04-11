@@ -6,6 +6,6 @@ void main(void) {
 	x = 12;
 	x--;
 	x--;
-	x << 1;
+	x <<= 1;
 	Prover.answer(x + y);
 }

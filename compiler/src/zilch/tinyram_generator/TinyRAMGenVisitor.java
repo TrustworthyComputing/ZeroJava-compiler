@@ -249,8 +249,11 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | "*="
      *       | "/="
      *       | "%="
-     *       | "<<"
-     *       | ">>"
+     *       | "<<="
+     *       | ">>="
+     *       | "&="
+     *       | "|="
+     *       | "^="
      */
 	public BaseType visit(OpAssignmentOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
@@ -264,10 +267,16 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			return new Variable_t("UDIV", "UDIV");
 		} else if (op == "%=") {
 			return new Variable_t("MOD", "MOD");
-		} else if (op == "<<") {
+		} else if (op == "<<=") {
 			return new Variable_t("SHL", "SHL");
-		} else if (op == ">>") {
+		} else if (op == ">>=") {
 			return new Variable_t("SHR", "SHR");
+		} else if (op == "&=") {
+			return new Variable_t("AND", "AND");
+		} else if (op == "|=") {
+			return new Variable_t("OR", "OR");
+		} else if (op == "^=") {
+			return new Variable_t("XOR", "XOR");
 		}
 		return null;
 	}
@@ -516,7 +525,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * 		| "%"
 	 * 		| "|"
 	 * 		| "&"
-	 * 		| "^" 
+	 * 		| "^"
+	 * 		| "<<"
+	 * 		| ">>"
 	 */
 	public BaseType visit(BinaryOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
@@ -536,6 +547,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			return new Variable_t("AND", "AND");
 		} else if (op == "^") {
 			return new Variable_t("XOR", "XOR");
+		}  else if (op == "<<") {
+			return new Variable_t("SHL", "SHL");
+		} else if (op == ">>") {
+			return new Variable_t("SHR", "SHR");
 		} else {
 			throw new Exception("Not supported operator");
 		}
