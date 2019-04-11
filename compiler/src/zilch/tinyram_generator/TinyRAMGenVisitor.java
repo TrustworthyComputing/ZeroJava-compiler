@@ -40,6 +40,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
+		this.result_ += "\n";
 		return null;
 	}
 

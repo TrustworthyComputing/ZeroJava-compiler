@@ -24,6 +24,7 @@ import org.deri.iris.storage.IRelation;
 
 
 public class Main {
+    
     public static void main (String [] args){
         if (args.length < 1){
             System.err.println("Usage: java Main <inputFile1> [<inputFile2>] ...");
@@ -36,20 +37,20 @@ public class Main {
                 TinyRAMParser spigParser = new TinyRAMParser(fis);
                 Goal root = spigParser.Goal();
                 File fp = new File(arg);
-                String abs_path = fp.getPath();
-                abs_path = abs_path.substring(0, abs_path.lastIndexOf('.'));
-                String path = fp.getName();
-                path = path.substring(0, path.lastIndexOf('.'));
-                path = "facts_rules/Facts/" + path;
-                Path p = Paths.get(path);
-                if (! Files.exists(p)) {
-                    if (!(new File(path)).mkdirs()) {
-                        System.err.println("Error creating folder " + path);
-                        System.exit(-1);
-                    }
-                } 
-                FactGeneratorVisitor dlVisitor = new FactGeneratorVisitor();
+                String ext = getFileExtension(fp);
+                String name = getFileNameWithoutExt(fp);
+                String abs_path = getFilePath(fp);
+                String path = "facts_rules/Facts/" + abs_path;
+                abs_path = abs_path + "/" + name;
                 try {
+                    if (! ext.equals("asm")) {
+                        throw new IOException("Input files should end with a '.asm' extension.");
+                    }
+                    Path p = Paths.get(path);
+                    if (! Files.exists(p) && !(new File(path)).mkdirs()) {
+                        throw new IOException("Error creating folder " + path);
+                    } 
+                    FactGeneratorVisitor dlVisitor = new FactGeneratorVisitor();
                     root.accept(dlVisitor, null);                  
                     writeFacts(dlVisitor, path);
 
@@ -99,14 +100,12 @@ public class Main {
                             String str = null;
                             for (int r = 0; r < relation.size(); r++) {
                                 str = (relation.get(r)).toString();
-                                // System.out.println(relation.get(r));
                                 int line = getLine(str);
                                 String meth = getMeth(str);
                                 if (tempOp.get(meth + line) == null) {
                                     tempOp.put(meth + line, str);
                                 } 
                                 else {
-                                // else if (queryType == "constProp") {
                                     tempOp.put(meth + "-sec-" + line, str);
                                 }
                             }
@@ -139,18 +138,13 @@ public class Main {
                     writer.println(opt.result);
                     writer.close();
                 } catch (Exception ex) {
-                    System.out.println("\n\n"+ ex.getMessage() + "\n\n");
+                    System.out.println("\n"+ ex.getMessage() + "\n");
                 }
-            } catch(ParseException ex) {
-                System.err.println(ex.getMessage());
-            } catch(FileNotFoundException ex) {
-                System.err.println(ex.getMessage());
+            } catch(ParseException ex) { System.err.println(ex.getMessage());
+            } catch(FileNotFoundException ex) { System.err.println(ex.getMessage());
             } finally {
-                try {
-                    if (fis != null) fis.close();
-                } catch(IOException ex) {
-                    System.err.println(ex.getMessage());
-                }
+                try { if (fis != null) fis.close();
+                } catch(IOException ex) { System.err.println(ex.getMessage()); }
             }
         }
     }
@@ -224,4 +218,23 @@ public class Main {
             System.err.println(ex.getMessage());
         }
     }
+    
+    private static String getFileExtension(File file) {
+        String fileName = file.getName();
+        if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1);
+        }
+        return "";
+    }
+    
+    private static String getFilePath(File file) {
+        String filepath = file.getPath();
+        return filepath.substring(0, filepath.lastIndexOf('/'));
+    }
+    
+    private static String getFileNameWithoutExt(File file) {
+        String filename = file.getName();
+        return filename.substring(0, filename.lastIndexOf('.'));
+    }
+    
 }
