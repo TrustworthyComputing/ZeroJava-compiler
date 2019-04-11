@@ -19,6 +19,7 @@ Zilch files use the `.zl` extension.
 ### Zilch Comparison and Logical Operators
 | Operator | Description        	|
 |----------|------------------------|
+| `==`     | Equal 					|
 | `<`      | Less than				|
 | `<=`     | Less or Equal than		|
 | `>`      | Greater than			|

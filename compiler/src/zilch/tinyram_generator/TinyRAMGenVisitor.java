@@ -494,6 +494,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f0 -> AndExpression()
      *       | OrExpression()
      *       | EqExpression()
+     *       | NeqExpression()
      *       | LessThanExpression()
      *       | GreaterThanExpression()
      *       | LessEqualThanExpression()
@@ -610,6 +611,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			this.inline_meth_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
 		} else {
 			this.result_ += new String("CMPE " + t1 + " " +  t1 + " " + t2 + "\n");
+		}
+		return new Variable_t(t1, null);
+	}
+	
+	/**
+	* f0 -> PrimaryExpression()
+	* f1 -> "!="
+	* f2 -> PrimaryExpression()
+	*/
+	public BaseType visit(NeqExpression n, BaseType argu) throws Exception {
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += new String("CMPNE " + t1 + " " +  t1 + " " + t2 + "\n");
+		} else {
+			this.result_ += new String("CMPNE " + t1 + " " +  t1 + " " + t2 + "\n");
 		}
 		return new Variable_t(t1, null);
 	}

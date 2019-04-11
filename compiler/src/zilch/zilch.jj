@@ -32,7 +32,6 @@ TOKEN :
 | < LBRACE: "{" >
 | < RBRACE: "}" >
 | < SEMICOLON: ";" >
-| < DOT: "." >
 | < ASSIGN: "=" >
 | < PLUSPLUS: "++" >
 | < MINUSMINUS: "--" >
@@ -41,15 +40,24 @@ TOKEN :
 | < MULLEQUAL: "*=" >
 | < DIVEQUAL: "/=" >
 | < MODEQUAL: "%=" >
+| < LSHIFT: "<<" >
+| < RSHIFT: ">>" >
 | < GT: ">" >
+| < GTE: ">=" >
 | < LT: "<" >
+| < LTE: "<=" >
+| < EQ: "==" >
+| < NEQ: "!=" >
 | < PLUS: "+" >
 | < MINUS: "-" >
 | < MULL: "*" >
 | < UDIV: "/" >
 | < MOD: "%" >
-| < AND : "&&" >
-| < OR : "||" >
+| < AND: "&" >
+| < OR: "|" >
+| < XOR: "^" >
+| < LOGICAL_AND : "&&" >
+| < LOGICAL_OR : "||" >
 | < NOT : "!" >
 | < ELSE: "else" >
 | < IF: "if" >
@@ -127,26 +135,26 @@ void Goal() :
 void VarDeclaration() :
 {}
 {
-  Type() Identifier() ";"
+  Type() Identifier() <SEMICOLON>
 }
 
 
 void MainMethodDeclaration() :
 {}
 {
-  "void" "main" "(" "void" ")" "{"
+  <VOID> <MAIN> <LPAREN> <VOID> <RPAREN> <LBRACE>
     ( LOOKAHEAD(2) VarDeclaration() )*
     ( Statement() )*
-  "}"
+  <RBRACE>
 }
 
 void MethodDeclaration() :
 {}
 {
   Type() Identifier()
-  "(" ( FormalParameterList() )? ")"
-  "{" ( LOOKAHEAD(2) VarDeclaration() )*
-      ( Statement() )* "return" Expression() ";" "}"
+  <LPAREN> ( FormalParameterList() )? <RPAREN>
+  <LBRACE> ( LOOKAHEAD(2) VarDeclaration() )*
+      ( Statement() )* <RETURN> Expression() <SEMICOLON> <RBRACE>
 }
 
 void FormalParameterList() :
@@ -178,261 +186,241 @@ void Type() :
 {
   LOOKAHEAD(3)
   ArrayType()
-|
-  IntegerType()
-|
-  Identifier()
+| IntegerType()
+| Identifier()
 }
 
 void ArrayType() :
 {}
 {
-  "int" "[" "]"
+  <INTEGER> <LSQPAREN> <RSQPAREN>
 }
 
 void IntegerType() :
 {}
 {
-  "int"
+  <INTEGER>
 }
 
 void Statement() :
 {}
 {
   Block()
-|
-  LOOKAHEAD(2)
+| LOOKAHEAD(2)
   AssignmentStatement()
-|
-  LOOKAHEAD(2)
+| LOOKAHEAD(2)
   OpAssignmentStatement()
-|
-  LOOKAHEAD(2)
+| LOOKAHEAD(2)
   ArrayAssignmentStatement()
-|
-  LOOKAHEAD( Identifier() "++" ";" )
+| LOOKAHEAD( Identifier() <PLUSPLUS> <SEMICOLON> )
   PlusPlusExpression()
-|
-  LOOKAHEAD( Identifier() "--" ";" )
+| LOOKAHEAD( Identifier() <MINUSMINUS> <SEMICOLON> )
   MinusMinusExpression()
-|
-  LOOKAHEAD( "if" "(" Expression() ")" Statement() "else" Statement() )
+| LOOKAHEAD( <IF> <LPAREN> Expression() <RPAREN> Statement() <ELSE> Statement() )
   IfElseStatement()
-|
-  LOOKAHEAD( "if" "(" Expression() ")" Statement())
+| LOOKAHEAD( <IF> <LPAREN> Expression() <RPAREN> Statement())
   IfStatement()
-|
-  WhileStatement()
-|
-  PrintStatement()
-|
-  ReadPrimaryTape()
-|
-  ReadPrivateTape()
-|
-  SeekPrimaryTape()
-|
-  SeekPrivateTape()
-|
-  AnswerStatement()
+| WhileStatement()
+| PrintStatement()
+| ReadPrimaryTape()
+| ReadPrivateTape()
+| SeekPrimaryTape()
+| SeekPrivateTape()
+| AnswerStatement()
 }
 
 void Block() :
 {}
 {
-  "{" ( Statement() )* "}"
+  <LBRACE> ( Statement() )* <RBRACE>
 }
 
 void AssignmentStatement() :
 {}
 {
-  Identifier() "=" Expression() ";"
+  Identifier() <ASSIGN> Expression() <SEMICOLON>
 }
 
 void OpAssignmentStatement() :
 {}
 {
-  Identifier() OpAssignmentOperator() Expression() ";"
+  Identifier() OpAssignmentOperator() Expression() <SEMICOLON>
 }
 
 void OpAssignmentOperator() :
 {}
 { 
-  "+="
-| "-="
-| "*="
-| "/="
-| "%="
-| "<<"
-| ">>"
+  <PLUSEQUAL>
+| <MINUSEQUAL>
+| <MULLEQUAL>
+| <DIVEQUAL>
+| <MODEQUAL>
+| <LSHIFT>
+| <RSHIFT>
 }
 
 void ArrayAssignmentStatement() :
 {}
 {
-  Identifier() "[" Expression() "]" "=" Expression() ";"
+  Identifier() <LSQPAREN> Expression() <RSQPAREN> <ASSIGN> Expression() <SEMICOLON>
 }
 
 void IfElseStatement() :
 {}
 {
-  "if" "(" Expression() ")" Statement() "else" Statement()
+  <IF> <LPAREN> Expression() <RPAREN> Statement() <ELSE> Statement()
 }
 
 void IfStatement() :
 {}
 {
-  "if" "(" Expression() ")" Statement()
+  <IF> <LPAREN> Expression() <RPAREN> Statement()
 }
 
 void WhileStatement() :
 {}
 {
-  "while" "(" Expression() ")" Statement()
+  <WHILE> <LPAREN> Expression() <RPAREN> Statement()
 }
 
 void PrintStatement() :
 {}
 {
-  "Out.print" "(" Expression() ")" ";"
+  "Out.print" <LPAREN> Expression() <RPAREN> <SEMICOLON>
 }
 
 void ReadPrimaryTape() :
 {}
 {
-  "PrimaryTape.read" "(" Expression() ")" ";"
+  "PrimaryTape.read" <LPAREN> Expression() <RPAREN> <SEMICOLON>
 }
 
 void ReadPrivateTape() :
 {}
 {
-  "PrivateTape.read" "(" Expression() ")" ";"
+  "PrivateTape.read" <LPAREN> Expression() <RPAREN> <SEMICOLON>
 }
 
 void SeekPrimaryTape() :
 {}
 {
-  "PrimaryTape.seek" "(" Expression() "," Expression() ")" ";"
+  "PrimaryTape.seek" <LPAREN> Expression() "," Expression() <RPAREN> <SEMICOLON>
 }
 
 void SeekPrivateTape() :
 {}
 {
-  "PrivateTape.seek" "(" Expression() "," Expression() ")" ";"
+  "PrivateTape.seek" <LPAREN> Expression() "," Expression() <RPAREN> <SEMICOLON>
 }
 
 void AnswerStatement() :
 {}
 {
-  "Prover.answer" "(" Expression() ")" ";"
+  "Prover.answer" <LPAREN> Expression() <RPAREN> <SEMICOLON>
 }
 
 
 void Expression() :
 {}
 {
-  LOOKAHEAD( PrimaryExpression() "&&" )
+  LOOKAHEAD( PrimaryExpression() <LOGICAL_AND> )
   AndExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "||" )
+| LOOKAHEAD( PrimaryExpression() <LOGICAL_OR> )
   OrExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "==" )
+| LOOKAHEAD( PrimaryExpression() <EQ> )
   EqExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "<" )
+| LOOKAHEAD( PrimaryExpression() <NEQ> )
+  NeqExpression()
+| LOOKAHEAD( PrimaryExpression() <LT> )
   LessThanExpression()
-|
-  LOOKAHEAD( PrimaryExpression() ">" )
+| LOOKAHEAD( PrimaryExpression() <GT> )
   GreaterThanExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "<=" )
+| LOOKAHEAD( PrimaryExpression() <LTE> )
   LessEqualThanExpression()
-|
-  LOOKAHEAD( PrimaryExpression() ">=" )
+| LOOKAHEAD( PrimaryExpression() <GTE> )
   GreaterEqualThanExpression()
-|
-  LOOKAHEAD( PrimaryExpression() BinaryOperator() )
+| LOOKAHEAD( PrimaryExpression() BinaryOperator() )
   BinaryExpression()
-|
-  LOOKAHEAD( "!" PrimaryExpression() )
+| LOOKAHEAD( <NOT> PrimaryExpression() )
   NotExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "[" )
+| LOOKAHEAD( PrimaryExpression() <LSQPAREN> )
   ArrayLookup()
-|
-  LOOKAHEAD( Identifier() "(" )
+| LOOKAHEAD( Identifier() <LPAREN> )
   MethodCall()
-|
-  PrimaryExpression()
+| PrimaryExpression()
 }
 
 void BinaryOperator() :
 {}
 { 
-  "+"
-| "-"
-| "*"
-| "/"
-| "%"
-| "|"
-| "&"
-| "^"
+  <PLUS>
+| <MINUS>
+| <MULL>
+| <UDIV>
+| <MOD>
+| <OR>
+| <AND>
+| <XOR>
 }
 
 void AndExpression() :
 {}
 {
-  PrimaryExpression() "&&" PrimaryExpression()
+  PrimaryExpression() <LOGICAL_AND> PrimaryExpression()
 }
 
 void OrExpression() :
 {}
 {
-  PrimaryExpression() "||" PrimaryExpression()
+  PrimaryExpression() <LOGICAL_OR> PrimaryExpression()
 }
-
 
 void EqExpression() :
 {}
 {
-  PrimaryExpression() "==" PrimaryExpression()
+  PrimaryExpression() <EQ> PrimaryExpression()
+}
+
+void NeqExpression() :
+{}
+{
+  PrimaryExpression() <NEQ> PrimaryExpression()
 }
 
 void LessThanExpression() :
 {}
 {
-  PrimaryExpression() "<" PrimaryExpression()
+  PrimaryExpression() <LT> PrimaryExpression()
 }
 
 void GreaterThanExpression() :
 {}
 {
-  PrimaryExpression() ">" PrimaryExpression()
+  PrimaryExpression() <GT> PrimaryExpression()
 }
 
 void LessEqualThanExpression() :
 {}
 {
-  PrimaryExpression() "<=" PrimaryExpression()
+  PrimaryExpression() <LTE> PrimaryExpression()
 }
 
 void GreaterEqualThanExpression() :
 {}
 {
-  PrimaryExpression() ">=" PrimaryExpression()
+  PrimaryExpression() <GTE> PrimaryExpression()
 }
 
 void PlusPlusExpression() :
 {}
 {
-  Identifier() "++" ";"
+  Identifier() <PLUSPLUS> <SEMICOLON>
 }
 
 void MinusMinusExpression() :
 {}
 {
-  Identifier() "--" ";"
+  Identifier() <MINUSMINUS> <SEMICOLON>
 }
 
 void BinaryExpression() :
@@ -444,13 +432,13 @@ void BinaryExpression() :
 void ArrayLookup() :
 {}
 {
-  PrimaryExpression() "[" PrimaryExpression() "]"
+  PrimaryExpression() <LSQPAREN> PrimaryExpression() <RSQPAREN>
 }
 
 void MethodCall() :
 {}
 {
-  Identifier() "(" ( ExpressionList() )? ")"
+  Identifier() <LPAREN> ( ExpressionList() )? <RPAREN>
 }
 
 void ExpressionList() :
@@ -499,17 +487,17 @@ void Identifier() :
 void ArrayAllocationExpression() :
 {}
 {
-  "new" "int" "[" Expression() "]"
+  <NEW> <INTEGER> <LSQPAREN> Expression() <RSQPAREN>
 }
 
 void NotExpression() :
 {}
 {
-  "!" PrimaryExpression()
+  <NOT> PrimaryExpression()
 }
 
 void BracketExpression() :
 {}
 {
-  "(" Expression() ")"
+  <LPAREN> Expression() <RPAREN>
 }
