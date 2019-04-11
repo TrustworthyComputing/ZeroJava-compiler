@@ -45,7 +45,7 @@ Zilch files use the `.zl` extension.
 | Operator | Description        			|
 |----------|--------------------------------|
 | `&`      | Binary AND 					|
-| `|`      | Binary OR						|
+| `\|`     | Binary OR						|
 | `^`      | Binary XOR						|
 | `<<`     | Binary Left shift operator. 	|
 | `>>`     | Binary Right shift operator. 	|
@@ -64,7 +64,7 @@ Zilch files use the `.zl` extension.
 | `>>=`    | Right shift AND assignment operator. 	|
 | `&=`     | Bitwise AND assignment operator. 		|
 | `^=`     | Bitwise XOR and assignment operator.	|
-| `|=`     | Bitwise OR and assignment operator. 	|
+| `\|=`    | Bitwise OR and assignment operator. 	|
 
 
 ### Built in Zilch Functions
