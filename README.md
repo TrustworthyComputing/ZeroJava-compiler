@@ -92,6 +92,7 @@ Zilch files use the `.zl` extension.
 | SHL ri rj A    | ri = rj << A                                         |
 | SHR ri rj A    | ri = rj >> A                                         |
 | CMPE ri rj A   | flag = rj == A                                       |
+| CMPNE ri rj A  | flag = rj != A                                       |
 | CMPG ri rj A   | flag = rj > A                                        |
 | CMPGE ri rj A  | flag = rj >= A                                       |
 | MOV ri rj A    | ri = A                                               |
