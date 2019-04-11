@@ -51,22 +51,13 @@ TOKEN :
 | < AND : "&&" >
 | < OR : "||" >
 | < NOT : "!" >
-| < BOOLEAN: "boolean" >
-| < CLASS: "class" >
-| < INTERFACE: "interface" >
 | < ELSE: "else" >
-| < EXTENDS: "extends" >
-| < FALSE: "false" >
 | < IF: "if" >
 | < WHILE: "while" >
 | < INTEGER: "int" >
 | < MAIN: "main" >
 | < NEW: "new" >
-| < PUBLIC: "public" >
 | < RETURN: "return" >
-| < STATIC: "static" >
-| < STRING: "String" >
-| < TRUE: "true" >
 | < PRINT: "Out.print" >
 | < VOID: "void" >
 }
@@ -188,8 +179,6 @@ void Type() :
   LOOKAHEAD(3)
   ArrayType()
 |
-  BooleanType()
-|
   IntegerType()
 |
   Identifier()
@@ -199,12 +188,6 @@ void ArrayType() :
 {}
 {
   "int" "[" "]"
-}
-
-void BooleanType() :
-{}
-{
-  "boolean"
 }
 
 void IntegerType() :
@@ -482,10 +465,10 @@ void PrimaryExpression() :
 {
   IntegerLiteral()
 |
-  TrueLiteral()
-|
-  FalseLiteral()
-|
+  // TrueLiteral()
+// |
+  // FalseLiteral()
+// |
   Identifier()
 |
   LOOKAHEAD(3)
@@ -501,17 +484,17 @@ void IntegerLiteral() :
 }
 
 
-void TrueLiteral() :
-{}
-{
-  "true"
-}
-
-void FalseLiteral() :
-{}
-{
-  "false"
-}
+// void TrueLiteral() :
+// {}
+// {
+//   "true"
+// }
+// 
+// void FalseLiteral() :
+// {}
+// {
+//   "false"
+// }
 
 void Identifier() :
 {}

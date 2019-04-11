@@ -61,8 +61,8 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
                     throw new Exception("Method main: Variable " + n.f6.nodes.get(i).accept(this).getName() + " already exists!");
                 }
                 String vartype = ((Variable_t) n.f6.nodes.get(i).accept(this)).getType();
-                if (!vartype.equals("int") && !vartype.equals("boolean") && !vartype.equals("int[]")) { //if not classic types
-                    throw new Exception("main: Cannot declare type " + vartype + " does not exist!\nUse either int, boolean or int[].");
+                if (!vartype.equals("int") && !vartype.equals("int[]")) { //if not classic types
+                    throw new Exception("main: Cannot declare type " + vartype + " does not exist!\nUse either int or int[].");
                 }
             }
         }
@@ -110,7 +110,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
                 Variable_t var = meth_entry.getValue();
                 meth.addParam((Variable_t) var);
                 String vartype = ((Variable_t) var).getType();
-                if (!vartype.equals("int") && !vartype.equals("boolean") && !vartype.equals("int[]")) { //if not classic types
+                if (!vartype.equals("int") && !vartype.equals("int[]")) { //if not classic types
                     throw new Exception(mname + ": Cannot declare " + vartype + " does not exist!");
                 }
             }
@@ -121,7 +121,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
                     throw new Exception("Method " + mname + ": Variable " + n.f6.nodes.get(i).accept(this).getName() + " already exists!");
                 }
                 String vartype = ((Variable_t) n.f6.nodes.get(i).accept(this)).getType();
-                if (!vartype.equals("int") && !vartype.equals("boolean") && !vartype.equals("int[]")) { //if not classic types
+                if (!vartype.equals("int") && !vartype.equals("int[]")) { //if not classic types
                     throw new Exception(mname + ": Cannot declare " + vartype + " does not exist!");
                 }
             }
@@ -189,7 +189,6 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
 
         /**
     * f0 -> ArrayType()
-    *       | BooleanType()
     *       | IntegerType()
     *       | Identifier()
     */
@@ -204,13 +203,6 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
     */
     public BaseType visit(ArrayType n) throws Exception {
         return new BaseType("int[]");
-    }
-
-    /**
-    * f0 -> "boolean"
-    */
-    public BaseType visit(BooleanType n) throws Exception {
-        return new BaseType("boolean");
     }
 
     /**

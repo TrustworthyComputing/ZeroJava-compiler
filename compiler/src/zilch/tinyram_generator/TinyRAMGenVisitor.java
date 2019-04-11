@@ -147,18 +147,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 	/**
 	* f0 -> ArrayType()
-	*       | BooleanType()
 	*       | IntegerType()
 	*       | Identifier()
 	*/
 	public BaseType visit(Type n, BaseType argu) throws Exception {
-		return n.f0.accept(this, argu);
-	}
-
-	/**
-	* f0 -> "boolean"
-	*/
-	public BaseType visit(BooleanType n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -785,8 +777,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 	/**
 	* f0 -> IntegerLiteral()
-	*       | TrueLiteral()
-	*       | FalseLiteral()
 	*       | Identifier()
 	*       | ArrayAllocationExpression()
 	*       | AllocationExpression()
@@ -810,32 +800,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			return new Variable_t(ret, null);
 		}
 		return new Variable_t(n.f0.toString(), null);
-	}
-
-	/**
-	* f0 -> "true"
-	*/
-	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++glob_temp_cnt_);
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 1\n");
-		} else {			
-			this.result_ += new String("MOV " + ret + " " + ret + " 1\n");
-		}
-		return new Variable_t(ret, null);
-	}
-
-	/**
-	* f0 -> "false"
-	*/
-	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++glob_temp_cnt_);
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("MOV " + ret + " " + ret + " 0\n");
-		} else {			
-			this.result_ += new String("MOV " + ret + " " + ret + " 0\n");
-		}
-		return new Variable_t(ret, null);
 	}
 
 	/**
