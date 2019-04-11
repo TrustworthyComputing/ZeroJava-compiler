@@ -216,6 +216,10 @@ void Statement() :
   LOOKAHEAD( Identifier() "--" ";" )
   MinusMinusExpression()
 |
+  LOOKAHEAD( "if" "(" Expression() ")" Statement() "else" Statement() )
+  IfElseStatement()
+|
+  LOOKAHEAD( "if" "(" Expression() ")" Statement())
   IfStatement()
 |
   WhileStatement()
@@ -259,6 +263,8 @@ void OpAssignmentOperator() :
 | "*="
 | "/="
 | "%="
+| "<<"
+| ">>"
 }
 
 void ArrayAssignmentStatement() :
@@ -267,10 +273,16 @@ void ArrayAssignmentStatement() :
   Identifier() "[" Expression() "]" "=" Expression() ";"
 }
 
-void IfStatement() :
+void IfElseStatement() :
 {}
 {
   "if" "(" Expression() ")" Statement() "else" Statement()
+}
+
+void IfStatement() :
+{}
+{
+  "if" "(" Expression() ")" Statement()
 }
 
 void WhileStatement() :
@@ -319,10 +331,10 @@ void AnswerStatement() :
 void Expression() :
 {}
 {
-  LOOKAHEAD( Clause() "&&" )
+  LOOKAHEAD( PrimaryExpression() "&&" )
   AndExpression()
 |
-  LOOKAHEAD( Clause() "||" )
+  LOOKAHEAD( PrimaryExpression() "||" )
   OrExpression()
 |
   LOOKAHEAD( PrimaryExpression() "==" )
@@ -340,8 +352,11 @@ void Expression() :
   LOOKAHEAD( PrimaryExpression() ">=" )
   GreaterEqualThanExpression()
 |
-  LOOKAHEAD( PrimaryExpression() SingleOp() )
-  SingleOpExpression()
+  LOOKAHEAD( PrimaryExpression() BinaryOperator() )
+  BinaryExpression()
+|
+  LOOKAHEAD( "!" PrimaryExpression() )
+  NotExpression()
 |
   LOOKAHEAD( PrimaryExpression() "[" )
   ArrayLookup()
@@ -349,10 +364,10 @@ void Expression() :
   LOOKAHEAD( Identifier() "(" )
   MethodCall()
 |
-  Clause()
+  PrimaryExpression()
 }
 
-void SingleOp() :
+void BinaryOperator() :
 {}
 { 
   "+"
@@ -360,18 +375,21 @@ void SingleOp() :
 | "*"
 | "/"
 | "%"
+| "|"
+| "&"
+| "^"
 }
 
 void AndExpression() :
 {}
 {
-  Clause() "&&" Clause()
+  PrimaryExpression() "&&" PrimaryExpression()
 }
 
 void OrExpression() :
 {}
 {
-  Clause() "||" Clause()
+  PrimaryExpression() "||" PrimaryExpression()
 }
 
 
@@ -417,10 +435,10 @@ void MinusMinusExpression() :
   Identifier() "--" ";"
 }
 
-void SingleOpExpression() :
+void BinaryExpression() :
 {}
 {
-  PrimaryExpression() SingleOp() PrimaryExpression()
+  PrimaryExpression() BinaryOperator() PrimaryExpression()
 }
 
 void ArrayLookup() :
@@ -453,22 +471,11 @@ void ExpressionTerm() :
   "," Expression()
 }
 
-void Clause() :
-{}
-{
-    NotExpression()
-  | PrimaryExpression()
-}
-
 void PrimaryExpression() :
 {}
 {
   IntegerLiteral()
 |
-  // TrueLiteral()
-// |
-  // FalseLiteral()
-// |
   Identifier()
 |
   LOOKAHEAD(3)
@@ -482,19 +489,6 @@ void IntegerLiteral() :
 {
   <INTEGER_LITERAL>
 }
-
-
-// void TrueLiteral() :
-// {}
-// {
-//   "true"
-// }
-// 
-// void FalseLiteral() :
-// {}
-// {
-//   "false"
-// }
 
 void Identifier() :
 {}
@@ -511,7 +505,7 @@ void ArrayAllocationExpression() :
 void NotExpression() :
 {}
 {
-  "!" Clause()
+  "!" PrimaryExpression()
 }
 
 void BracketExpression() :

@@ -168,6 +168,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | ArrayAssignmentStatement()
      *       | PlusPlusExpression()
      *       | MinusMinusExpression()
+     *       | IfElseStatement()
      *       | IfStatement()
      *       | WhileStatement()
      *       | PrintStatement()
@@ -247,6 +248,8 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | "*="
      *       | "/="
      *       | "%="
+     *       | "<<"
+     *       | ">>"
      */
 	public BaseType visit(OpAssignmentOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
@@ -260,6 +263,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			return new Variable_t("UDIV", "UDIV");
 		} else if (op == "%=") {
 			return new Variable_t("MOD", "MOD");
+		} else if (op == "<<") {
+			return new Variable_t("SHL", "SHL");
+		} else if (op == ">>") {
+			return new Variable_t("SHR", "SHR");
 		}
 		return null;
 	}
@@ -304,21 +311,45 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f5 -> "else"
 	* f6 -> Statement()
 	*/
-	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+	public BaseType visit(IfElseStatement n, BaseType argu) throws Exception {
 		String elselabel = L.new_label();
 		String endlabel = L.new_label();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
 			this.inline_meth_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
 			n.f4.accept(this, argu);
-			this.inline_meth_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
+			this.inline_meth_ += "JMP r0 r0 " + endlabel + "\n";
+			this.inline_meth_ +=  elselabel + "\n";
 			n.f6.accept(this, argu);
 			this.inline_meth_ += endlabel + "\n";
 		} else {
 			this.result_ += "CNJMP " + cond + " " + cond + " " + elselabel + "\n"; //if cond not true go to elselabel
 			n.f4.accept(this, argu);
-			this.result_ += "JMP r0 r0 " + endlabel + "\n" + elselabel + "\n";
+			this.result_ += "JMP r0 r0 " + endlabel + "\n";
+			this.result_ +=  elselabel + "\n";
 			n.f6.accept(this, argu);
+			this.result_ += endlabel + "\n";
+		}
+		return null;
+	}
+	
+	/**
+	* f0 -> "if"
+	* f1 -> "("
+	* f2 -> Expression()
+	* f3 -> ")"
+	* f4 -> Statement()
+	*/
+	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+		String endlabel = L.new_label();
+		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "CNJMP " + cond + " " + cond + " " + endlabel + "\n";
+			n.f4.accept(this, argu);
+			this.inline_meth_ += endlabel + "\n";
+		} else {
+			this.result_ += "CNJMP " + cond + " " + cond + " " + endlabel + "\n";
+			n.f4.accept(this, argu);
 			this.result_ += endlabel + "\n";
 		}
 		return null;
@@ -466,10 +497,10 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | GreaterThanExpression()
      *       | LessEqualThanExpression()
      *       | GreaterEqualThanExpression()
-     *       | SingleOpExpression()
+     *       | BinaryExpression()
      *       | ArrayLookup()
      *       | MethodCall()
-     *       | Clause()
+     *       | PrimaryExpression()
      */
 	public BaseType visit(Expression n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
@@ -480,9 +511,12 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * 		| "-"
 	 * 		| "*"
 	 * 		| "/"
-	 * 		| "%" 
+	 * 		| "%"
+	 * 		| "|"
+	 * 		| "&"
+	 * 		| "^" 
 	 */
-	public BaseType visit(SingleOp n, BaseType argu) throws Exception {
+	public BaseType visit(BinaryOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
 		if (op == "+") {
 			return new Variable_t("ADD", "ADD");
@@ -494,14 +528,22 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			return new Variable_t("UDIV", "UDIV");
 		} else if (op == "%") {
 			return new Variable_t("MOD", "MOD");
+		} else if (op == "|") {
+			return new Variable_t("OR", "OR");
+		} else if (op == "&") {
+			return new Variable_t("AND", "AND");
+		} else if (op == "^") {
+			return new Variable_t("XOR", "XOR");
+		} else {
+			throw new Exception("Not supported operator");
 		}
-		return null;
+		// return null;
 	}
 	
 	/**
-	* f0 -> Clause()
+	* f0 -> PrimaryExpression()
 	* f1 -> "&&"
-	* f2 -> Clause()
+	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
 		String l1 = L.new_label();
@@ -524,9 +566,9 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 	
 	/**
-	* f0 -> Clause()
+	* f0 -> PrimaryExpression()
 	* f1 -> "||"
-	* f2 -> Clause()
+	* f2 -> PrimaryExpression()
 	*/
 	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
 		String l1 = L.new_label();
@@ -666,12 +708,21 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 	/**
 	* f0 -> PrimaryExpression()
-	* f1 -> SingleOp()
+	* f1 -> BinaryOperator()
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(SingleOpExpression n, BaseType argu) throws Exception {
-		String ret = new String("r" + ++glob_temp_cnt_);
+	public BaseType visit(BinaryExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		if (! t1.startsWith("r")) {
+			String imm = t1;
+			t1 = new String("r" + ++glob_temp_cnt_);
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += new String("MOV " + t1 + " " +  t1 + " " + imm + "\n");
+			} else {
+				this.result_ += new String("MOV " + t1 + " " +  t1 + " " + imm + "\n");
+			}
+		}
+		String ret = new String("r" + ++glob_temp_cnt_);
 		String op = ((Variable_t) n.f1.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
@@ -765,16 +816,6 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         return (Variable_t) n.f1.accept(this, argu);
     }
 
-
-
-	/**
-	* f0 -> NotExpression()
-	*       | PrimaryExpression()
-	*/
-	public BaseType visit(Clause n, BaseType argu) throws Exception {
-		return n.f0.accept(this, argu);
-	}
-
 	/**
 	* f0 -> IntegerLiteral()
 	*       | Identifier()
@@ -842,18 +883,15 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	
 	/**
 	* f0 -> "!"
-	* f1 -> Clause()
+	* f1 -> PrimaryExpression()
 	*/
 	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
 		String ret = new String("r" + ++glob_temp_cnt_);
 		String t = ((Variable_t) n.f1.accept(this, argu)).getType();
-		String one = new String("r" + ++glob_temp_cnt_);
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "MOV " + one + " " + one + " 1\n";
-			this.inline_meth_ += "SUB " + ret + " " + one + " " + t + "\n";
+			this.inline_meth_ += "NOT " + ret + " " + ret + " " + t + "\n";
 		} else {			
-			this.result_ += "MOV " + one + " " + one + " 1\n";
-			this.result_ += "SUB " + ret + " " + one + " " + t + "\n";
+			this.result_ += "NOT " + ret + " " + ret + " " + t + "\n";
 		}
 		return new Variable_t(ret, null);
 	}
