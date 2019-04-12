@@ -118,6 +118,16 @@ Our compiler also supports TinyRAM analysis and optimizations. In order to enabl
 Below are some usage examples and we also demonstrate the optimizer.
 
 ### Zilch Examples:
+```
+ _______ _      _       _____                       _ _           
+|___  (_) |    | |     /  __ \                     (_) |          
+   / / _| | ___| |__   | /  \/ ___  _ __ ___  _ __  _| | ___ _ __ 
+  / / | | |/ __| '_ \  | |    / _ \| '_   _ \| '_ \| | |/ _ \ '__|
+./ /__| | | (__| | | | | \__/\ (_) | | | | | | |_) | | |  __/ |   
+\_____/_|_|\___|_| |_|  \____/\___/|_| |_| |_| .__/|_|_|\___|_|   
+											| |                  
+											|_|      
+```
 
 A simple program that performs addition:
 ```
