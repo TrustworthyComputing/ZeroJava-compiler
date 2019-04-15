@@ -125,8 +125,8 @@ Below are some usage examples and we also demonstrate the optimizer.
   / / | | |/ __| '_ \  | |    / _ \| '_   _ \| '_ \| | |/ _ \ '__|
 ./ /__| | | (__| | | | | \__/\ (_) | | | | | | |_) | | |  __/ |   
 \_____/_|_|\___|_| |_|  \____/\___/|_| |_| |_| .__/|_|_|\___|_|   
-											| |                  
-											|_|      
+					     | |                  
+					     |_|      
 ```
 
 A simple program that performs addition:
