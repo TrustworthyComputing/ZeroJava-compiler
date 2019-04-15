@@ -36,6 +36,9 @@ jtype(?meth, ?l) :- jumpInstr(?meth, ?l, ?label).
 // Last instruction of program
 lastInstr(?meth, ?l) :-	instruction(?meth, ?l, ?smth),
 						!next(?meth, ?l, ?j).
+						
+lastInstr(?meth, ?l) :-	instruction(?meth, ?l, ?smth),
+						answerInstruction(?meth, ?l, ?smth).
 
 // Live Variable at i
 live(?meth, ?var, ?i):-	varUse(?meth, ?i, ?var).
@@ -103,16 +106,16 @@ noBothProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 // Constant Propagation
 constProp(?meth, ?l, ?var, ?val) :- prop(?meth, ?k, ?l, ?var),
 		 							constMOV(?meth, ?k, ?var, ?val),
-							 		!noConstProp(?meth, ?l, ?var, ?val),
-									!noBothProp(?meth, ?l, ?var, ?v2),
+							 		// !noConstProp(?meth, ?l, ?var, ?val),
+									// !noBothProp(?meth, ?l, ?var, ?v2),
 									var(?meth, ?var),
 									varUse(?meth, ?l, ?var).
 
 // Copy Propagation
 copyProp(?meth, ?l, ?var, ?val) :-	prop(?meth, ?k, ?l, ?var),
 		 							varMove(?meth, ?k, ?var, ?val),
-									!noCopyProp(?meth, ?l, ?var, ?val),
-									!noBothProp(?meth, ?l, ?var, ?v2),
+									// !noCopyProp(?meth, ?l, ?var, ?val),
+									// !noBothProp(?meth, ?l, ?var, ?v2),
 									var(?meth, ?var),
 									varUse(?meth, ?l, ?var).
 

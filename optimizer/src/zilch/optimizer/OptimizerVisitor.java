@@ -11,12 +11,14 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public int ic1;
     private Map<String, Map<String, String>> optimisationMap;
     private boolean label_from_stmt;
+    private boolean is_dst;
     
     public OptimizerVisitor(Map<String, Map<String, String>> optimisationMap) {
         result = new String();
         this.ic1 = 1;
         this.optimisationMap = optimisationMap;
         this.label_from_stmt = true;
+        this.is_dst = false;
     }
 
     static int getLine(String fact) {
@@ -211,11 +213,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu);
-
         this.label_from_stmt = false;
         String src = n.f3.accept(this, argu);
         this.label_from_stmt = true;
-        
         if (src == null) { return null; }
         String instr = null;
         if (src.matches("r(.*)")) {
@@ -243,13 +243,14 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(ThreeRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
+        this.is_dst = true;
         String dst = n.f1.accept(this, argu).split("&")[0];
+        this.is_dst = false;
         String reg2 = n.f2.accept(this, argu).split("&")[0];
         
         this.label_from_stmt = false;
         String reg3 = n.f3.accept(this, argu);
         this.label_from_stmt = true;
-        
         if (reg3 == null) { return null; }
         String instr = null;
         if (reg3.matches("r(.*)")) {
@@ -447,6 +448,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Register n, String argu) throws Exception {
         String reg = n.f0.toString();
+        if (this.is_dst) { return reg; }
         String copy_opt = optimisationMap.get("copyProp").get(argu + ic1);
         // String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" +  ic1);
         // if (copy_opt_2 != null) { // if two constant propagations in the same line

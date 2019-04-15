@@ -7,6 +7,7 @@ import java.io.*;
 
 public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<Instruction_t> instrList;
+    public Instruction_t answerInstruction;
     public LinkedList<Var_t> varList;
     public LinkedList<Next_t> nextList;
     public LinkedList<VarMove_t> varMoveList;
@@ -71,6 +72,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
                 String str = n.f0.elementAt(i).accept(this, argu);
                 this.ic1++;
                 instrList.addLast(new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\""));
+                if (str.toLowerCase().contains("ANSWER".toLowerCase())) {
+                    answerInstruction = new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\"");
+                }
             }
         }
         return null;

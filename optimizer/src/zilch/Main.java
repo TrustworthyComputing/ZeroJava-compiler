@@ -40,7 +40,7 @@ public class Main {
                 String ext = getFileExtension(fp);
                 String name = getFileNameWithoutExt(fp);
                 String abs_path = getFilePath(fp);
-                String path = "facts_rules/Facts/" + abs_path;
+                String path = "facts_rules/Facts/" + name;
                 abs_path = abs_path + "/" + name;
                 try {
                     if (! ext.equals("asm")) {
@@ -191,6 +191,12 @@ public class Main {
                 dlVisitor.instrList.get(k).writerec(file);
             file.close();
             
+            file = new PrintWriter(path + "/AnswerInstruction.iris");
+            // System.out.println("\nAnswerInstruction:");
+            if (dlVisitor.answerInstruction != null)
+                dlVisitor.answerInstruction.writerec(file);
+            file.close();
+            
             file = new PrintWriter(path + "/VarUses.iris");
             // System.out.println("\nVarUses:");
             for (int k = 0 ; k < dlVisitor.varUseList.size() ; k++)
@@ -229,6 +235,9 @@ public class Main {
     
     private static String getFilePath(File file) {
         String filepath = file.getPath();
+        if (filepath.lastIndexOf('/') == -1) {
+            return "./";
+        }
         return filepath.substring(0, filepath.lastIndexOf('/'));
     }
     

@@ -4,7 +4,7 @@ void main(void) {
 	y = 13;
 	y += 7;
 	x = 12;
-	x--;
+	x = x - 1;
 	x--;
 	x <<= 1;
 	Prover.answer(x + y);
