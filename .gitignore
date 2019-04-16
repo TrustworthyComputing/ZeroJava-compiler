@@ -26,10 +26,10 @@ compiler/src/zilch/JavaCharStream.java
 compiler/src/zilch/syntaxtree/*
 compiler/src/zilch/visitor/*
 
-optimizer/src/zilch/tinyram-jtb.jj
-optimizer/src/zilch/TinyRAMParser.java
-optimizer/src/zilch/TinyRAMParserConstants.java
-optimizer/src/zilch/TinyRAMParserTokenManager.java
+optimizer/src/zilch/zmips-jtb.jj
+optimizer/src/zilch/ZMIPSParser.java
+optimizer/src/zilch/ZMIPSParserConstants.java
+optimizer/src/zilch/ZMIPSParserTokenManager.java
 optimizer/src/zilch/ParseException.java
 optimizer/src/zilch/Token.java
 optimizer/src/zilch/TokenMgrError.java

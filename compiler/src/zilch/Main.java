@@ -1,7 +1,7 @@
 import syntaxtree.*;
 import visitor.*;
 import symbol_table.*;
-import tinyram_generator.*;
+import zmips_generator.*;
 import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class Main {
                 try {
                     root.accept(stvisitor);
                     Map<String, Method_t> symbol_table = stvisitor.getSymbolTable();
-                    TinyRAMGenVisitor generator = new TinyRAMGenVisitor(symbol_table);
+                    ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table);
                     root.accept(generator, null);
                     // stvisitor.printST();
                     /* Write the generated code to the same directory as .asm file */

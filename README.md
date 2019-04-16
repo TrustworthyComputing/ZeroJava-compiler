@@ -1,9 +1,9 @@
-# ![alt text][zilch] Zilch to TinyRAM compiler [![License MIT][badge-license]](LICENSE)
+# ![alt text][zilch] Zilch to ZMIPS compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to TinyRAM.
+A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to ZMIPS.
 
 ## Zilch Language
-Zilch is a custom designed language for easy translation to TinyRAM and thus easy Zero-Knowledge Proofs creation.
+Zilch is a custom designed language for easy translation to ZMIPS and thus easy Zero-Knowledge Proofs creation.
 Below we briefly describe the language.
 
 Zilch has one main method and also supports arbitrary methods.
@@ -68,7 +68,7 @@ Zilch files use the `.zl` extension.
 
 
 ### Built in Zilch Functions
-| Built in Zilch Function Name       	| Description and corresponding TinyRAM command 			|
+| Built in Zilch Function Name       	| Description and corresponding ZMIPS command 			|
 |---------------------------------------|-----------------------------------------------------------|
 | `Prover.answer(int result);`			| `ANSWER`: returns the result 								|
 | `Out.print(int variable);`			| `PRINT`: prints the contents of `variable` 				|
@@ -79,7 +79,7 @@ Zilch files use the `.zl` extension.
 
 
 
-## TinyRAM ISA
+## ZMIPS ISA
 | Instruction    | Description                                          |
 |----------------|------------------------------------------------------|
 | AND ri rj A    | ri = rj & A                                          |
@@ -111,9 +111,9 @@ To compile the compiler type `make`.
 
 In order to make the Zilch compiler script (`zc`) executable type `chmod +x ./zc`.
 
-Then, use the `zc` script to compile Zilch programs to TinyRAM assembly code.
+Then, use the `zc` script to compile Zilch programs to ZMIPS assembly code.
 
-Our compiler also supports TinyRAM analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
+Our compiler also supports ZMIPS analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
 
 Below are some usage examples and we also demonstrate the optimizer.
 
@@ -145,7 +145,7 @@ void main(void) {
 }
 ```
 
-Which generates the following four lines of TinyRAM assembly:
+Which generates the following four lines of ZMIPS assembly:
 ```
 MOV r1 r1 12
 MOV r2 r2 13
@@ -181,7 +181,7 @@ void main(void) {
 }
 ```
 
-Which generates the following TinyRAM code:
+Which generates the following ZMIPS code:
 ```
 MOV r1 r1 0
 __L1__
@@ -222,7 +222,7 @@ void main(void) {
 }
 ```
 
-Which generates the following TinyRAM code:
+Which generates the following ZMIPS code:
 ```
 MOV r1 r1 30
 MOV r2 r2 r1
@@ -246,7 +246,7 @@ MOV r1 r1 30
 ADD r7 r3 30
 ANSWER r7 r7 r7
 ```
-the TinyRAM assembly output is optimized.
+the ZMIPS assembly output is optimized.
 
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.

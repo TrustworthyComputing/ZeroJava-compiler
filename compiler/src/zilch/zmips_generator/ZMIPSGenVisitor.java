@@ -1,4 +1,4 @@
-package tinyram_generator;
+package zmips_generator;
 
 import syntaxtree.*;
 import visitor.GJDepthFirst;
@@ -7,7 +7,7 @@ import base_type.*;
 import java.util.Map;
 import java.util.HashMap;
 
-public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
+public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public String result_;
 	private Label L;
 	private Map<String, Method_t> st_;
@@ -19,7 +19,7 @@ public class TinyRAMGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	private boolean is_inline_meth_;
 	private String inline_meth_;
 
-	public TinyRAMGenVisitor(Map<String, Method_t> st) {
+	public ZMIPSGenVisitor(Map<String, Method_t> st) {
 		this.L = new Label();
         this.st_ = st;
 		this.glob_temp_cnt_ = 0;

@@ -34,7 +34,7 @@ public class Main {
         for (String arg : args) {
             try {
                 fis = new FileInputStream(arg);
-                TinyRAMParser spigParser = new TinyRAMParser(fis);
+                ZMIPSParser spigParser = new ZMIPSParser(fis);
                 Goal root = spigParser.Goal();
                 File fp = new File(arg);
                 String ext = getFileExtension(fp);

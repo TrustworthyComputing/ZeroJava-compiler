@@ -3,9 +3,9 @@ options {
   STATIC = false;
 }
 
-PARSER_BEGIN(TinyRAMParser)
-  public class TinyRAMParser {}
-PARSER_END(TinyRAMParser)
+PARSER_BEGIN(ZMIPSParser)
+  public class ZMIPSParser {}
+PARSER_END(ZMIPSParser)
 
 SKIP : /* WHITE SPACE */
 {
@@ -110,16 +110,16 @@ TOKEN : /* IDENTIFIERS */
 }
 
 /***********************************
- * The TinyRAM Grammar Starts Here *
+ * The ZMIPS Grammar Starts Here *
  ***********************************/
 
 void Goal() :
 {}
 {
-  TinyRAMProg() <EOF>
+  ZMIPSProg() <EOF>
 }
 
-void TinyRAMProg() :
+void ZMIPSProg() :
 {}
 {
   ( Stmt() )*

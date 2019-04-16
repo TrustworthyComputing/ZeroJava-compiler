@@ -1,4 +1,4 @@
-package tinyram_generator;
+package zmips_generator;
 
 public class Label {
 	private int cnt;

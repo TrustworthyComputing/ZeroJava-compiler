@@ -44,5 +44,5 @@ if [ "$ASM" != "$RES" ]; then
     mv $ASM $RES
 fi
 
-echo -e "TinyRAM output:" $RES "\n"
+echo -e "zMIPS output:" $RES "\n"
 cat $RES

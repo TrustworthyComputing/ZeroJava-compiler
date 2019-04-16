@@ -55,7 +55,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-    * f0 -> TinyRAMProg()
+    * f0 -> ZMIPSProg()
     * f1 -> <EOF>
     */
     public String visit(Goal n, String argu) throws Exception {
@@ -66,7 +66,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> ( Stmt() )*
      */
-    public String visit(TinyRAMProg n, String argu) throws Exception {
+    public String visit(ZMIPSProg n, String argu) throws Exception {
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
                 String str = n.f0.elementAt(i).accept(this, argu);
