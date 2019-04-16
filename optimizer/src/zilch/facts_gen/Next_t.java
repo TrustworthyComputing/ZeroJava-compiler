@@ -12,9 +12,9 @@ public class Next_t extends dl_t {
 		this.instr_next = instr_next;
 	}
 
-	public void writerec(PrintWriter writer) {
+	public void writerec(PrintWriter writer, boolean print) {
 		String ret = "next(" + this.meth_name + ", " + this.instr_now + ", " + this.instr_next + ").";
-		// System.out.println(ret);
+		if (print) System.out.println(ret);
 		writer.println(ret);
 	}
 

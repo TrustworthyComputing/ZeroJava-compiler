@@ -10,9 +10,9 @@ public class VarUse_t extends Var_t {
 		this.ic = ic;
 	}
 
-	public void writerec(PrintWriter writer) {
+	public void writerec(PrintWriter writer, boolean print) {
 		String ret = "varUse(" + this.meth_name + ", " + this.ic + ", " + this.temp + ").";
-		// System.out.println(ret);
+		if (print) System.out.println(ret);
 		writer.println(ret);
 	}
 

@@ -10,9 +10,9 @@ public class Var_t extends dl_t {
 		this.temp = temp;
 	}
 
-	public void writerec(PrintWriter writer) {
+	public void writerec(PrintWriter writer, boolean print) {
 		String ret = "var(" + this.meth_name + ", " + this.temp + ").";
-		// System.out.println(ret);
+		if (print) System.out.println(ret);
 		writer.println(ret);
 	}
 

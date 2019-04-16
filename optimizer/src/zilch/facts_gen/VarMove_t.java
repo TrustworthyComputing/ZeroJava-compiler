@@ -12,9 +12,9 @@ public class VarMove_t extends Var_t {
 		this.tempsrc = tempsrc;
 	}
 
-	public void writerec(PrintWriter writer) {
+	public void writerec(PrintWriter writer, boolean print) {
 		String ret = "varMove(" + this.meth_name + ", " + this.ic + ", " + this.temp + ", " + this.tempsrc + ").";
-		// System.out.println(ret);
+		if (print) System.out.println(ret);
 		writer.println(ret);
 	}
 

@@ -25,6 +25,8 @@ import org.deri.iris.storage.IRelation;
 
 public class Main {
     
+    private static boolean debug_ = false;
+    
     public static void main (String [] args){
         if (args.length < 1){
             System.err.println("Usage: java Main <inputFile1> [<inputFile2>] ...");
@@ -52,7 +54,7 @@ public class Main {
                     } 
                     FactGeneratorVisitor dlVisitor = new FactGeneratorVisitor();
                     root.accept(dlVisitor, null);                  
-                    writeFacts(dlVisitor, path);
+                    writeFacts(dlVisitor, path, debug_);
 
                     Parser parser = new Parser();
                     Map<IPredicate, IRelation> factMap = new HashMap<>();
@@ -87,6 +89,7 @@ public class Main {
                     for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
                         List<IVariable> variableBindings = new ArrayList<>();
                         IRelation relation = knowledgeBase.execute(query, variableBindings);
+                        if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
                         String queryType = null;
                         if ((query.toString()).equals("?- constProp(?meth, ?l, ?v, ?val).")) {
                             queryType = "constProp";
@@ -100,6 +103,7 @@ public class Main {
                             String str = null;
                             for (int r = 0; r < relation.size(); r++) {
                                 str = (relation.get(r)).toString();
+                                if (debug_) System.out.println(relation.get(r));
                                 int line = getLine(str);
                                 String meth = getMeth(str);
                                 if (tempOp.get(meth + line) == null) {
@@ -111,19 +115,23 @@ public class Main {
                             }
                             optimisationMap.put(queryType, tempOp);
                         } else {
-                            // for (int r = 0; r < relation.size(); r++) {
-                            //     System.out.println(relation.get(r));
-                            // }
+                            if (debug_) {
+                                for (int r = 0; r < relation.size(); r++) {
+                                    System.out.println(relation.get(r));
+                                }
+                            }
                         }
                     }
                     /* Print optimizations map */
-                    // System.out.println();
-                    // for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
-                    //     System.out.println(entry.getKey() + ":");
-                    //     for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
-                    //         System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
-                    //     }
-                    // }
+                    if (debug_) {
+                        System.out.println();
+                        for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
+                            System.out.println(entry.getKey() + ":");
+                            for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
+                                System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
+                            }
+                        }
+                    }
 
                     OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
                     root.accept(opt, null);
@@ -133,8 +141,9 @@ public class Main {
                     System.out.println(abs_path + ".opt.asm");
                     PrintWriter writer = new PrintWriter(abs_path + ".opt.asm");
                     
-                    // System.out.println("\n" + opt.result);
-    
+                    if (debug_) {
+                        System.out.println("\n" + opt.result);
+                    }    
                     writer.println(opt.result);
                     writer.close();
                 } catch (Exception ex) {
@@ -159,66 +168,66 @@ public class Main {
         return parts[0].substring(2,  parts[0].length()-1);
     }
     
-    static void writeFacts(FactGeneratorVisitor dlVisitor, String path) {
+    static void writeFacts(FactGeneratorVisitor dlVisitor, String path, boolean print_facts) {
         try {
             PrintWriter file = new PrintWriter(path + "/Vars.iris");
-            // System.out.println("\nVars:");
+            if (print_facts) System.out.println("\nVars:");
             for (int k = 0 ; k < dlVisitor.varList.size() ; k++)
-                dlVisitor.varList.get(k).writerec(file);
+                dlVisitor.varList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/varMoves.iris");
-            // System.out.println("\nvarMoves:");
+            if (print_facts) System.out.println("\nvarMoves:");
             for (int k = 0 ; k < dlVisitor.varMoveList.size() ; k++)
-                dlVisitor.varMoveList.get(k).writerec(file);
+                dlVisitor.varMoveList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/ConstMoves.iris");
-            // System.out.println("\nConstMoves:");
+            if (print_facts) System.out.println("\nConstMoves:");
             for (int k = 0 ; k < dlVisitor.constMoveList.size() ; k++)
-                dlVisitor.constMoveList.get(k).writerec(file);
+                dlVisitor.constMoveList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/BinOpMoves.iris");
-            // System.out.println("\nBinOpMoves:");
+            if (print_facts) System.out.println("\nBinOpMoves:");
             for (int k = 0 ; k < dlVisitor.binOpMoveList.size() ; k++)
-                dlVisitor.binOpMoveList.get(k).writerec(file);
+                dlVisitor.binOpMoveList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/Instructions.iris");
-            // System.out.println("\nInstructions:");
+            if (print_facts) System.out.println("\nInstructions:");
             for (int k = 0 ; k < dlVisitor.instrList.size() ; k++)
-                dlVisitor.instrList.get(k).writerec(file);
+                dlVisitor.instrList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/AnswerInstruction.iris");
-            // System.out.println("\nAnswerInstruction:");
+            if (print_facts) System.out.println("\nAnswerInstruction:");
             if (dlVisitor.answerInstruction != null)
-                dlVisitor.answerInstruction.writerec(file);
+                dlVisitor.answerInstruction.writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/VarUses.iris");
-            // System.out.println("\nVarUses:");
+            if (print_facts) System.out.println("\nVarUses:");
             for (int k = 0 ; k < dlVisitor.varUseList.size() ; k++)
-                dlVisitor.varUseList.get(k).writerec(file);
+                dlVisitor.varUseList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/VarDefs.iris");
-            // System.out.println("\nVarDefs:");
+            if (print_facts) System.out.println("\nVarDefs:");
             for (int k = 0 ; k < dlVisitor.varDefList.size() ; k++)
-                dlVisitor.varDefList.get(k).writerec(file);
+                dlVisitor.varDefList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/Jumps.iris");
-            // System.out.println("\nJumps:");
+            if (print_facts) System.out.println("\nJumps:");
             for (int k = 0 ; k < dlVisitor.jumpList.size() ; k++)
-                dlVisitor.jumpList.get(k).writerec(file);
+                dlVisitor.jumpList.get(k).writerec(file, print_facts);
             file.close();
             
             file = new PrintWriter(path + "/Args.iris");
-            // System.out.println("\nArgs:");
+            if (print_facts) System.out.println("\nArgs:");
             for (int k = 0 ; k < dlVisitor.argsList.size() ; k++)
-                dlVisitor.argsList.get(k).writerec(file);
+                dlVisitor.argsList.get(k).writerec(file, print_facts);
             file.close();
         } catch(FileNotFoundException ex) {
             System.err.println(ex.getMessage());

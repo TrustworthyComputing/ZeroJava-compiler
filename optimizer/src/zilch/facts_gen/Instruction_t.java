@@ -12,9 +12,9 @@ public class Instruction_t extends dl_t {
 		this.instr = instr;
 	}
 
-	public void writerec(PrintWriter writer) {
+	public void writerec(PrintWriter writer, boolean print) {
 		String ret = "instruction(" + this.meth_name + ", " + this.ic + ", " + this.instr + ").";
-		// System.out.println(ret);
+		if (print) System.out.println(ret);
 		writer.println(ret);
 	}
 

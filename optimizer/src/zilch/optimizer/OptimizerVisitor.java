@@ -140,7 +140,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
           this.label_from_stmt = true;
           if (reg3 == null) { return null; }
           String instr = null;
-          if (reg3.matches("$r(.*)")) {
+          if (reg3.startsWith("$r")) {
               String []parts = new String[2];
               parts = reg3.split("&");
               if (parts.length == 2) {
@@ -149,7 +149,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                   reg3 = parts[0];
               }
           }
-          if (reg2.matches("$r(.*)")) {
+          if (reg2.startsWith("$r")) {
               String []parts = new String[2];
               parts = reg2.split("&");
               reg2 = parts[0];
@@ -227,7 +227,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("$r(.*)")) {
+        if (src.startsWith("$r")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -263,7 +263,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (reg3 == null) { return null; }
         String instr = null;
-        if (reg3.matches("$r(.*)")) {
+        if (reg3.startsWith("$r")) {
             String []parts = new String[2];
             parts = reg3.split("&");
             if (parts.length == 2) {
@@ -346,7 +346,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("$r(.*)")) {
+        if (src.startsWith("$r")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -381,7 +381,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("$r(.*)")) {
+        if (src.startsWith("$r")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -390,7 +390,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 src = parts[0];
             }
         }
-        if (reg2.matches("$r(.*)")) {
+        if (reg2.startsWith("$r")) {
             String []parts = new String[2];
             parts = reg2.split("&");
             if (parts.length == 2) {
