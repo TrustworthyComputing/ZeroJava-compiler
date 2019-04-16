@@ -33,7 +33,7 @@ if [ "$2" == "-opts" ]; then
     # Do optimizations util reaching a fixed point
     DIFF=$(diff $ASM $OPT)
     while [[ "$DIFF" != "" ]] ; do
-        ASM=$OPT
+        mv $OPT $ASM
         OPT="$($JVM -cp $CLASSPATH Main $ASM | sed -n 1p)"
         DIFF=$(diff $ASM $OPT)
     done
