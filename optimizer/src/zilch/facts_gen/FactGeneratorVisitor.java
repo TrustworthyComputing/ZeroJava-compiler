@@ -100,14 +100,16 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> JmpOps()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> Label()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Label()
      */
     public String visit(JmpStmts n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String reg1 = n.f1.accept(this, argu);
-        String reg2 = n.f2.accept(this, argu);
-        String label = n.f3.accept(this, argu);
+        String reg2 = n.f3.accept(this, argu);
+        String label = n.f5.accept(this, argu);
         String instr = op + " " + reg1 + " " + reg2 + " " + label;
         jumpList.addLast(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
         return instr;
@@ -116,31 +118,36 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> ComparisonOps()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
      public String visit(ComparisonStmts n, String argu) throws Exception {
          String op = n.f0.accept(this, argu);
          String reg1 = n.f1.accept(this, argu);
-         String reg2 = n.f2.accept(this, argu);
-         String reg3 = n.f3.accept(this, argu);
+         String reg2 = n.f3.accept(this, argu);
+         String reg3 = n.f5.accept(this, argu);
          String instr = op + " " + reg1 + " " + reg2 + " " + reg3;
          varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg2+"\""));
          varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg3+"\""));
          return instr;
      }
 
-    /**
+     /**
      * f0 -> "sw"
      * f1 -> Register()
-     * f2 -> Register()
+     * f2 -> ","
      * f3 -> SimpleExp()
+     * f4 -> "("
+     * f5 -> SimpleExp()
+     * f6 -> ")"
      */
     public String visit(swStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu);
-        String reg2 = n.f2.accept(this, argu);
-        String addr = n.f3.accept(this, argu);
-        String op = "sw " + src + " " + reg2 + " " + addr;
+        String idx = n.f3.accept(this, argu);
+        String addr = n.f5.accept(this, argu);
+        String op = "sw " + src + ", " + idx + "(" + addr + ")";
         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
         if (addr.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
@@ -149,16 +156,19 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-     * f0 -> "lw"
-     * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
-     */
+    * f0 -> "lw"
+    * f1 -> Register()
+    * f2 -> ","
+    * f3 -> SimpleExp()
+    * f4 -> "("
+    * f5 -> SimpleExp()
+    * f6 -> ")"
+    */
     public String visit(lwStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
-        String reg2 = n.f2.accept(this, argu);
-        String addr = n.f3.accept(this, argu);
-        String op = "lw " + dst + " " + reg2 + " " + addr;
+        String idx = n.f3.accept(this, argu);
+        String addr = n.f5.accept(this, argu);
+        String op = "lw " + dst + ", " + idx + "(" + addr + ")";
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         if (addr.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
@@ -169,16 +179,18 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> TwoRegInstrOp()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(TwoRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu);
-        String sec_reg = n.f2.accept(this, argu);
-        String src = n.f3.accept(this, argu);
+        String sec_reg = n.f3.accept(this, argu);
+        String src = n.f5.accept(this, argu);
         if (src == null) { return null; }
-        String instr = op + " " + dst + " " + sec_reg + " " + src;
+        String instr = op + " " + dst + ", " + sec_reg + ", " + src;
         if (src.matches("$r(.*)")) {
             varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
@@ -192,16 +204,18 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> ThreeRegInstrOp()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(ThreeRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu);
-        String src1 = n.f2.accept(this, argu);
-        String src2 = n.f3.accept(this, argu);
+        String src1 = n.f3.accept(this, argu);
+        String src2 = n.f5.accept(this, argu);
         if (src2 == null) { return null; }
-        String instr = op + " " + dst + " " + src1 + " " + src2;
+        String instr = op + " " + dst + ", " + src1 + ", " + src2;
         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src1+"\""));
         if (src2.matches("$r(.*)")) { // if third argument is not immediate
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
@@ -216,12 +230,14 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "print"
      * f1 -> Register()
-     * f2 -> Register()
+     * f2 -> ","
      * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Register()
      */
     public String visit(PrintStmt n, String argu) throws Exception {
-        String reg = n.f3.accept(this, argu);
-        String op = "print " + reg + " " + reg + " " + reg;
+        String reg = n.f5.accept(this, argu);
+        String op = "print " + reg + ", " + reg + ", " + reg;
         if (reg != null && reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
@@ -231,12 +247,14 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "answer"
      * f1 -> Register()
-     * f2 -> Register()
+     * f2 -> ","
      * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Register()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
         String reg = n.f3.accept(this, argu);
-        String op = "answer " + reg + " " + reg + " " + reg;
+        String op = "answer " + reg + ", " + reg + ", " + reg;
         if (reg != null && reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
@@ -246,13 +264,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "read"
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(ReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
-        String tape = n.f3.accept(this, argu);
-        String op = "read " + dst + " " + dst + " " + tape;
+        String tape = n.f5.accept(this, argu);
+        String op = "read " + dst + ", " + dst + ", " + tape;
         if (tape != null && tape.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
@@ -263,14 +283,16 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "seek"
      * f1 -> Register()
-     * f2 -> SimpleExp()
+     * f2 -> ","
      * f3 -> SimpleExp()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(SeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
-        String sec_reg = n.f2.accept(this, argu);
-        String tape = n.f3.accept(this, argu);
-        String op = "seek " + dst + " " + sec_reg + " " + tape;
+        String sec_reg = n.f3.accept(this, argu);
+        String tape = n.f5.accept(this, argu);
+        String op = "seek " + dst + ", " + sec_reg + ", " + tape;
         if (sec_reg != null && sec_reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
