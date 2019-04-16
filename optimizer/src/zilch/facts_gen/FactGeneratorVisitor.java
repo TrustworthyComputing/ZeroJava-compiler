@@ -142,7 +142,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String addr = n.f3.accept(this, argu);
         String op = "sw " + src + " " + reg2 + " " + addr;
         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
-        if (addr.matches("r(.*)")) {
+        if (addr.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
         }
         return op;
@@ -160,7 +160,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String addr = n.f3.accept(this, argu);
         String op = "lw " + dst + " " + reg2 + " " + addr;
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
-        if (addr.matches("r(.*)")) {
+        if (addr.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
         }
         return op;
@@ -179,7 +179,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String src = n.f3.accept(this, argu);
         if (src == null) { return null; }
         String instr = op + " " + dst + " " + sec_reg + " " + src;
-        if (src.matches("r(.*)")) {
+        if (src.matches("$r(.*)")) {
             varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
         } else if (src.matches("[0-9]+")) {
@@ -203,7 +203,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src2 == null) { return null; }
         String instr = op + " " + dst + " " + src1 + " " + src2;
         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src1+"\""));
-        if (src2.matches("r(.*)")) { // if third argument is not immediate
+        if (src2.matches("$r(.*)")) { // if third argument is not immediate
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
         // binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
@@ -222,7 +222,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(PrintStmt n, String argu) throws Exception {
         String reg = n.f3.accept(this, argu);
         String op = "print " + reg + " " + reg + " " + reg;
-        if (reg != null && reg.matches("r(.*)")) {
+        if (reg != null && reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
         return op;
@@ -237,7 +237,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(AnswerStmt n, String argu) throws Exception {
         String reg = n.f3.accept(this, argu);
         String op = "answer " + reg + " " + reg + " " + reg;
-        if (reg != null && reg.matches("r(.*)")) {
+        if (reg != null && reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
         return op;
@@ -253,7 +253,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String dst = n.f1.accept(this, argu);
         String tape = n.f3.accept(this, argu);
         String op = "read " + dst + " " + dst + " " + tape;
-        if (tape != null && tape.matches("r(.*)")) {
+        if (tape != null && tape.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
@@ -271,10 +271,10 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String sec_reg = n.f2.accept(this, argu);
         String tape = n.f3.accept(this, argu);
         String op = "seek " + dst + " " + sec_reg + " " + tape;
-        if (sec_reg != null && sec_reg.matches("r(.*)")) {
+        if (sec_reg != null && sec_reg.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
-        if (tape != null && tape.matches("r(.*)")) {
+        if (tape != null && tape.matches("$r(.*)")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));

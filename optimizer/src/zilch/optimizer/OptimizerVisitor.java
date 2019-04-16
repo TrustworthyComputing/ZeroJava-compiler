@@ -103,15 +103,17 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> JmpOps()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> Label()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Label()
      */
      public String visit(JmpStmts n, String argu) throws Exception {
          String op = n.f0.accept(this, argu);
          String reg1 = n.f1.accept(this, argu);
-         String reg2 = n.f2.accept(this, argu);
+         String reg2 = n.f3.accept(this, argu);
          this.label_from_stmt = false;
-         String label = n.f3.accept(this, argu);
+         String label = n.f5.accept(this, argu);
          this.label_from_stmt = true;
          String instr = op + " " + reg1 + " " + reg2 + " " + label + "\n";
          
@@ -125,19 +127,21 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      /**
       * f0 -> ComparisonOps()
       * f1 -> Register()
-      * f2 -> Register()
-      * f3 -> SimpleExp()
+      * f2 -> ","
+      * f3 -> Register()
+      * f4 -> ","
+      * f5 -> SimpleExp()
       */
       public String visit(ComparisonStmts n, String argu) throws Exception {
           String op = n.f0.accept(this, argu);
           String reg1 = n.f1.accept(this, argu).split("&")[0];
-          String reg2 = n.f2.accept(this, argu);
+          String reg2 = n.f3.accept(this, argu);
           this.label_from_stmt = false;
-          String reg3 = n.f3.accept(this, argu);
+          String reg3 = n.f5.accept(this, argu);
           this.label_from_stmt = true;
           if (reg3 == null) { return null; }
           String instr = null;
-          if (reg3.matches("r(.*)")) {
+          if (reg3.matches("$r(.*)")) {
               String []parts = new String[2];
               parts = reg3.split("&");
               if (parts.length == 2) {
@@ -146,7 +150,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                   reg3 = parts[0];
               }
           }
-          if (reg2.matches("r(.*)")) {
+          if (reg2.matches("$r(.*)")) {
               String []parts = new String[2];
               parts = reg2.split("&");
               reg2 = parts[0];
@@ -162,15 +166,18 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
     * f0 -> "sw"
     * f1 -> Register()
-    * f2 -> Register()
+    * f2 -> ","
     * f3 -> SimpleExp()
+    * f4 -> "("
+    * f5 -> SimpleExp()
+    * f6 -> ")"
     */
     public String visit(swStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu).split("&")[0];
-        String reg2 = n.f2.accept(this, argu);
+        String reg2 = n.f3.accept(this, argu);
 
         this.label_from_stmt = false;
-        String addr = n.f3.accept(this, argu).split("&")[0];
+        String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
         
         String intsr = "sw " + src + " " + reg2 + " " + addr + "\n";
@@ -184,15 +191,18 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
     * f0 -> "lw"
     * f1 -> Register()
-    * f2 -> Register()
+    * f2 -> ","
     * f3 -> SimpleExp()
+    * f4 -> "("
+    * f5 -> SimpleExp()
+    * f6 -> ")"
     */
     public String visit(lwStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
-        String reg = n.f2.accept(this, argu).split("&")[0];
+        String reg = n.f3.accept(this, argu).split("&")[0];
         
         this.label_from_stmt = false;
-        String addr = n.f3.accept(this, argu);
+        String addr = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         
         String instr = "lw " + dst + " " + reg + " " + addr + "\n";
@@ -206,19 +216,21 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> TwoRegInstrOp()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(TwoRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu).split("&")[0];
-        String reg2 = n.f2.accept(this, argu);
+        String reg2 = n.f3.accept(this, argu);
         this.label_from_stmt = false;
-        String src = n.f3.accept(this, argu);
+        String src = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("r(.*)")) {
+        if (src.matches("$r(.*)")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -238,22 +250,23 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> ThreeRegInstrOp()
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(ThreeRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         this.is_dst = true;
         String dst = n.f1.accept(this, argu).split("&")[0];
         this.is_dst = false;
-        String reg2 = n.f2.accept(this, argu).split("&")[0];
-        
+        String reg2 = n.f3.accept(this, argu).split("&")[0];
         this.label_from_stmt = false;
-        String reg3 = n.f3.accept(this, argu);
+        String reg3 = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         if (reg3 == null) { return null; }
         String instr = null;
-        if (reg3.matches("r(.*)")) {
+        if (reg3.matches("$r(.*)")) {
             String []parts = new String[2];
             parts = reg3.split("&");
             if (parts.length == 2) {
@@ -273,11 +286,13 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "print"
      * f1 -> Register()
-     * f2 -> Register()
+     * f2 -> ","
      * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Register()
      */
     public String visit(PrintStmt n, String argu) throws Exception {
-        String reg = n.f3.accept(this, argu);
+        String reg = n.f5.accept(this, argu);
         String []parts = new String[2];
         parts = reg.split("&");
         if (parts.length == 2) {
@@ -296,11 +311,13 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "answer"
      * f1 -> Register()
-     * f2 -> Register()
+     * f2 -> ","
      * f3 -> Register()
+     * f4 -> ","
+     * f5 -> Register()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
-        String reg = n.f3.accept(this, argu);
+        String reg = n.f5.accept(this, argu);
         String []parts = new String[2];
         parts = reg.split("&");
         if (parts.length == 2) {
@@ -319,20 +336,22 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "read"
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(ReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
-        String reg2 = n.f2.accept(this, argu);
+        String reg2 = n.f3.accept(this, argu);
         
         this.label_from_stmt = false;
-        String src = n.f3.accept(this, argu);
+        String src = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("r(.*)")) {
+        if (src.matches("$r(.*)")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -352,23 +371,25 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> "seek"
      * f1 -> Register()
-     * f2 -> Register()
-     * f3 -> SimpleExp()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(SeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         
         this.label_from_stmt = false;
-        String reg2 = n.f2.accept(this, argu);
+        String reg2 = n.f3.accept(this, argu);
         this.label_from_stmt = true;
 
         this.label_from_stmt = false;
-        String src = n.f3.accept(this, argu);
+        String src = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         
         if (src == null) { return null; }
         String instr = null;
-        if (src.matches("r(.*)")) {
+        if (src.matches("$r(.*)")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -377,7 +398,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 src = parts[0];
             }
         }
-        if (reg2.matches("r(.*)")) {
+        if (reg2.matches("$r(.*)")) {
             String []parts = new String[2];
             parts = reg2.split("&");
             if (parts.length == 2) {

@@ -56,7 +56,7 @@ public class Method_t extends BaseType {
         }
         param.var_num = this.par_cnt;
         this.par_cnt++;
-        param.var_temp = new String("r" + param.var_num);
+        param.var_temp = new String("$r" + param.var_num);
         methodParamsMap_.put(pname, param);
         return true;
     }
