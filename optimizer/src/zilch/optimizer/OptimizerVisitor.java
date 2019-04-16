@@ -174,11 +174,18 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String visit(swStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu).split("&")[0];
         String idx = n.f3.accept(this, argu);
-
         this.label_from_stmt = false;
         String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
-        
+        if (idx.startsWith("$r")) {
+            String []parts = new String[2];
+            parts = idx.split("&");
+            if (parts.length == 2) {
+                idx = parts[1];
+            } else {
+                idx = parts[0];
+            }
+        }
         String intsr = "sw " + src + ", " + idx + "(" + addr + ")\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
@@ -198,10 +205,19 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     */
     public String visit(lwStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
-        String idx = n.f3.accept(this, argu).split("&")[0];
+        String idx = n.f3.accept(this, argu);
         this.label_from_stmt = false;
-        String addr = n.f5.accept(this, argu);
+        String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
+        if (idx.startsWith("$r")) {
+            String []parts = new String[2];
+            parts = idx.split("&");
+            if (parts.length == 2) {
+                idx = parts[1];
+            } else {
+                idx = parts[0];
+            }
+        }
         String instr = "lw " + dst + ", " + idx + "(" + addr + ")\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {

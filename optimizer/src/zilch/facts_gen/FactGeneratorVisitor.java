@@ -152,6 +152,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (addr.startsWith("$r")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
         }
+        if (addr.startsWith("$r")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
+        }
         return op;
     }
 
@@ -172,6 +175,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         if (addr.startsWith("$r")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
+        }
+        if (addr.startsWith("$r")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
         }
         return op;
     }
