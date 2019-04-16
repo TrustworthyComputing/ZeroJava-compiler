@@ -1,19 +1,19 @@
 package facts_gen;
 import java.io.*;
 
-public class BinOpMove_t extends Var_t {
+public class BinOpmovee_t extends Var_t {
 	
 	public int ic;
 	public String tempsrc;
 
-	public BinOpMove_t(String meth_name, int ic, String temp, String tempsrc) {
+	public BinOpmovee_t(String meth_name, int ic, String temp, String tempsrc) {
 		super(meth_name, temp);
 		this.ic = ic;
 		this.tempsrc = tempsrc;
 	}
 
 	public void writerec(PrintWriter writer) {
-		String ret = "binOpMOV(" + this.meth_name + ", " + this.ic + ", " + this.temp + ", " + this.tempsrc + ").";
+		String ret = "binOpmove(" + this.meth_name + ", " + this.ic + ", " + this.temp + ", " + this.tempsrc + ").";
 		// System.out.println(ret);
 		writer.println(ret);
 	}

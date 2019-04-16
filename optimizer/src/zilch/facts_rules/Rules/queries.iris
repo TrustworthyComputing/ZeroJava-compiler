@@ -3,7 +3,7 @@
 ?- deadCode(?meth, ?i, ?v).
 
 
-// DO NOT CHANGE FROM HERE
+// DO not CHANGE FROM HERE
 ?- basicBlock(?meth, ?start, ?end).
 ?- copyProp(?meth, ?l, ?v1, ?v2).
 ?- constProp(?meth, ?l, ?v, ?val).

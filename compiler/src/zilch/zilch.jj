@@ -19,7 +19,7 @@ SKIP : /* WHITE SPACE */
 SPECIAL_TOKEN : /* COMMENTS */
 {
   <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <ForMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
@@ -37,14 +37,14 @@ TOKEN :
 | < MINUSMINUS: "--" >
 | < PLUSEQUAL: "+=" >
 | < MINUSEQUAL: "-=" >
-| < MULLEQUAL: "*=" >
+| < multEQUAL: "*=" >
 | < DIVEQUAL: "/=" >
-| < MODEQUAL: "%=" >
+| < modEQUAL: "%=" >
 | < LSHIFTEQUAL: "<<=" >
 | < RSHIFTEQUAL: ">>=" >
 | < ANDEQUAL: "&=" >
-| < OREQUAL: "|=" >
-| < XOREQUAL: "^=" >
+| < orEQUAL: "|=" >
+| < XorEQUAL: "^=" >
 | < LSHIFT: "<<" >
 | < RSHIFT: ">>" >
 | < GT: ">" >
@@ -55,15 +55,15 @@ TOKEN :
 | < NEQ: "!=" >
 | < PLUS: "+" >
 | < MINUS: "-" >
-| < MULL: "*" >
-| < UDIV: "/" >
-| < MOD: "%" >
-| < AND: "&" >
-| < OR: "|" >
-| < XOR: "^" >
+| < mult: "*" >
+| < div: "/" >
+| < mod: "%" >
+| < and: "&" >
+| < or: "|" >
+| < xor: "^" >
 | < LOGICAL_AND : "&&" >
-| < LOGICAL_OR : "||" >
-| < NOT : "!" >
+| < LOGICAL_or : "||" >
+| < not : "!" >
 | < ELSE: "else" >
 | < IF: "if" >
 | < WHILE: "while" >
@@ -71,7 +71,7 @@ TOKEN :
 | < MAIN: "main" >
 | < NEW: "new" >
 | < RETURN: "return" >
-| < PRINT: "Out.print" >
+| < print: "Out.print" >
 | < VOID: "void" >
 }
 
@@ -257,14 +257,14 @@ void OpAssignmentOperator() :
 { 
   <PLUSEQUAL>
 | <MINUSEQUAL>
-| <MULLEQUAL>
+| <multEQUAL>
 | <DIVEQUAL>
-| <MODEQUAL>
+| <modEQUAL>
 | <LSHIFTEQUAL>
 | <RSHIFTEQUAL>
 | <ANDEQUAL>
-| <OREQUAL>
-| <XOREQUAL>
+| <orEQUAL>
+| <XorEQUAL>
 }
 
 void ArrayAssignmentStatement() :
@@ -333,7 +333,7 @@ void Expression() :
 {
   LOOKAHEAD( PrimaryExpression() <LOGICAL_AND> )
   AndExpression()
-| LOOKAHEAD( PrimaryExpression() <LOGICAL_OR> )
+| LOOKAHEAD( PrimaryExpression() <LOGICAL_or> )
   OrExpression()
 | LOOKAHEAD( PrimaryExpression() <EQ> )
   EqExpression()
@@ -349,7 +349,7 @@ void Expression() :
   GreaterEqualThanExpression()
 | LOOKAHEAD( PrimaryExpression() BinaryOperator() )
   BinaryExpression()
-| LOOKAHEAD( <NOT> PrimaryExpression() )
+| LOOKAHEAD( <not> PrimaryExpression() )
   NotExpression()
 | LOOKAHEAD( PrimaryExpression() <LSQPAREN> )
   ArrayLookup()
@@ -363,12 +363,12 @@ void BinaryOperator() :
 { 
   <PLUS>
 | <MINUS>
-| <MULL>
-| <UDIV>
-| <MOD>
-| <OR>
-| <AND>
-| <XOR>
+| <mult>
+| <div>
+| <mod>
+| <or>
+| <and>
+| <xor>
 | <LSHIFT>
 | <RSHIFT>
 }
@@ -382,7 +382,7 @@ void AndExpression() :
 void OrExpression() :
 {}
 {
-  PrimaryExpression() <LOGICAL_OR> PrimaryExpression()
+  PrimaryExpression() <LOGICAL_or> PrimaryExpression()
 }
 
 void EqExpression() :
@@ -503,7 +503,7 @@ void ArrayAllocationExpression() :
 void NotExpression() :
 {}
 {
-  <NOT> PrimaryExpression()
+  <not> PrimaryExpression()
 }
 
 void BracketExpression() :

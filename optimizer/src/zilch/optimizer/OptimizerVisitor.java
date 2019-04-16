@@ -89,8 +89,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      *       | TwoRegInstr()
      *       | ThreeRegInstr()
      *       | JmpStmts()
-     *       | StoreWStmt()
-     *       | LoadWStmt()
+     *       | swStmt()
+     *       | lwStmt()
      *       | PrintStmt()
      *       | AnswerStmt()
      *       | ReadStmt()
@@ -160,12 +160,12 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
       }
 
     /**
-    * f0 -> "STOREW"
+    * f0 -> "sw"
     * f1 -> Register()
     * f2 -> Register()
     * f3 -> SimpleExp()
     */
-    public String visit(StoreWStmt n, String argu) throws Exception {
+    public String visit(swStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f2.accept(this, argu);
 
@@ -173,7 +173,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String addr = n.f3.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
         
-        String intsr = "STOREW " + src + " " + reg2 + " " + addr + "\n";
+        String intsr = "sw " + src + " " + reg2 + " " + addr + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += intsr;
@@ -182,12 +182,12 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-    * f0 -> "LOADW"
+    * f0 -> "lw"
     * f1 -> Register()
     * f2 -> Register()
     * f3 -> SimpleExp()
     */
-    public String visit(LoadWStmt n, String argu) throws Exception {
+    public String visit(lwStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg = n.f2.accept(this, argu).split("&")[0];
         
@@ -195,7 +195,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String addr = n.f3.accept(this, argu);
         this.label_from_stmt = true;
         
-        String instr = "LOADW " + dst + " " + reg + " " + addr + "\n";
+        String instr = "lw " + dst + " " + reg + " " + addr + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += instr;
@@ -271,7 +271,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "PRINT"
+     * f0 -> "print"
      * f1 -> Register()
      * f2 -> Register()
      * f3 -> Register()
@@ -285,7 +285,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         } else {
             reg = parts[0];
         }
-        String instr = "PRINT " + reg + " " + reg + " " + reg + "\n";
+        String instr = "print " + reg + " " + reg + " " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += instr;
@@ -294,7 +294,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "ANSWER"
+     * f0 -> "answer"
      * f1 -> Register()
      * f2 -> Register()
      * f3 -> Register()
@@ -308,7 +308,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         } else {
             reg = parts[0];
         }
-        String instr = "ANSWER " + reg + " " + reg + " " + reg + "\n";
+        String instr = "answer " + reg + " " + reg + " " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += instr;
@@ -317,7 +317,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-     * f0 -> "READ"
+     * f0 -> "read"
      * f1 -> Register()
      * f2 -> Register()
      * f3 -> SimpleExp()
@@ -341,7 +341,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 src = parts[0];
             }
         }
-        instr = "READ " + dst + " " + reg2 + " " + src + "\n";
+        instr = "read " + dst + " " + reg2 + " " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -350,7 +350,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "SEEK"
+     * f0 -> "seek"
      * f1 -> Register()
      * f2 -> Register()
      * f3 -> SimpleExp()
@@ -386,7 +386,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 reg2 = parts[0];
             }
         }
-        instr = "SEEK " + dst + " " + reg2 + " " + src + "\n";
+        instr = "seek " + dst + " " + reg2 + " " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -394,29 +394,29 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         return instr;
     }
     /**
-     * f0 -> "MOV"
-     *       | "NOT"
+     * f0 -> "move"
+     *       | "not"
      */
     public String visit(TwoRegInstrOp n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
 
     /**
-     * f0 -> "AND"
-     *       | "OR"
-     *       | "XOR"
-     *       | "ADD"
-     *       | "SUB"
-     *       | "MULL"
-     *       | "SHL"
-     *       | "SHR"
+     * f0 -> "and"
+     *       | "or"
+     *       | "xor"
+     *       | "add"
+     *       | "sub"
+     *       | "mult"
+     *       | "sll"
+     *       | "srl"
      */
     public String visit(ThreeRegInstrOp n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
     
     /**
-     * f0 -> "JMP"
+     * f0 -> "j"
      *       | "CJMP"
      *       | "CNJMP"
      */
@@ -426,7 +426,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     
     
     /**
-     * f0 -> "JMP"
+     * f0 -> "j"
      *       | "CJMP"
      *       | "CNJMP"
      */

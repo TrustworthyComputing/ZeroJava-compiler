@@ -19,35 +19,35 @@ SKIP : /* WHITE SPACE */
 SPECIAL_TOKEN : /* COMMENTS */
 {
   <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <ForMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
 TOKEN : 
 {
 // Special Instructions
-  < PRINT: "PRINT" >
-| < ANSWER: "ANSWER" >
-| < READ: "READ" >
-| < SEEK: "SEEK" >
-| < LOADW: "LOADW" >
-| < STOREW: "STOREW" >
+  < print: "print" >
+| < answer: "answer" >
+| < read: "read" >
+| < seek: "seek" >
+| < lw: "lw" >
+| < sw: "sw" >
 // Jump Instructions
-| < JMP: "JMP" >
+| < j: "j" >
 | < CJMP: "CJMP" >
 | < CNJMP: "CNJMP" >
 // Instructions that only use Dest and Arg2OrImmidiate
-| < MOV : "MOV" >
-| < NOT : "NOT" >
+| < move : "move" >
+| < not : "not" >
 // Instructions that All three registers
-| < AND : "AND" >
-| < OR : "OR" >   
-| < XOR : "XOR" >   
-| < ADD: "ADD" >
-| < SUB: "SUB" >
-| < MULL: "MULL" >
-| < SHL: "SHL" >
-| < SHR: "SHR" >
+| < and : "and" >
+| < or : "or" >   
+| < xor : "xor" >   
+| < add: "add" >
+| < sub: "sub" >
+| < mult: "mult" >
+| < sll: "sll" >
+| < srl: "srl" >
 // Comparisons
 | < CMPE: "CMPE" >
 | < CMPG: "CMPG" >
@@ -133,8 +133,8 @@ Label()
 | ThreeRegInstr()
 | JmpStmts()
 | ComparisonStmts()
-| StoreWStmt()
-| LoadWStmt()
+| swStmt()
+| lwStmt()
 | PrintStmt()
 | AnswerStmt()
 | ReadStmt()
@@ -150,7 +150,7 @@ void JmpStmts() :
 void JmpOps():
 {}
 {
-  "JMP"
+  "j"
 | "CJMP"
 | "CNJMP"
 }
@@ -169,16 +169,16 @@ void ComparisonOps():
 | "CMPGE"
 }
 
-void StoreWStmt() :
+void swStmt() :
 {}
 {
-  "STOREW" Register() Register() SimpleExp()
+  "sw" Register() Register() SimpleExp()
 }
 
-void LoadWStmt() :
+void lwStmt() :
 {}
 {
-  "LOADW" Register() Register() SimpleExp() 
+  "lw" Register() Register() SimpleExp() 
 }
 
 void TwoRegInstr() :
@@ -190,8 +190,8 @@ void TwoRegInstr() :
 void TwoRegInstrOp() :
 {}
 { 
-  "MOV"
-| "NOT"
+  "move"
+| "not"
 }
 
 void ThreeRegInstr() :
@@ -203,38 +203,38 @@ void ThreeRegInstr() :
 void ThreeRegInstrOp() :
 {}
 { 
-  "AND"
-| "OR"
-| "XOR"
-| "ADD"
-| "SUB"
-| "MULL"
-| "SHL"
-| "SHR"
+  "and"
+| "or"
+| "xor"
+| "add"
+| "sub"
+| "mult"
+| "sll"
+| "srl"
 }
 
 void PrintStmt() :
 {}
 {
-  "PRINT" Register() Register() Register() 
+  "print" Register() Register() Register() 
 }
 
 void AnswerStmt() :
 {}
 {
-  "ANSWER" Register() Register() Register() 
+  "answer" Register() Register() Register() 
 }
 
 void ReadStmt() :
 {}
 {
-  "READ" Register() Register() SimpleExp() 
+  "read" Register() Register() SimpleExp() 
 }
 
 void SeekStmt() :
 {}
 {
-  "SEEK" Register() SimpleExp() SimpleExp() 
+  "seek" Register() SimpleExp() SimpleExp() 
 }
 
 void SimpleExp() :

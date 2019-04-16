@@ -37,16 +37,16 @@ Zilch files use the `.zl` extension.
 | `>`      | Greater than			|
 | `<=`     | Less or Equal than		|
 | `>=`     | Greater or Equal than	|
-| `&&`     | Logical `AND`			|
-| `\|\|`   | Logical `OR`			|
+| `&&`     | Logical `and`			|
+| `\|\|`   | Logical `or`			|
 
 
 ### Zilch Bitwise Operators
 | Operator | Description        			|
 |----------|--------------------------------|
-| `&`      | Binary AND 					|
-| `\|`     | Binary OR						|
-| `^`      | Binary XOR						|
+| `&`      | Binary and 					|
+| `\|`     | Binary or						|
+| `^`      | Binary xor						|
 | `<<`     | Binary Left shift operator. 	|
 | `>>`     | Binary Right shift operator. 	|
 
@@ -60,50 +60,50 @@ Zilch files use the `.zl` extension.
 | `*=`     | Multiply and assignment operator. 		|
 | `/=`     | Divide and assignment operator. 		|
 | `%=`     | Modulo and assignment operator. 		|
-| `<<=`    | Left shift AND assignment operator.	|
-| `>>=`    | Right shift AND assignment operator. 	|
-| `&=`     | Bitwise AND assignment operator. 		|
-| `^=`     | Bitwise XOR and assignment operator.	|
-| `\|=`    | Bitwise OR and assignment operator. 	|
+| `<<=`    | Left shift and assignment operator.	|
+| `>>=`    | Right shift and assignment operator. 	|
+| `&=`     | Bitwise and assignment operator. 		|
+| `^=`     | Bitwise xor and assignment operator.	|
+| `\|=`    | Bitwise or and assignment operator. 	|
 
 
 ### Built in Zilch Functions
 | Built in Zilch Function Name       	| Description and corresponding ZMIPS command 			|
 |---------------------------------------|-----------------------------------------------------------|
-| `Prover.answer(int result);`			| `ANSWER`: returns the result 								|
-| `Out.print(int variable);`			| `PRINT`: prints the contents of `variable` 				|
-| `PrimaryTape.read(int dst);`			| `READ dst dst 0`: consumes next word from public tape		|
-| `PrivateTape.read(int dst);`			| `READ dst dst 1`: consumes next word from private tape 	|
-| `PrimaryTape.seek(int dst, int idx);`	| `SEEK dst idx 0`: consumes `idx`th word from public tape	|
-| `PrivateTape.seek(int dst, int idx);` | `SEEK dst idx 1`: consumes `idx`th word from private tape	|
+| `Prover.answer(int result);`			| `answer`: returns the result 								|
+| `Out.print(int variable);`			| `print`: prints the contents of `variable` 				|
+| `PrimaryTape.read(int dst);`			| `read dst dst 0`: consumes next word from public tape		|
+| `PrivateTape.read(int dst);`			| `read dst dst 1`: consumes next word from private tape 	|
+| `PrimaryTape.seek(int dst, int idx);`	| `seek dst idx 0`: consumes `idx`th word from public tape	|
+| `PrivateTape.seek(int dst, int idx);` | `seek dst idx 1`: consumes `idx`th word from private tape	|
 
 
 
 ## ZMIPS ISA
 | Instruction    | Description                                          |
 |----------------|------------------------------------------------------|
-| AND ri rj A    | ri = rj & A                                          |
-| OR ri rj A     | ri = rj \| A                                         |
-| XOR ri rj A    | ri = rj ^ A                                          |
-| NOT ri rj A    | ri = !A                                              |
-| ADD ri rj A    | ri = rj + A                                          |
-| SUB ri rj A    | ri = rj - A                                          |
-| MULL ri rj A   | ri = rj * A                                          |
-| SHL ri rj A    | ri = rj << A                                         |
-| SHR ri rj A    | ri = rj >> A                                         |
+| and ri rj A    | ri = rj & A                                          |
+| or ri rj A     | ri = rj \| A                                         |
+| xor ri rj A    | ri = rj ^ A                                          |
+| not ri rj A    | ri = !A                                              |
+| add ri rj A    | ri = rj + A                                          |
+| sub ri rj A    | ri = rj - A                                          |
+| mult ri rj A   | ri = rj * A                                          |
+| sll ri rj A    | ri = rj << A                                         |
+| srl ri rj A    | ri = rj >> A                                         |
 | CMPE ri rj A   | flag = rj == A                                       |
 | CMPNE ri rj A  | flag = rj != A                                       |
 | CMPG ri rj A   | flag = rj > A                                        |
 | CMPGE ri rj A  | flag = rj >= A                                       |
-| MOV ri rj A    | ri = A                                               |
-| READ ri rj A   | ri = (A == 0) ? next from public : next from private |
-| SEEK ri rj A   | ri = (A == 0) ? public[rj] : ri = private[rj]        |
-| JMP ri rj A    | goto label A                                         |
+| move ri rj A    | ri = A                                               |
+| read ri rj A   | ri = (A == 0) ? next from public : next from private |
+| seek ri rj A   | ri = (A == 0) ? public[rj] : ri = private[rj]        |
+| j ri rj A    | goto label A                                         |
 | CJMP ri rj A   | if (flag) then goto label A                          |
 | CNJMP ri rj A  | if (!flag) then goto label A                         |
-| STOREW ri rj A | [A] = ri                                             |
-| LOADW ri rj A  | ri = [A]                                             |
-| ANSWER ri rj A | return A                                             |
+| sw ri rj A | [A] = ri                                             |
+| lw ri rj A  | ri = [A]                                             |
+| answer ri rj A | return A                                             |
 
 
 ## Compilation & Execution:
@@ -147,19 +147,19 @@ void main(void) {
 
 Which generates the following four lines of ZMIPS assembly:
 ```
-MOV r1 r1 12
-MOV r2 r2 13
-ADD r3 r1 r2
-ANSWER r3 r3 r3
+move r1 r1 12
+move r2 r2 13
+add r3 r1 r2
+answer r3 r3 r3
 ```
 Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
 ```
 ./zc ./compiler/zilch-examples/simpleAdd.zl -opts
 ```
 ```
-MOV r1 r1 12
-ADD r3 r1 13
-ANSWER r3 r3 r3
+move r1 r1 12
+add r3 r1 13
+answer r3 r3 r3
 ```
 
 A more complex program that reads inputs from the primary tape and adds them all together:
@@ -183,19 +183,19 @@ void main(void) {
 
 Which generates the following ZMIPS code:
 ```
-MOV r1 r1 0
+move r1 r1 0
 __L1__
-MOV r4 r4 5
+move r4 r4 5
 CMPG r4 r4 r1
 CNJMP r4 r4 __L2__
-READ r2 r2 0
-ADD r5 r3 r2
-MOV r3 r3 r5
-ADD r6 r1 1
-MOV r1 r1 r6
-JMP r0 r0 __L1__
+read r2 r2 0
+add r5 r3 r2
+move r3 r3 r5
+add r6 r1 1
+move r1 r1 r6
+j $r0, $r0, __L1__
 __L2__
-ANSWER r3 r3 r3
+answer r3 r3 r3
 ```
 
 A final example that invokes methods is presented below:
@@ -224,27 +224,27 @@ void main(void) {
 
 Which generates the following ZMIPS code:
 ```
-MOV r1 r1 30
-MOV r2 r2 r1
-MOV r4 r4 40
-ADD r3 r2 r4
-MOV r5 r5 r3
-MOV r1 r1 30
-MOV r6 r6 r1
-ADD r7 r5 r6
-ANSWER r7 r7 r7
+move r1 r1 30
+move r2 r2 r1
+move r4 r4 40
+add r3 r2 r4
+move r5 r5 r3
+move r1 r1 30
+move r6 r6 r1
+add r7 r5 r6
+answer r7 r7 r7
 ```
 while enabling the optimizations:
 ```
 ./zc ./compiler/zilch-examples/methodCalls.zl -opts
 ```
 ```
-MOV r1 r1 30
-ADD r3 r1 40
-MOV r5 r5 r3
-MOV r1 r1 30
-ADD r7 r3 30
-ANSWER r7 r7 r7
+move r1 r1 30
+add r3 r1 40
+move r5 r5 r3
+move r1 r1 30
+add r7 r3 30
+answer r7 r7 r7
 ```
 the ZMIPS assembly output is optimized.
 
