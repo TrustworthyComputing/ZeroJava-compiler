@@ -27,7 +27,7 @@ label(?meth, ?line) :-	jumpInstr(?meth, ?i, ?lab),
 
 // move type
 move(?meth, ?l, ?var, ?v) :- constmove(?meth, ?l, ?var, ?v).
-move(?meth, ?l, ?var, ?v) :- varmovee(?meth, ?l, ?var, ?v).
+move(?meth, ?l, ?var, ?v) :- varMove(?meth, ?l, ?var, ?v).
 
 // Jump type
 jtype(?meth, ?l) :- jumpInstr(?meth, ?l, ?label).
@@ -88,19 +88,19 @@ noConstProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 // Cannot propagate if u have 2 different values for 1 var at line k
 noCopyProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								prop(?meth, ?k2, ?l, ?var2),
-		 								varmovee(?meth, ?k1, ?var, ?val1),
-		 								varmovee(?meth, ?k2, ?var, ?val2),
+		 								varMove(?meth, ?k1, ?var, ?val1),
+		 								varMove(?meth, ?k2, ?var, ?val2),
 		 								?val1 != ?val2.
 noCopyProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								prop(?meth, ?k2, ?l, ?var2),
-		 								varmovee(?meth, ?k1, ?var, ?val1),
+		 								varMove(?meth, ?k1, ?var, ?val1),
 		 								binOpmove(?meth, ?k2, ?var, ?val2),
 		 								?val1 != ?val2.
 // Cannot propagate if u have 2 different values for 1 var at line k
 noBothProp(?meth, ?l, ?var, ?val1) :-	prop(?meth, ?k1, ?l, ?var1),
 		 								prop(?meth, ?k2, ?l, ?var2),
 		 								constmove(?meth, ?k1, ?var, ?val1),
-		 								varmovee(?meth, ?k2, ?var, ?val2),
+		 								varMove(?meth, ?k2, ?var, ?val2),
 		 								?val1 != ?val2.
 
 // Constant Propagation
@@ -113,7 +113,7 @@ constProp(?meth, ?l, ?var, ?val) :- prop(?meth, ?k, ?l, ?var),
 
 // Copy Propagation
 copyProp(?meth, ?l, ?var, ?val) :-	prop(?meth, ?k, ?l, ?var),
-		 							varmovee(?meth, ?k, ?var, ?val),
+		 							varMove(?meth, ?k, ?var, ?val),
 									// !noCopyProp(?meth, ?l, ?var, ?val),
 									// !noBothProp(?meth, ?l, ?var, ?v2),
 									var(?meth, ?var),

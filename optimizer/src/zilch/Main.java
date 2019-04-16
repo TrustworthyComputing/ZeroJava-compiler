@@ -167,22 +167,22 @@ public class Main {
                 dlVisitor.varList.get(k).writerec(file);
             file.close();
             
-            file = new PrintWriter(path + "/varmovees.iris");
-            // System.out.println("\nvarmovees:");
-            for (int k = 0 ; k < dlVisitor.varmoveeList.size() ; k++)
-                dlVisitor.varmoveeList.get(k).writerec(file);
+            file = new PrintWriter(path + "/varMoves.iris");
+            // System.out.println("\nvarMoves:");
+            for (int k = 0 ; k < dlVisitor.varMoveList.size() ; k++)
+                dlVisitor.varMoveList.get(k).writerec(file);
             file.close();
             
-            file = new PrintWriter(path + "/Constmovees.iris");
-            // System.out.println("\nConstmovees:");
-            for (int k = 0 ; k < dlVisitor.constmoveeList.size() ; k++)
-                dlVisitor.constmoveeList.get(k).writerec(file);
+            file = new PrintWriter(path + "/ConstMoves.iris");
+            // System.out.println("\nConstMoves:");
+            for (int k = 0 ; k < dlVisitor.constMoveList.size() ; k++)
+                dlVisitor.constMoveList.get(k).writerec(file);
             file.close();
             
-            file = new PrintWriter(path + "/BinOpmovees.iris");
-            // System.out.println("\nBinOpmovees:");
-            for (int k = 0 ; k < dlVisitor.binOpmoveeList.size() ; k++)
-                dlVisitor.binOpmoveeList.get(k).writerec(file);
+            file = new PrintWriter(path + "/BinOpMoves.iris");
+            // System.out.println("\nBinOpMoves:");
+            for (int k = 0 ; k < dlVisitor.binOpMoveList.size() ; k++)
+                dlVisitor.binOpMoveList.get(k).writerec(file);
             file.close();
             
             file = new PrintWriter(path + "/Instructions.iris");

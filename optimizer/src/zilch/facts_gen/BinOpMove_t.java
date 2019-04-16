@@ -1,12 +1,12 @@
 package facts_gen;
 import java.io.*;
 
-public class BinOpmovee_t extends Var_t {
+public class BinOpMove_t extends Var_t {
 	
 	public int ic;
 	public String tempsrc;
 
-	public BinOpmovee_t(String meth_name, int ic, String temp, String tempsrc) {
+	public BinOpMove_t(String meth_name, int ic, String temp, String tempsrc) {
 		super(meth_name, temp);
 		this.ic = ic;
 		this.tempsrc = tempsrc;

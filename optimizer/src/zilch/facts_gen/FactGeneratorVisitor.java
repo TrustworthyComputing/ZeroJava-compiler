@@ -10,9 +10,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public Instruction_t answerInstruction;
     public LinkedList<Var_t> varList;
     public LinkedList<Next_t> nextList;
-    public LinkedList<Varmovee_t> varmoveeList;
-    public LinkedList<Constmovee_t> constmoveeList;
-    public LinkedList<BinOpmovee_t> binOpmoveeList;
+    public LinkedList<VarMove_t> varMoveList;
+    public LinkedList<ConstMove_t> constMoveList;
+    public LinkedList<BinOpMove_t> binOpMoveList;
     public LinkedList<VarUse_t> varUseList;
     public LinkedList<VarDef_t> varDefList;
     // public LinkedList<Cjump_t> cjumpList;
@@ -25,9 +25,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         instrList = new LinkedList<Instruction_t>();
         varList = new LinkedList<Var_t>();
         nextList = new LinkedList<Next_t>();
-        varmoveeList = new LinkedList<Varmovee_t>();
-        constmoveeList = new LinkedList<Constmovee_t>();
-        binOpmoveeList =  new LinkedList<BinOpmovee_t>();
+        varMoveList = new LinkedList<VarMove_t>();
+        constMoveList = new LinkedList<ConstMove_t>();
+        binOpMoveList =  new LinkedList<BinOpMove_t>();
         varUseList = new LinkedList<VarUse_t>();
         varDefList = new LinkedList<VarDef_t>();
         // cjumpList = new LinkedList<Cjump_t>();
@@ -180,10 +180,10 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src == null) { return null; }
         String instr = op + " " + dst + " " + sec_reg + " " + src;
         if (src.matches("r(.*)")) {
-            varmoveeList.addLast(new Varmovee_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
+            varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
         } else if (src.matches("[0-9]+")) {
-            constmoveeList.addLast(new Constmovee_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(src) ));
+            constMoveList.addLast(new ConstMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(src) ));
         }
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
@@ -206,9 +206,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src2.matches("r(.*)")) { // if third argument is not immediate
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
-        // binOpmoveeList.addLast(new BinOpmovee_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
-        binOpmoveeList.addLast(new BinOpmovee_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\""));
-        binOpmoveeList.addLast(new BinOpmovee_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src2+"\""));
+        // binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+op+" "+src1+" "+src2+"\""));
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\""));
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src2+"\""));
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
