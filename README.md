@@ -143,29 +143,41 @@ A simple program that performs addition:
 void main(void) {
 	int x;
 	int y;
-	x = foo();
-	y = bar();
-	x = 12;
 	y = 13;
+	y += 7;
+	x = 12;
+	x = x - 1;
+	x--;
+	x <<= 1;
 	Prover.answer(x + y);
 }
 ```
 
 Which generates the following four lines of ZMIPS assembly:
 ```
-move r1 r1 12
-move r2 r2 13
-add r3 r1 r2
-answer r3 r3 r3
+move $r2, $r2, 13
+add $r2, $r2, 7
+move $r1, $r1, 12
+sub $r3, $r1, 1
+move $r1, $r1, $r3
+sub $r1, $r1, 1
+sll $r1, $r1, 1
+add $r4, $r1, $r2
+answer $r4, $r4, $r4
 ```
 Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
 ```
 ./zc ./compiler/zilch-examples/simpleAdd.zl -opts
 ```
 ```
-move r1 r1 12
-add r3 r1 13
-answer r3 r3 r3
+move $r2, $r2, 13
+add $r2, $r2, 7
+move $r1, $r1, 12
+sub $r3, $r1, 1
+sub $r1, $r3, 1
+sll $r1, $r1, 1
+add $r4, $r1, $r2
+answer $r4, $r4, $r4
 ```
 
 A more complex program that reads inputs from the primary tape and adds them all together:
@@ -189,19 +201,19 @@ void main(void) {
 
 Which generates the following ZMIPS code:
 ```
-move r1 r1 0
+move $r1, $r1, 0
 __L1__
-move r4 r4 5
-cmpg r4 r4 r1
-cnjmp r4 r4 __L2__
-read r2 r2 0
-add r5 r3 r2
-move r3 r3 r5
-add r6 r1 1
-move r1 r1 r6
+move $r4, $r4, 5
+cmpg $r4, $r4, $r1
+cnjmp $r4, $r4, __L2__
+read $r2, $r2, 0
+add $r5, $r3, $r2
+move $r3, $r3, $r5
+add $r6, $r1, 1
+move $r1, $r1, $r6
 j $r0, $r0, __L1__
 __L2__
-answer r3 r3 r3
+answer $r3, $r3, $r3
 ```
 
 A final example that invokes methods is presented below:
@@ -230,27 +242,25 @@ void main(void) {
 
 Which generates the following ZMIPS code:
 ```
-move r1 r1 30
-move r2 r2 r1
-move r4 r4 40
-add r3 r2 r4
-move r5 r5 r3
-move r1 r1 30
-move r6 r6 r1
-add r7 r5 r6
-answer r7 r7 r7
+move $r1, $r1, 30
+move $r2, $r2, $r1
+move $r4, $r4, 40
+add $r3, $r2, $r4
+move $r5, $r5, $r3
+move $r1, $r1, 30
+move $r6, $r6, $r1
+add $r7, $r5, $r6
+answer $r7, $r7, $r7
 ```
 while enabling the optimizations:
 ```
 ./zc ./compiler/zilch-examples/methodCalls.zl -opts
 ```
 ```
-move r1 r1 30
-add r3 r1 40
-move r5 r5 r3
-move r1 r1 30
-add r7 r3 30
-answer r7 r7 r7
+move $r1, $r1, 30
+add $r3, $r1, 40
+add $r7, $r3, 30
+answer $r7, $r7, $r7
 ```
 the ZMIPS assembly output is optimized.
 
