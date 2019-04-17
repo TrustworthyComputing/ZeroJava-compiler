@@ -91,18 +91,24 @@ Zilch files use the `.zl` extension.
 | mult ri rj A   | ri = rj * A                                          |
 | sll ri rj A    | ri = rj << A                                         |
 | srl ri rj A    | ri = rj >> A                                         |
-| CMPE ri rj A   | flag = rj == A                                       |
-| CMPNE ri rj A  | flag = rj != A                                       |
-| CMPG ri rj A   | flag = rj > A                                        |
-| CMPGE ri rj A  | flag = rj >= A                                       |
-| move ri rj A    | ri = A                                               |
+| cmpe ri rj A   | flag = rj == A                                       |
+| cmpne ri rj A  | flag = rj != A                                       |
+| cmpg ri rj A   | flag = rj > A                                        |
+| cmpge ri rj A  | flag = rj >= A                                       |
+| beq ri rj A    | if ri == rj goto A                                   |
+| bne ri rj A    | if ri != rj goto A                                   |
+| bgt ri rj A    | if ri > rj goto A                                    |
+| bge ri rj A    | if ri >= rj goto A                                   |
+| blt ri rj A    | if ri < rj goto A                                    |
+| ble ri rj A    | if ri <= rj goto A                                   |
+| move ri rj A   | ri = A                                               |
 | read ri rj A   | ri = (A == 0) ? next from public : next from private |
 | seek ri rj A   | ri = (A == 0) ? public[rj] : ri = private[rj]        |
-| j ri rj A    | goto label A                                         |
-| CJMP ri rj A   | if (flag) then goto label A                          |
-| CNJMP ri rj A  | if (!flag) then goto label A                         |
-| sw ri rj A | [A] = ri                                             |
-| lw ri rj A  | ri = [A]                                             |
+| j ri rj A      | goto label A                                         |
+| cjmp ri rj A   | if (flag) then goto label A                          |
+| cnjmp ri rj A  | if (!flag) then goto label A                         |
+| sw ri rj A     | [A] = ri                                             |
+| lw ri rj A     | ri = [A]                                             |
 | answer ri rj A | return A                                             |
 
 
@@ -186,8 +192,8 @@ Which generates the following ZMIPS code:
 move r1 r1 0
 __L1__
 move r4 r4 5
-CMPG r4 r4 r1
-CNJMP r4 r4 __L2__
+cmpg r4 r4 r1
+cnjmp r4 r4 __L2__
 read r2 r2 0
 add r5 r3 r2
 move r3 r3 r5

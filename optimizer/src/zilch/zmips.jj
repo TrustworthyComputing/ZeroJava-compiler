@@ -34,8 +34,8 @@ TOKEN :
 | < sw: "sw" >
 // Jump Instructions
 | < j: "j" >
-| < CJMP: "CJMP" >
-| < CNJMP: "CNJMP" >
+| < cjmp: "cjmp" >
+| < cnjmp: "cnjmp" >
 // Instructions that only use Dest and Arg2OrImmidiate
 | < move : "move" >
 | < not : "not" >
@@ -49,9 +49,9 @@ TOKEN :
 | < sll: "sll" >
 | < srl: "srl" >
 // Comparisons
-| < CMPE: "CMPE" >
-| < CMPG: "CMPG" >
-| < CMPGE: "CMPGE" >
+| < cmpe: "cmpe" >
+| < cmpg: "cmpg" >
+| < cmpge: "cmpge" >
 // for registers
 | < r: "$r" >   
 }
@@ -151,8 +151,8 @@ void JmpOps():
 {}
 {
   "j"
-| "CJMP"
-| "CNJMP"
+| "cjmp"
+| "cnjmp"
 }
 
 void ComparisonStmts() :
@@ -164,9 +164,9 @@ void ComparisonStmts() :
 void ComparisonOps():
 {}
 {
-  "CMPE"
-| "CMPG"
-| "CMPGE"
+  "cmpe"
+| "cmpg"
+| "cmpge"
 }
 
 void swStmt() :

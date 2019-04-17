@@ -447,8 +447,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     
     /**
      * f0 -> "j"
-     *       | "CJMP"
-     *       | "CNJMP"
+     *       | "cjmp"
+     *       | "cnjmp"
      */
     public String visit(JmpOps n, String argu) throws Exception {
         return n.f0.choice.toString();
@@ -457,8 +457,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     
     /**
      * f0 -> "j"
-     *       | "CJMP"
-     *       | "CNJMP"
+     *       | "cjmp"
+     *       | "cnjmp"
      */
     public String visit(ComparisonOps n, String argu) throws Exception {
         return n.f0.choice.toString();
