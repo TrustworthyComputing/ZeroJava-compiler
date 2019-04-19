@@ -223,6 +223,12 @@ public class Main {
             for (int k = 0 ; k < dlVisitor.jumpList.size() ; k++)
                 dlVisitor.jumpList.get(k).writerec(file, print_facts);
             file.close();
+            
+            file = new PrintWriter(path + "/Cjumps.iris");
+            if (print_facts) System.out.println("\nCjumps:");
+            for (int k = 0 ; k < dlVisitor.cjumpList.size() ; k++)
+                dlVisitor.cjumpList.get(k).writerec(file, print_facts);
+            file.close();
         } catch(FileNotFoundException ex) {
             System.err.println(ex.getMessage());
         }

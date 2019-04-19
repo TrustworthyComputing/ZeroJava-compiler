@@ -330,9 +330,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      * f5 -> Register()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
-        // this.is_dst = true;
+        this.is_dst = true;
         String reg = n.f5.accept(this, argu);
-        // this.is_dst = false;
+        this.is_dst = false;
         String []parts = new String[2];
         parts = reg.split("&");
         if (parts.length == 2) {
@@ -340,7 +340,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         } else {
             reg = parts[0];
         }
-        String instr = "answer $r0, $r0, " + reg + "\n";
+        String instr = "answer " + reg + ", " + reg + ", " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += instr;
