@@ -223,12 +223,6 @@ public class Main {
             for (int k = 0 ; k < dlVisitor.jumpList.size() ; k++)
                 dlVisitor.jumpList.get(k).writerec(file, print_facts);
             file.close();
-            
-            file = new PrintWriter(path + "/Args.iris");
-            if (print_facts) System.out.println("\nArgs:");
-            for (int k = 0 ; k < dlVisitor.argsList.size() ; k++)
-                dlVisitor.argsList.get(k).writerec(file, print_facts);
-            file.close();
         } catch(FileNotFoundException ex) {
             System.err.println(ex.getMessage());
         }

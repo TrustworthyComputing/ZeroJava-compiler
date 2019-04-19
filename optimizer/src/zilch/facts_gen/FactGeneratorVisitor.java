@@ -15,9 +15,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<BinOpMove_t> binOpMoveList;
     public LinkedList<VarUse_t> varUseList;
     public LinkedList<VarDef_t> varDefList;
-    // public LinkedList<Cjump_t> cjumpList;
     public LinkedList<Jump_t> jumpList;
-    public LinkedList<Args_t> argsList;
     public int ic1;
     public int ic2;
 
@@ -30,9 +28,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         binOpMoveList =  new LinkedList<BinOpMove_t>();
         varUseList = new LinkedList<VarUse_t>();
         varDefList = new LinkedList<VarDef_t>();
-        // cjumpList = new LinkedList<Cjump_t>();
         jumpList = new LinkedList<Jump_t>();
-        argsList = new LinkedList<Args_t>();
         this.ic1 = 0;
         this.ic2 = 0;
     }
@@ -226,8 +222,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src2.startsWith("$r")) { // if third argument is not immediate
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
-        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\""));
-        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src2+"\""));
+
+        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\"", "\""+src2+"\""));
+        
         varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
@@ -364,7 +361,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String v = n.f0.toString();
         Var_t var = new Var_t("\""+argu+"\"", "\""+v+"\"");
         for (Var_t variable : varList) {
-            if (variable.temp.equals("\"" + v + "\"")) {
+            if (variable.var.equals("\"" + v + "\"")) {
                 return v;
             }
         }
