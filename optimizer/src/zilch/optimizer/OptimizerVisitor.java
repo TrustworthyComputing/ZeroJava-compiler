@@ -237,11 +237,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String visit(TwoRegInstr n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String dst = n.f1.accept(this, argu).split("&")[0];
-        
-        System.out.println("ADD reg2 : ");
         String reg2 = n.f3.accept(this, argu);
-        System.out.println(reg2 + "\n");
-        
         this.label_from_stmt = false;
         String src = n.f5.accept(this, argu);
         this.label_from_stmt = true;
@@ -344,7 +340,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         } else {
             reg = parts[0];
         }
-        String instr = "answer " + reg + ", " + reg + ", " + reg + "\n";
+        String instr = "answer $r0, $r0, " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null) {
             this.result += instr;
@@ -484,7 +480,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Register n, String argu) throws Exception {
         String reg = n.f0.toString();
-        // System.out.println(reg);
+        
+        if (this.is_dst) { return reg; }
+        
         String copy_opt = optimisationMap.get("copyProp").get(argu + ic1);
         // String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" +  ic1);
         // if (copy_opt_2 != null) { // if two constant propagations in the same line
@@ -494,7 +492,6 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         if (copy_opt != null && getTemp(copy_opt).equals(reg)) {
             return getOpt(copy_opt, false);
         }
-        if (this.is_dst) { return reg; }
         String const_opt = optimisationMap.get("constProp").get(argu + ic1);
         // String const_opt_2 = optimisationMap.get("constProp").get(argu + "-sec-" +  ic1);
         // if (const_opt_2 != null) { // if two constant propagations in the same line

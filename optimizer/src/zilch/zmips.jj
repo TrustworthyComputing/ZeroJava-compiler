@@ -19,7 +19,9 @@ SKIP : /* WHITE SPACE */
 SPECIAL_TOKEN : /* COMMENTS */
 {
   <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <ForMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <ASM_COMMENT: ";" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <MIPS_COMMENT: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
@@ -50,6 +52,7 @@ TOKEN :
 | < srl: "srl" >
 // Comparisons
 | < cmpe: "cmpe" >
+| < cmpne: "cmpne" >
 | < cmpg: "cmpg" >
 | < cmpge: "cmpge" >
 // for registers
@@ -165,6 +168,7 @@ void ComparisonOps():
 {}
 {
   "cmpe"
+| "cmpne"
 | "cmpg"
 | "cmpge"
 }

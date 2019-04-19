@@ -16,6 +16,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<VarUse_t> varUseList;
     public LinkedList<VarDef_t> varDefList;
     public LinkedList<Jump_t> jumpList;
+    public LinkedList<Cjump_t> cjumpList;
     public int ic1;
     public int ic2;
 
@@ -29,6 +30,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         varUseList = new LinkedList<VarUse_t>();
         varDefList = new LinkedList<VarDef_t>();
         jumpList = new LinkedList<Jump_t>();
+        cjumpList = new LinkedList<Cjump_t>();
         this.ic1 = 0;
         this.ic2 = 0;
     }
@@ -107,7 +109,13 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String reg2 = n.f3.accept(this, argu);
         String label = n.f5.accept(this, argu);
         String instr = op + ", " + reg1 + ", " + reg2 + ", " + label;
-        jumpList.addLast(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
+        
+        if (op.equals("j")) {
+            jumpList.addLast(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
+        } else {
+            cjumpList.addLast(new Cjump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
+        }
+        
         return instr;
     }
 

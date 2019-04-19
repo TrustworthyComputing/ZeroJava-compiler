@@ -257,25 +257,25 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
 	public BaseType visit(OpAssignmentOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
-		if (op == "+=") {
+		if (op.equals("+=")) {
 			return new Variable_t("add", "add");
-		} else if (op == "-=") {
+		} else if (op.equals("-=")) {
 			return new Variable_t("sub", "sub");
-		} else if (op == "*=") {
+		} else if (op.equals("*=")) {
 			return new Variable_t("mult", "mult");
-		} else if (op == "/=") {
+		} else if (op.equals("/=")) {
 			return new Variable_t("div", "div");
-		} else if (op == "%=") {
+		} else if (op.equals("%=")) {
 			return new Variable_t("mod", "mod");
-		} else if (op == "<<=") {
+		} else if (op.equals("<<=")) {
 			return new Variable_t("sll", "sll");
-		} else if (op == ">>=") {
+		} else if (op.equals(">>=")) {
 			return new Variable_t("srl", "srl");
-		} else if (op == "&=") {
+		} else if (op.equals("&=")) {
 			return new Variable_t("and", "and");
-		} else if (op == "|=") {
+		} else if (op.equals("|=")) {
 			return new Variable_t("or", "or");
-		} else if (op == "^=") {
+		} else if (op.equals("^=")) {
 			return new Variable_t("xor", "xor");
 		}
 		return null;
@@ -531,25 +531,25 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 */
 	public BaseType visit(BinaryOperator n, BaseType argu) throws Exception {
 		String op = n.f0.choice.toString();
-		if (op == "+") {
+		if (op.equals("+")) {
 			return new Variable_t("add", "add");
-		} else if (op == "-") {
+		} else if (op.equals("-")) {
 			return new Variable_t("sub", "sub");
-		} else if (op == "*") {
+		} else if (op.equals("*")) {
 			return new Variable_t("mult", "mult");
-		} else if (op == "/") {
+		} else if (op.equals("/")) {
 			return new Variable_t("div", "div");
-		} else if (op == "%") {
+		} else if (op.equals("%")) {
 			return new Variable_t("mod", "mod");
-		} else if (op == "|") {
+		} else if (op.equals("|")) {
 			return new Variable_t("or", "or");
-		} else if (op == "&") {
+		} else if (op.equals("&")) {
 			return new Variable_t("and", "and");
-		} else if (op == "^") {
+		} else if (op.equals("^")) {
 			return new Variable_t("xor", "xor");
-		}  else if (op == "<<") {
+		}  else if (op.equals("<<")) {
 			return new Variable_t("sll", "sll");
-		} else if (op == ">>") {
+		} else if (op.equals(">>")) {
 			return new Variable_t("srl", "srl");
 		} else {
 			throw new Exception("Not supported operator");
