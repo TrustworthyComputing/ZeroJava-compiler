@@ -45,8 +45,8 @@ public class Main {
                 String path = "facts_rules/Facts/" + name;
                 abs_path = abs_path + "/" + name;
                 try {
-                    if (! ext.equals("asm")) {
-                        throw new IOException("Input files should end with a '.asm' extension.");
+                    if (! ext.equals("zmips")) {
+                        throw new IOException("Input files should end with a '.zmips' extension.");
                     }
                     Path p = Paths.get(path);
                     if (! Files.exists(p) && !(new File(path)).mkdirs()) {
@@ -138,8 +138,8 @@ public class Main {
                     if (abs_path.endsWith(".opt")) {
                         abs_path = abs_path.substring(0, abs_path.length() - 4);
                     }
-                    System.out.println(abs_path + ".opt.asm");
-                    PrintWriter writer = new PrintWriter(abs_path + ".opt.asm");
+                    System.out.println(abs_path + ".opt.zmips");
+                    PrintWriter writer = new PrintWriter(abs_path + ".opt.zmips");
                     
                     if (debug_) {
                         System.out.println("\n" + opt.result);

@@ -27,7 +27,7 @@ public class Main {
                     ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table);
                     root.accept(generator, null);
                     // stvisitor.printST();
-                    /* Write the generated code to the same directory as .asm file */
+                    /* Write the generated code to the same directory as .zmips file */
                     File fp = new File(arg);
                     String ext = getFileExtension(fp);
                     String name = getFileNameWithoutExt(fp);
@@ -35,7 +35,7 @@ public class Main {
                     if (! ext.equals("zl")) {
                         throw new IOException("Input files should end with a '.zl' extension.");
                     }
-                    String outfile = path + "/" + name + ".asm";
+                    String outfile = path + "/" + name + ".zmips";
                     PrintWriter out = new PrintWriter(outfile);
                     out.print(generator.result_);
                     out.close();

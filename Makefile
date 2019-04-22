@@ -7,4 +7,4 @@ compile:
 clean:
 	cd compiler/src/zilch && $(MAKE) clean
 	cd optimizer/src/zilch && $(MAKE) clean
-	rm ./compiler/zilch-examples/*.asm
+	rm ./compiler/zilch-examples/*.zmips
