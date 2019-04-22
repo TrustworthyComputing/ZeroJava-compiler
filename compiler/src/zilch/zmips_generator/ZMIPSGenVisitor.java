@@ -905,7 +905,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String array_size = ((Variable_t) n.f3.accept(this, argu)).getType();
 		this.immediate_ = false;
 		String base = Integer.toString(this.base_addr_);
-		this.base_addr_ += Integer.parseInt(array_size);
+		try {
+			this.base_addr_ += Integer.parseInt(array_size);
+		} catch (NumberFormatException ex) {
+			this.base_addr_ += 256; // TODO: possibly add a dynamic allocator in zMIPS execution engine or forbid dynamic allocations.
+		}
 		return new Variable_t(base, null);
 	}
 	
