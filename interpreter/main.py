@@ -51,8 +51,24 @@ def main(filename, pubtape, auxtape, array_sizes):
                     ofp.write('void main(void) {\n')
                     if pubtape is not None:
                         ofp.write('FILE *pubfp = fopen("' + pubtape + '", "r");\n')
+                        ofp.write('int pub_tape[1000];\n')
+                        ofp.write('int pub_tape_idx = 0;\n')
+                        ofp.write('while (!feof(pubfp)) {\n')
+                        ofp.write('    fscanf(pubfp, "%d", &pub_tape[pub_tape_idx]);\n')
+                        ofp.write('    pub_tape_idx++;\n')
+                        ofp.write('}\n')
+                        ofp.write('fclose(pubfp);\n')
+                        ofp.write('pub_tape_idx = 0;\n')
                     if auxtape is not None:
-                        ofp.write('FILE *auxfp = fopen("' + auxtape + '", "r");\n')
+                        ofp.write('FILE *auxfp = fopen("'+ auxtape + '", "r");\n')
+                        ofp.write('int priv_tape[1000];\n')
+                        ofp.write('int priv_tape_idx = 0;\n')
+                        ofp.write('while (!feof(auxfp)) {\n')
+                        ofp.write('    fscanf(auxfp, "%d", &priv_tape[priv_tape_idx]);\n')
+                        ofp.write('    priv_tape_idx++;\n')
+                        ofp.write('}\n')
+                        ofp.write('fclose(auxfp);\n')
+                        ofp.write('priv_tape_idx = 0;\n')
                 elif str.startswith('Prover.answer('):
                     ofp.write('printf("%d\\n", ' + str[len('Prover.answer('):] + "\n")
                 elif str.startswith('int[]'):  # int[] arr; --> int arr[size];
@@ -64,12 +80,30 @@ def main(filename, pubtape, auxtape, array_sizes):
                     if pubtape is None:
                         print("Cannot use PrimaryTape.read without providing a public tape file.")
                         exit(-1)
-                    ofp.write('fscanf(auxfp, "%d", &' + str[len('PrimaryTape.read('):] + "\n")
+                    var = str[len('PrimaryTape.read('):-2]
+                    ofp.write(var + ' = pub_tape[pub_tape_idx++];\n')
                 elif str.startswith('PrivateTape.read('):
                     if auxtape is None:
                         print("Cannot use PrivateTape.read without providing a auxiliary tape file.")
                         exit(-1)
-                    ofp.write('fscanf(pubfp, "%d", &' + str[len('PrivateTape.read('):] + "\n")
+                    var = str[len('PrivateTape.read('):-2]
+                    ofp.write(var + ' = priv_tape[priv_tape_idx++];\n')
+                elif str.startswith('PrimaryTape.seek('):
+                    if pubtape is None:
+                        print("Cannot use PrimaryTape.seek without providing a public tape file.")
+                        exit(-1)
+                    parts = str.split(',')
+                    idx = parts[1].strip()[:-2]
+                    var = parts[0][len('PrimaryTape.seek('):]
+                    ofp.write(var + ' = pub_tape[' + idx + '];\n')
+                elif str.startswith('PrivateTape.seek('):
+                    if auxtape is None:
+                        print("Cannot use PrivateTape.seek without providing a auxiliary tape file.")
+                        exit(-1)
+                    parts = str.split(',')
+                    idx = parts[1].strip()[:-2]
+                    var = parts[0][len('PrivateTape.seek('):]
+                    ofp.write(var + ' = priv_tape[' + idx + '];\n')
                 else:
                     ofp.write(line)
     return c_outputfile
