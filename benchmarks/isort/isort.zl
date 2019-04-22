@@ -2,22 +2,26 @@ void main(void) {
 	int i;
 	int j;
 	int arrj;
+	int x;
 	int key;
 	int N;
 	int[] arr;
-	arr = new int[4];
-	N = 4;
-	arr[0] = 4;
-	arr[1] = 2;
-	arr[2] = 5;
-	arr[3] = 1;
+	PrimaryTape.read(N);
+	arr = new int[N];
+	i = 0;
+	while (i < N) {
+		PrivateTape.read(x);
+		arr[i] = x;
+		i++;
+	}
+
 	i = 1;
 	while (i < N) {
-		
 		key = arr[i]; 
 		j = i - 1; 
 		arrj = arr[j];
 		while ((j >= 0) && (arrj > key)) { 
+			arrj = arr[j];
 			arr[j + 1] = arr[j];
 			j--;
 		}
@@ -25,6 +29,6 @@ void main(void) {
 		arr[j + 1] = key; 
 		i++;
 	}
-	
+
 	Prover.answer(arr[0]);
 }
