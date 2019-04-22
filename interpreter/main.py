@@ -72,10 +72,12 @@ def main(filename, pubtape, auxtape, array_sizes):
                 elif str.startswith('Prover.answer('):
                     ofp.write('printf("%d\\n", ' + str[len('Prover.answer('):] + "\n")
                 elif str.startswith('int[]'):  # int[] arr; --> int arr[size];
+                    continue
                     var = str.split('int[]')[1][:-1].strip()
                     ofp.write('int ' + var + '[' + array_sizes[var] + '];\n')
                 elif 'new int[' in str:
-                    continue
+                    var = str.split('=')[0].strip()
+                    ofp.write('int ' + var + '[' + array_sizes[var] + '];\n')
                 elif str.startswith('PrimaryTape.read('):
                     if pubtape is None:
                         print("Cannot use PrimaryTape.read without providing a public tape file.")
