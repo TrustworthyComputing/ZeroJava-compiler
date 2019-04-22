@@ -122,4 +122,5 @@ if __name__== "__main__":
         exit(-1)
     cmd_result = subprocess.check_output(['bash','-c', c_out])
     print cmd_result
+    os.remove(c_out)
     os.remove(c_outputfile)
