@@ -1,0 +1,29 @@
+void main(void) {
+	int i;
+	int key;
+	int x;
+	int size;
+	int[] keys;
+	int[] values;
+	PrimaryTape.read(size);
+	PrimaryTape.read(key);
+	keys = new int[size];
+	values = new int[size];
+	i = 0;
+	while (i < size) {
+		PrivateTape.read(x);
+		keys[i] = x;
+		PrivateTape.read(x);
+		values[i] = x;
+		i++;
+	}
+	
+	i = 0;
+	while (i < size) {
+		if (key == (keys[i])) {
+			Prover.answer(values[i]);
+		}
+		i++;
+	}
+	Prover.answer(0);
+}
