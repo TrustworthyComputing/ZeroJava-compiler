@@ -71,6 +71,7 @@ def main(filename, pubtape, auxtape, array_sizes):
                         ofp.write('priv_tape_idx = 0;\n')
                 elif str.startswith('Prover.answer('):
                     ofp.write('printf("%d\\n", ' + str[len('Prover.answer('):] + "\n")
+                    ofp.write('return;\n')
                 elif str.startswith('int[]'):  # int[] arr; --> int arr[size];
                     continue
                     var = str.split('int[]')[1][:-1].strip()
