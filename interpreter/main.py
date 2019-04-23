@@ -48,7 +48,7 @@ def main(filename, pubtape, auxtape, array_sizes):
                     while '{' not in str:
                         line = next(ifp)
                         str = line.strip()
-                    ofp.write('void main(void) {\n')
+                    ofp.write('int main(void) {\n')
                     if pubtape is not None:
                         ofp.write('FILE *pubfp = fopen("' + pubtape + '", "r");\n')
                         ofp.write('int pub_tape[1000];\n')
@@ -71,7 +71,7 @@ def main(filename, pubtape, auxtape, array_sizes):
                         ofp.write('priv_tape_idx = 0;\n')
                 elif str.startswith('Prover.answer('):
                     ofp.write('printf("%d\\n", ' + str[len('Prover.answer('):] + "\n")
-                    ofp.write('return;\n')
+                    ofp.write('return 0;\n')
                 elif str.startswith('int[]'):  # int[] arr; --> int arr[size];
                     continue
                     var = str.split('int[]')[1][:-1].strip()
@@ -117,6 +117,7 @@ if __name__== "__main__":
     array_sizes = getArraySizes(filename)
     c_outputfile = main(filename, pubtape, auxtape, array_sizes)
     c_out = c_outputfile + '.out'
+    c_out = os.path.abspath(c_out)
     cmd_result = subprocess.call(['bash','-c', 'gcc ' + c_outputfile + ' -o ' + c_out])
     if cmd_result != 0:
         os.remove(c_outputfile)
