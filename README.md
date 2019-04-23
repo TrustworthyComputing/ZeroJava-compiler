@@ -78,6 +78,7 @@ Zilch files use the `.zl` extension.
 | `PrivateTape.seek(int dst, int idx);` | `seek dst idx 1`: consumes `idx`th word from private tape	|
 
 
+Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluates to b if the value of a is true, and otherwise to c.
 
 ## ZMIPS ISA
 | Instruction    | Description                                          |
