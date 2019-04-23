@@ -810,6 +810,45 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return new Variable_t(meth.return_reg, null);
 	}
 
+
+	/**
+     * f0 -> <LPAREN>
+     * f1 -> Expression()
+     * f2 -> <RPAREN>
+     * f3 -> "?"
+     * f4 -> Expression()
+     * f5 -> ":"
+     * f6 -> Expression()
+     */
+	public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
+		String elselabel = L.new_label();
+		String endlabel = L.new_label();
+		String cond = ((Variable_t) n.f1.accept(this, argu)).getType();
+		String res = new String("$r" + ++glob_temp_cnt_);
+		
+		if (this.is_inline_meth_) {
+			this.inline_meth_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n";
+			String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
+			this.inline_meth_ += "move " + res + ", " + res + ", " + if_var + "\n";
+			this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
+			this.inline_meth_ += elselabel + "\n";
+			String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
+			this.inline_meth_ += "move " + res + ", " + res + ", " + else_var + "\n";
+			this.inline_meth_ += endlabel + "\n";
+		} else {
+			this.result_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n";
+			String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
+			this.result_ += "move " + res + ", " + res + ", " + if_var + "\n";
+			this.result_ += "j $r0, $r0, " + endlabel + "\n";
+			this.result_ += elselabel + "\n";
+			String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
+			this.result_ += "move " + res + ", " + res + ", " + else_var + "\n";
+			this.result_ += endlabel + "\n";
+		}
+		return new Variable_t(res, null);
+	}
+	
+	
  	/**
     * f0 -> Expression()
     * f1 -> ExpressionTail()

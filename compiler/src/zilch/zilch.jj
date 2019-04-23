@@ -285,6 +285,12 @@ void IfStatement() :
   <IF> <LPAREN> Expression() <RPAREN> Statement()
 }
 
+void TernaryExpression() :
+{}
+{
+  <LPAREN> Expression() <RPAREN> "?" Expression() ":" Expression()
+}
+
 void WhileStatement() :
 {}
 {
@@ -355,6 +361,8 @@ void Expression() :
   ArrayLookup()
 | LOOKAHEAD( Identifier() <LPAREN> )
   MethodCall()
+| LOOKAHEAD( <LPAREN> Expression() <RPAREN> "?" )
+  TernaryExpression()
 | PrimaryExpression()
 }
 
