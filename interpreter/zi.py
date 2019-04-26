@@ -14,6 +14,9 @@ def parseArgs():
     if not args.filename.endswith(".zl"):
         print("Zilch code filename should end with '.zl' extension.")
         exit(-1)
+    if not os.path.isfile(args.filename):
+        print("Input file '" + args.filename + "' does not exist.")
+        exit(-2)
     if args.pubtape is not None:
         if not os.path.isfile(args.pubtape):
             print("Public tape file '" + args.pubtape + "' does not exist.")
