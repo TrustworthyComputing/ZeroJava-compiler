@@ -1,0 +1,12 @@
+void main(void) {
+	int min;
+	int max;
+	int val;
+	PrimaryTape.read(min);
+	PrimaryTape.read(max);
+	PrivateTape.read(val);
+	if ((min <= val) && (val <= max)) {
+		Prover.answer(1);
+	} 
+	Prover.answer(0);
+}
