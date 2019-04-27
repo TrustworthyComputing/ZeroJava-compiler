@@ -81,62 +81,58 @@ Zilch files use the `.zl` extension.
 Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluates to b if the value of a is true, and otherwise to c.
 
 ## ZMIPS ISA
-| Instruction    | Description                                          |
-|----------------|------------------------------------------------------|
-| and ri rj A    | ri = rj & A                                          |
-| or ri rj A     | ri = rj \| A                                         |
-| xor ri rj A    | ri = rj ^ A                                          |
-| not ri rj A    | ri = !A                                              |
-| add ri rj A    | ri = rj + A                                          |
-| sub ri rj A    | ri = rj - A                                          |
-| mult ri rj A   | ri = rj * A                                          |
-| sll ri rj A    | ri = rj << A                                         |
-| srl ri rj A    | ri = rj >> A                                         |
-| cmpe ri rj A   | flag = rj == A                                       |
-| cmpne ri rj A  | flag = rj != A                                       |
-| cmpg ri rj A   | flag = rj > A                                        |
-| cmpge ri rj A  | flag = rj >= A                                       |
-| beq ri rj A    | if ri == rj goto A                                   |
-| bne ri rj A    | if ri != rj goto A                                   |
-| bgt ri rj A    | if ri > rj goto A                                    |
-| bge ri rj A    | if ri >= rj goto A                                   |
-| blt ri rj A    | if ri < rj goto A                                    |
-| ble ri rj A    | if ri <= rj goto A                                   |
-| move ri rj A   | ri = A                                               |
-| read ri rj A   | ri = (A == 0) ? next from public : next from private |
-| seek ri rj A   | ri = (A == 0) ? public[rj] : ri = private[rj]        |
-| j ri rj A      | goto label A                                         |
-| cjmp ri rj A   | if (flag) then goto label A                          |
-| cnjmp ri rj A  | if (!flag) then goto label A                         |
-| sw ri rj A     | [A] = ri                                             |
-| lw ri rj A     | ri = [A]                                             |
-| answer ri rj A | return A                                             |
+| Instruction        | Description                                              |
+|--------------------|----------------------------------------------------------|
+| and $ri, $rj, A    | $ri, = $rj & A                                           |
+| or $ri, $rj, A     | $ri, = $rj \| A                                          |
+| xor $ri, $rj, A    | $ri, = $rj ^ A                                           |
+| not $ri, $rj, A    | $ri, = !A                                                |
+| add $ri, $rj, A    | $ri, = $rj + A                                           |
+| sub $ri, $rj, A    | $ri, = $rj - A                                           |
+| mult $ri, $rj, A   | $ri, = $rj * A                                           |
+| sll $ri, $rj, A    | $ri, = $rj << A                                          |
+| srl $ri, $rj, A    | $ri, = $rj >> A                                          |
+| cmpe $ri, $rj, A   | flag = $rj == A                                          |
+| cmpne $ri, $rj, A  | flag = $rj != A                                          |
+| cmpg $ri, $rj, A   | flag = $rj > A                                           |
+| cmpge $ri, $rj, A  | flag = $rj >= A                                          |
+| beq $ri, $rj, A    | if $ri == $rj goto A                                     |
+| bne $ri, $rj, A    | if $ri != $rj goto A                                     |
+| bgt $ri, $rj, A    | if $ri > $rj goto A                                      |
+| bge $ri, $rj, A    | if $ri >= $rj goto A                                     |
+| blt $ri, $rj, A    | if $ri < $rj goto A                                      |
+| ble $ri, $rj, A    | if $ri <= $rj goto A                                     |
+| move $ri, $rj, A   | $ri = A                                                  |
+| read $ri, $rj, A   | $ri = (A == 0) ? next from public : next from private    |
+| seek $ri, $rj, A   | $ri = (A == 0) ? public[$rj] : $ri = private[$rj]        |
+| j $ri, $rj, A      | goto label A                                             |
+| cjmp $ri, $rj, A   | if (flag) then goto label A                              |
+| cnjmp $ri, $rj, A  | if (!flag) then goto label A                             |
+| sw $ri, A($rj)     | [A+$rj] = $ri                                            |
+| lw $ri, A($rj)     | $ri = [A+$rj]                                            |
+| answer $ri, $rj, A | return A                                                 |
 
 
 ## Compilation & Execution:
 To compile the compiler type `make`.
 
-In order to make the Zilch compiler script (`zc`) executable type `chmod +x ./zc`.
+In order to make the Zilch compiler (`zc`) and the Zilch interpreter (`zi`) scripts executable type `chmod +x ./zc` and `chmod +x ./zi`.
 
-Then, use the `zc` script to compile Zilch programs to ZMIPS assembly code.
+Use the `zi` script to simulate Zilch programs and the `zc` script to compile Zilch programs to ZMIPS assembly code.
 
 Our compiler also supports ZMIPS analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
 
 Below are some usage examples and we also demonstrate the optimizer.
 
 ### Zilch Examples:
-```
- _______ _      _       _____                       _ _           
-|___  (_) |    | |     /  __ \                     (_) |          
-   / / _| | ___| |__   | /  \/ ___  _ __ ___  _ __  _| | ___ _ __ 
-  / / | | |/ __| '_ \  | |    / _ \| '_   _ \| '_ \| | |/ _ \ '__|
-./ /__| | | (__| | | | | \__/\ (_) | | | | | | |_) | | |  __/ |   
-\_____/_|_|\___|_| |_|  \____/\___/|_| |_| |_| .__/|_|_|\___|_|   
-					     | |                  
-					     |_|      
-```
 
 A simple program that performs addition:
+```
+./zi ./compiler/zilch-examples/simpleAdd.zl
+
+40
+```
+To generate zMIPS code:
 ```
 ./zc ./compiler/zilch-examples/simpleAdd.zl
 ```
