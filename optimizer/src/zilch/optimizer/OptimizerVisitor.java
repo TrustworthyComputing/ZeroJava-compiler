@@ -93,8 +93,10 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      *       | lwStmt()
      *       | PrintStmt()
      *       | AnswerStmt()
-     *       | ReadStmt()
-     *       | SeekStmt()
+     *       | PubReadStmt()
+     *       | SecReadStmt()
+     *       | PubSeekStmt()
+     *       | SecSeekStmt()
      */
     public String visit(Stmt n, String argu) throws Exception {
         return n.f0.accept(this, argu);
@@ -349,14 +351,14 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-     * f0 -> "read"
+     * f0 -> "pubread"
      * f1 -> Register()
      * f2 -> ","
      * f3 -> Register()
      * f4 -> ","
      * f5 -> SimpleExp()
      */
-    public String visit(ReadStmt n, String argu) throws Exception {
+    public String visit(PubReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         String reg2 = n.f3.accept(this, argu);
         this.label_from_stmt = false;
@@ -373,7 +375,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 src = parts[0];
             }
         }
-        instr = "read " + dst + ", " + reg2 + ", " + src + "\n";
+        instr = "pubread " + dst + ", " + reg2 + ", " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;
@@ -382,14 +384,47 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "seek"
+     * f0 -> "secread"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
+     */
+    public String visit(SecReadStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        String reg2 = n.f3.accept(this, argu);
+        this.label_from_stmt = false;
+        String src = n.f5.accept(this, argu);
+        this.label_from_stmt = true;
+        if (src == null) { return null; }
+        String instr = null;
+        if (src.startsWith("$r")) {
+            String []parts = new String[2];
+            parts = src.split("&");
+            if (parts.length == 2) {
+                src = parts[1];
+            } else {
+                src = parts[0];
+            }
+        }
+        instr = "secread " + dst + ", " + reg2 + ", " + src + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null){
+            this.result += instr;
+        }
+        return instr;
+    }
+    
+    /**
+     * f0 -> "pubseek"
      * f1 -> Register()
      * f2 -> ","
      * f3 -> SimpleExp()
      * f4 -> ","
      * f5 -> SimpleExp()
      */
-    public String visit(SeekStmt n, String argu) throws Exception {
+    public String visit(PubSeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         this.label_from_stmt = false;
         String reg2 = n.f3.accept(this, argu);
@@ -417,7 +452,51 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                 reg2 = parts[0];
             }
         }
-        instr = "seek " + dst + ", " + reg2 + ", " + src + "\n";
+        instr = "pubseek " + dst + ", " + reg2 + ", " + src + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        if (opt_found == null){
+            this.result += instr;
+        }
+        return instr;
+    }
+    
+    /**
+     * f0 -> "secseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     * f4 -> ","
+     * f5 -> SimpleExp()
+     */
+    public String visit(SecSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        this.label_from_stmt = false;
+        String reg2 = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        this.label_from_stmt = false;
+        String src = n.f5.accept(this, argu);
+        this.label_from_stmt = true;
+        if (src == null) { return null; }
+        String instr = null;
+        if (src.startsWith("$r")) {
+            String []parts = new String[2];
+            parts = src.split("&");
+            if (parts.length == 2) {
+                src = parts[1];
+            } else {
+                src = parts[0];
+            }
+        }
+        if (reg2.startsWith("$r")) {
+            String []parts = new String[2];
+            parts = reg2.split("&");
+            if (parts.length == 2) {
+                reg2 = parts[1];
+            } else {
+                reg2 = parts[0];
+            }
+        }
+        instr = "secseek " + dst + ", " + reg2 + ", " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
         if (opt_found == null){
             this.result += instr;

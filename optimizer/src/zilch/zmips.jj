@@ -30,8 +30,10 @@ TOKEN :
 // Special Instructions
   < print: "print" >
 | < answer: "answer" >
-| < read: "read" >
-| < seek: "seek" >
+| < pubread: "pubread" >
+| < secread: "secread" >
+| < pubseek: "pubseek" >
+| < secseek: "secseek" >
 | < lw: "lw" >
 | < sw: "sw" >
 // Jump Instructions
@@ -140,8 +142,10 @@ Label()
 | lwStmt()
 | PrintStmt()
 | AnswerStmt()
-| ReadStmt()
-| SeekStmt()
+| PubReadStmt()
+| SecReadStmt()
+| PubSeekStmt()
+| SecSeekStmt()
 }
 
 void JmpStmts() :
@@ -229,17 +233,30 @@ void AnswerStmt() :
   "answer" Register() "," Register() "," Register() 
 }
 
-void ReadStmt() :
+void PubReadStmt() :
 {}
 {
-  "read" Register() "," Register() "," SimpleExp() 
+  "pubread" Register() "," Register() "," SimpleExp() 
 }
 
-void SeekStmt() :
+void PubSeekStmt() :
 {}
 {
-  "seek" Register() "," SimpleExp() "," SimpleExp() 
+  "pubseek" Register() "," SimpleExp() "," SimpleExp() 
 }
+
+void SecReadStmt() :
+{}
+{
+  "secread" Register() "," Register() "," SimpleExp() 
+}
+
+void SecSeekStmt() :
+{}
+{
+  "secseek" Register() "," SimpleExp() "," SimpleExp() 
+}
+
 
 void SimpleExp() :
 {}

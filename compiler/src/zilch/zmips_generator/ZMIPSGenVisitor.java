@@ -418,9 +418,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ReadPrimaryTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "read " + t + ", " + t + ", " + 0 +"\n";
+			this.inline_meth_ += "pubread " + t + ", " + t + ", " + 0 +"\n";
 		} else {
-			this.result_ += "read " + t + ", " + t + ", " + 0 +"\n";
+			this.result_ += "pubread " + t + ", " + t + ", " + 0 +"\n";
 		}
 		return null;
 	}
@@ -435,9 +435,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ReadPrivateTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "read " + t + ", " + t + ", " + 1 +"\n";
+			this.inline_meth_ += "secread " + t + ", " + t + ", " + 1 +"\n";
 		} else {
-			this.result_ += "read " + t + ", " + t + ", " + 1 +"\n";
+			this.result_ += "secread " + t + ", " + t + ", " + 1 +"\n";
 		}
 		return null;
 	}
@@ -455,9 +455,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "seek " + dst + ", " + idx + ", " + 0 +"\n";
+			this.inline_meth_ += "pubseek " + dst + ", " + idx + ", " + 0 +"\n";
 		} else {
-			this.result_ += "seek " + dst + ", " + idx + ", " + 0 +"\n";
+			this.result_ += "pubseek " + dst + ", " + idx + ", " + 0 +"\n";
 		}
 		return null;
 	}
@@ -475,9 +475,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "seek " + dst + ", " + idx + ", " + 1 +"\n";
+			this.inline_meth_ += "secseek " + dst + ", " + idx + ", " + 1 +"\n";
 		} else {
-			this.result_ += "seek " + dst + ", " + idx + ", " + 1 +"\n";
+			this.result_ += "secseek " + dst + ", " + idx + ", " + 1 +"\n";
 		}
 		return null;
 	}

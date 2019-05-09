@@ -272,17 +272,17 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-     * f0 -> "read"
+     * f0 -> "pubread"
      * f1 -> Register()
      * f2 -> ","
      * f3 -> Register()
      * f4 -> ","
      * f5 -> SimpleExp()
      */
-    public String visit(ReadStmt n, String argu) throws Exception {
+    public String visit(PubReadStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
         String tape = n.f5.accept(this, argu);
-        String op = "read " + dst + ", " + dst + ", " + tape;
+        String op = "pubread " + dst + ", " + dst + ", " + tape;
         if (tape != null && tape.startsWith("$r")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
@@ -291,18 +291,60 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "seek"
+     * f0 -> "secread"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
+     */
+    public String visit(SecReadStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu);
+        String tape = n.f5.accept(this, argu);
+        String op = "secread " + dst + ", " + dst + ", " + tape;
+        if (tape != null && tape.startsWith("$r")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+        }
+        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        return op;
+    }
+    
+    /**
+     * f0 -> "pubseek"
      * f1 -> Register()
      * f2 -> ","
      * f3 -> SimpleExp()
      * f4 -> ","
      * f5 -> SimpleExp()
      */
-    public String visit(SeekStmt n, String argu) throws Exception {
+    public String visit(PubSeekStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu);
         String sec_reg = n.f3.accept(this, argu);
         String tape = n.f5.accept(this, argu);
-        String op = "seek " + dst + ", " + sec_reg + ", " + tape;
+        String op = "pubseek " + dst + ", " + sec_reg + ", " + tape;
+        if (sec_reg != null && sec_reg.startsWith("$r")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
+        }
+        if (tape != null && tape.startsWith("$r")) {
+            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+        }
+        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        return op;
+    }
+    
+    /**
+     * f0 -> "secseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     * f4 -> ","
+     * f5 -> SimpleExp()
+     */
+    public String visit(SecSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu);
+        String sec_reg = n.f3.accept(this, argu);
+        String tape = n.f5.accept(this, argu);
+        String op = "secseek " + dst + ", " + sec_reg + ", " + tape;
         if (sec_reg != null && sec_reg.startsWith("$r")) {
             varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
