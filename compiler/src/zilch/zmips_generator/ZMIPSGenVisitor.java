@@ -161,6 +161,20 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(IntegerType n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
+	
+	/**
+	* f0 -> "short"
+	*/
+	public BaseType visit(ShortType n, BaseType argu) throws Exception {
+		return n.f0.accept(this, argu);
+	}
+	
+	/**
+	* f0 -> "unsigned short"
+	*/
+	public BaseType visit(UShortType n, BaseType argu) throws Exception {
+		return n.f0.accept(this, argu);
+	}
 
 	/**
      * f0 -> Block()
@@ -418,9 +432,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ReadPrimaryTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "pubread " + t + ", " + t + ", " + 0 +"\n";
+			this.inline_meth_ += "pubread " + t + ", " + t + ", " + t +"\n";
 		} else {
-			this.result_ += "pubread " + t + ", " + t + ", " + 0 +"\n";
+			this.result_ += "pubread " + t + ", " + t + ", " + t +"\n";
 		}
 		return null;
 	}
@@ -435,9 +449,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ReadPrivateTape n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "secread " + t + ", " + t + ", " + 1 +"\n";
+			this.inline_meth_ += "secread " + t + ", " + t + ", " + t +"\n";
 		} else {
-			this.result_ += "secread " + t + ", " + t + ", " + 1 +"\n";
+			this.result_ += "secread " + t + ", " + t + ", " + t +"\n";
 		}
 		return null;
 	}
@@ -455,9 +469,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "pubseek " + dst + ", " + idx + ", " + 0 +"\n";
+			this.inline_meth_ += "pubseek " + dst + ", " + idx + ", " + idx +"\n";
 		} else {
-			this.result_ += "pubseek " + dst + ", " + idx + ", " + 0 +"\n";
+			this.result_ += "pubseek " + dst + ", " + idx + ", " + idx +"\n";
 		}
 		return null;
 	}
@@ -475,9 +489,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String dst = ((Variable_t) n.f2.accept(this, argu)).getType();
 		String idx = ((Variable_t) n.f4.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += "secseek " + dst + ", " + idx + ", " + 1 +"\n";
+			this.inline_meth_ += "secseek " + dst + ", " + idx + ", " + idx +"\n";
 		} else {
-			this.result_ += "secseek " + dst + ", " + idx + ", " + 1 +"\n";
+			this.result_ += "secseek " + dst + ", " + idx + ", " + idx +"\n";
 		}
 		return null;
 	}

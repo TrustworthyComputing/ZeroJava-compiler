@@ -1,9 +1,9 @@
 void main(void) {
 	int i;
-	int x;
-	int y;
-	int tmp_x;
-	int tmp_ror;
+	unsigned short x;
+	unsigned short y;
+	unsigned short tmp_x;
+	unsigned short tmp_ror;
 	int rounds;
 	int[] K;
 	rounds = 32;
@@ -30,6 +30,8 @@ void main(void) {
 		y = tmp_x;
 		i++;
 	}
-
+	Out.print(x);
+	Out.print(y);
+	
 	Prover.answer(y);
 }

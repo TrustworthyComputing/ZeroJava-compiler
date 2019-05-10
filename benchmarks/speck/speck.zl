@@ -1,7 +1,7 @@
 void main(void) {
 	int i;
-	int x;
-	int y;
+	unsigned short x;
+	unsigned short y;
 	int rounds;
 	int[] K;
 	rounds = 22;
@@ -24,6 +24,9 @@ void main(void) {
         x ^= y;
 		i++;
 	}
-
+	
+	Out.print(x);
+	Out.print(y);
+	
 	Prover.answer(y);
 }

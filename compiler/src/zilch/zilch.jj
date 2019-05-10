@@ -68,6 +68,8 @@ TOKEN :
 | < IF: "if" >
 | < WHILE: "while" >
 | < INTEGER: "int" >
+| < SHORT: "short" >
+| < UNSIGNED: "unsigned" >
 | < MAIN: "main" >
 | < NEW: "new" >
 | < RETURN: "return" >
@@ -192,6 +194,8 @@ void Type() :
   LOOKAHEAD(3)
   ArrayType()
 | IntegerType()
+| ShortType()
+| UShortType()
 | Identifier()
 }
 
@@ -205,6 +209,18 @@ void IntegerType() :
 {}
 {
   <INTEGER>
+}
+
+void ShortType() :
+{}
+{
+  <SHORT>
+}
+
+void UShortType() :
+{}
+{
+  <UNSIGNED> <SHORT>
 }
 
 void Statement() :

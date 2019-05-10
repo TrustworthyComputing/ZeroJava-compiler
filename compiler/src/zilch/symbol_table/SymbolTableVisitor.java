@@ -61,7 +61,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
                     throw new Exception("Method main: Variable " + n.f6.nodes.get(i).accept(this).getName() + " already exists!");
                 }
                 String vartype = ((Variable_t) n.f6.nodes.get(i).accept(this)).getType();
-                if (!vartype.equals("int") && !vartype.equals("int[]")) { //if not classic types
+                if (!vartype.equals("int") && !vartype.equals("int[]") && !vartype.equals("short") && !vartype.equals("unsigned short")) { //if not classic types
                     throw new Exception("main: Cannot declare type " + vartype + " does not exist!\nUse either int or int[].");
                 }
             }
@@ -211,6 +211,21 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
     public BaseType visit(IntegerType n) throws Exception {
         return new BaseType("int");
     }
+    
+    /**
+    * f0 -> "short"
+    */
+    public BaseType visit(ShortType n) throws Exception {
+        return new BaseType("short");
+    }
+    
+    /**
+    * f0 -> "unsigned short"
+    */
+    public BaseType visit(UShortType n) throws Exception {
+        return new BaseType("unsigned short");
+    }
+
 
     /**
     * f0 -> <IDENTIFIER>

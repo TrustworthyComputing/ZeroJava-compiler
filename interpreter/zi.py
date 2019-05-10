@@ -110,6 +110,9 @@ def main(filename, pubtape, auxtape, array_sizes):
                     idx = parts[1].strip()[:-2]
                     var = parts[0][len('PrivateTape.seek('):]
                     ofp.write(var + ' = priv_tape[' + idx + '];\n')
+                elif str.startswith('Out.print('):
+                    var = str[len('Out.print('):-2]
+                    ofp.write('printf("'+var+': %d\\n", '+var+');\n')
                 else:
                     ofp.write(line)
     return c_outputfile
