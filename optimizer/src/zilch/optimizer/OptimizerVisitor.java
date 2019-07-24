@@ -8,14 +8,14 @@ import java.io.*;
 
 public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String result;
-    public int ic1;
+    private int instr_cnt;
     private Map<String, Map<String, String>> optimisationMap;
     private boolean label_from_stmt;
     private boolean is_dst;
     
     public OptimizerVisitor(Map<String, Map<String, String>> optimisationMap) {
         result = new String();
-        this.ic1 = 1;
+        this.instr_cnt = 1;
         this.optimisationMap = optimisationMap;
         this.label_from_stmt = true;
         this.is_dst = false;
@@ -78,7 +78,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
                 String str = n.f0.elementAt(i).accept(this, argu);
-                this.ic1++;
+                this.instr_cnt++;
             }
         }
         return null;
@@ -118,7 +118,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
          String label = n.f5.accept(this, argu);
          this.label_from_stmt = true;
          String instr = op + " " + reg1 + ", " + reg2 + ", " + label + "\n";
-         String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
          if (opt_found == null) {
              this.result += instr;
          }
@@ -133,36 +133,36 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
       * f4 -> ","
       * f5 -> SimpleExp()
       */
-      public String visit(ComparisonStmts n, String argu) throws Exception {
-          String op = n.f0.accept(this, argu);
-          String reg1 = n.f1.accept(this, argu).split("&")[0];
-          String reg2 = n.f3.accept(this, argu);
-          this.label_from_stmt = false;
-          String reg3 = n.f5.accept(this, argu);
-          this.label_from_stmt = true;
-          if (reg3 == null) { return null; }
-          String instr = null;
-          if (reg3.startsWith("$r")) {
-              String []parts = new String[2];
-              parts = reg3.split("&");
-              if (parts.length == 2) {
-                  reg3 = parts[1];
-              } else {
-                  reg3 = parts[0];
-              }
-          }
-          if (reg2.startsWith("$r")) {
-              String []parts = new String[2];
-              parts = reg2.split("&");
-              reg2 = parts[0];
-          }
-          instr = op + " " + reg1 + ", " + reg2 + ", " + reg3 + "\n";
-          String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
-          if (opt_found == null){
-              this.result += instr;
-          }
-          return instr;
-      }
+      // public String visit(ComparisonStmts n, String argu) throws Exception {
+      //     String op = n.f0.accept(this, argu);
+      //     String reg1 = n.f1.accept(this, argu).split("&")[0];
+      //     String reg2 = n.f3.accept(this, argu);
+      //     this.label_from_stmt = false;
+      //     String reg3 = n.f5.accept(this, argu);
+      //     this.label_from_stmt = true;
+      //     if (reg3 == null) { return null; }
+      //     String instr = null;
+      //     if (reg3.startsWith("$r")) {
+      //         String []parts = new String[2];
+      //         parts = reg3.split("&");
+      //         if (parts.length == 2) {
+      //             reg3 = parts[1];
+      //         } else {
+      //             reg3 = parts[0];
+      //         }
+      //     }
+      //     if (reg2.startsWith("$r")) {
+      //         String []parts = new String[2];
+      //         parts = reg2.split("&");
+      //         reg2 = parts[0];
+      //     }
+      //     instr = op + " " + reg1 + ", " + reg2 + ", " + reg3 + "\n";
+      //     String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
+      //     if (opt_found == null){
+      //         this.result += instr;
+      //     }
+      //     return instr;
+      // }
 
     /**
     * f0 -> "sw"
@@ -189,7 +189,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         String intsr = "sw " + src + ", " + idx + "(" + addr + ")\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
             this.result += intsr;
         }
@@ -221,7 +221,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         String instr = "lw " + dst + ", " + idx + "(" + addr + ")\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
             this.result += instr;
         }
@@ -255,7 +255,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = op + " " + dst + ", " + reg2 + ", " + src + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -291,7 +291,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = op + " " + dst + ", " + reg2 + ", " + reg3 + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -316,7 +316,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             reg = parts[0];
         }
         String instr = "print " + reg + ", " + reg + ", " + reg + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
             this.result += instr;
         }
@@ -332,18 +332,16 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      * f5 -> Register()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
-        this.is_dst = true;
-        String reg = n.f5.accept(this, argu);
-        this.is_dst = false;
-        String []parts = new String[2];
-        parts = reg.split("&");
-        if (parts.length == 2) {
-            reg = parts[1];
-        } else {
-            reg = parts[0];
-        }
+        String reg = n.f5.accept(this, argu).split("&")[0];
+        // String []parts = new String[2];
+        // parts = reg.split("&");
+        // if (parts.length == 2) {
+        //     reg = parts[1];
+        // } else {
+        //     reg = parts[0];
+        // }
         String instr = "answer " + reg + ", " + reg + ", " + reg + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
             this.result += instr;
         }
@@ -376,7 +374,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = "pubread " + dst + ", " + reg2 + ", " + src + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -409,7 +407,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = "secread " + dst + ", " + reg2 + ", " + src + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -453,7 +451,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = "pubseek " + dst + ", " + reg2 + ", " + src + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -497,7 +495,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             }
         }
         instr = "secseek " + dst + ", " + reg2 + ", " + src + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + ic1);
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
             this.result += instr;
         }
@@ -527,23 +525,18 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "j"
-     *       | "cjmp"
-     *       | "cnjmp"
+     * f0 ->   "j"
+     *      | "beq"
+     *      | "bne"
+     *      | "blt"
+     *      | "ble"
+     *      | "bgt"
+     *      | "bge"
      */
     public String visit(JmpOps n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
     
-    
-    /**
-     * f0 -> "j"
-     *       | "cjmp"
-     *       | "cnjmp"
-     */
-    public String visit(ComparisonOps n, String argu) throws Exception {
-        return n.f0.choice.toString();
-    }
     
     /**
      * f0 -> Register()
@@ -559,25 +552,24 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Register n, String argu) throws Exception {
         String reg = n.f0.toString();
-        
         if (this.is_dst) { return reg; }
-        
-        String copy_opt = optimisationMap.get("copyProp").get(argu + ic1);
-        // String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" +  ic1);
-        // if (copy_opt_2 != null) { // if two constant propagations in the same line
-        //     copy_opt = copy_opt_2;
-        //     System.out.println("\n\nCOPY: " + copy_opt);
-        // }
-        if (copy_opt != null && getTemp(copy_opt).equals(reg)) {
-            return getOpt(copy_opt, false);
+
+        String copy_opt = optimisationMap.get("copyProp").get(argu + instr_cnt);
+        String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" + instr_cnt);
+        if (copy_opt_2 != null) { // if two constant propagations in the same line
+            copy_opt = copy_opt_2;
         }
-        String const_opt = optimisationMap.get("constProp").get(argu + ic1);
-        // String const_opt_2 = optimisationMap.get("constProp").get(argu + "-sec-" +  ic1);
-        // if (const_opt_2 != null) { // if two constant propagations in the same line
-        //     const_opt = const_opt_2;
-        //     System.out.println("\n\nCONST: " + copy_opt);
-        // 
-        // }
+        if (copy_opt != null) {
+            if (getTemp(copy_opt).equals(reg)) {
+                return getOpt(copy_opt, false);
+            }
+        }
+        
+        String const_opt = optimisationMap.get("constProp").get(argu + instr_cnt);
+        String const_opt_2 = optimisationMap.get("constProp").get(argu + "-sec-" + instr_cnt);
+        if (const_opt_2 != null) { // if two constant propagations in the same line
+            const_opt = const_opt_2;
+        }
         if (const_opt == null) { return reg; }
         if (getTemp(const_opt).equals(reg)) {
             return reg + "&" + getOpt(const_opt, true);

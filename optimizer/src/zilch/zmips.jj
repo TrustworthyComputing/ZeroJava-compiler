@@ -137,7 +137,6 @@ Label()
 | TwoRegInstr()
 | ThreeRegInstr()
 | JmpStmts()
-| ComparisonStmts()
 | swStmt()
 | lwStmt()
 | PrintStmt()
@@ -158,23 +157,12 @@ void JmpOps():
 {}
 {
   "j"
-| "cjmp"
-| "cnjmp"
-}
-
-void ComparisonStmts() :
-{}
-{
-  ComparisonOps() Register() "," Register() "," SimpleExp()
-}
-
-void ComparisonOps():
-{}
-{
-  "cmpe"
-| "cmpne"
-| "cmpg"
-| "cmpge"
+| "beq"
+| "bne"
+| "blt"
+| "ble"
+| "bgt"
+| "bge"
 }
 
 void swStmt() :

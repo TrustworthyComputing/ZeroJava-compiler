@@ -345,13 +345,13 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			String elselabel = instr;
 			if (this.is_inline_meth_) {
 				n.f4.accept(this, argu);
-				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
 				this.inline_meth_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.inline_meth_ += endlabel + "\n";
 			} else {
 				n.f4.accept(this, argu);
-				this.result_ += "j " + endlabel + "\n";
+				this.result_ += "j $r0, $r0, " + endlabel + "\n";
 				this.result_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.result_ += endlabel + "\n";
@@ -361,14 +361,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			if (this.is_inline_meth_) {
 				this.inline_meth_ += instr + ", " + elselabel + "\n";
 				n.f4.accept(this, argu);
-				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
 				this.inline_meth_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.inline_meth_ += endlabel + "\n";
 			} else {
 				this.result_ += instr + ", " + elselabel + "\n";
 				n.f4.accept(this, argu);
-				this.result_ += "j " + endlabel + "\n";
+				this.result_ += "j $r0, $r0, " + endlabel + "\n";
 				this.result_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.result_ += endlabel + "\n";
@@ -425,13 +425,13 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
 			this.inline_meth_ += expr + ", " + lend + "\n";
 			n.f4.accept(this, argu);
-			this.inline_meth_ += "j " + lstart + "\n" + lend + "\n";
+			this.inline_meth_ += "j $r0, $r0, " + lstart + "\n" + lend + "\n";
 		} else {
 			this.result_ += lstart + "\n";
 			String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
 			this.result_ += expr + ", " + lend + "\n";
 			n.f4.accept(this, argu);
-			this.result_ += "j " + lstart + "\n" + lend + "\n";
+			this.result_ += "j $r0, $r0, " + lstart + "\n" + lend + "\n";
 		}
 		return null;
 	}
@@ -839,13 +839,13 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			String elselabel = instr;
 			if (this.is_inline_meth_) {
 				n.f4.accept(this, argu);
-				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
 				this.inline_meth_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.inline_meth_ += endlabel + "\n";
 			} else {
 				n.f4.accept(this, argu);
-				this.result_ += "j " + endlabel + "\n";
+				this.result_ += "j $r0, $r0, " + endlabel + "\n";
 				this.result_ +=  elselabel + "\n";
 				n.f6.accept(this, argu);
 				this.result_ += endlabel + "\n";
@@ -856,7 +856,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				this.inline_meth_ += instr + ", " + elselabel + "\n";
 				String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
 				this.inline_meth_ += "move " + res + ", " + res + ", "  + if_var + "\n";
-				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
 				this.inline_meth_ +=  elselabel + "\n";
 				String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
 				this.inline_meth_ += "move " + res + ", " + res + ", "  + else_var + "\n";
@@ -865,7 +865,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				this.result_ += instr + ", " + elselabel + "\n";
 				String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
 				this.result_ += "move " + res + ", " + res + ", "  + if_var + "\n";
-				this.result_ += "j " + endlabel + "\n";
+				this.result_ += "j $r0, $r0, " + endlabel + "\n";
 				this.result_ +=  elselabel + "\n";
 				String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
 				this.result_ += "move " + res + ", " + res + ", "  + else_var + "\n";

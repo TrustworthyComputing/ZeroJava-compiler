@@ -91,11 +91,11 @@ public class Main {
                         IRelation relation = knowledgeBase.execute(query, variableBindings);
                         if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
                         String queryType = null;
-                        if ((query.toString()).equals("?- constProp(?meth, ?l, ?v, ?val).")) {
+                        if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
                             queryType = "constProp";
-                        } else if ((query.toString()).equals("?- copyProp(?meth, ?l, ?v1, ?v2).")) {
+                        } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
                             queryType = "copyProp";
-                        } else if ((query.toString()).equals("?- deadCode(?meth, ?i, ?v).")) {
+                        } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
                             queryType = "deadCode";
                         }
                         if (queryType != null) {
@@ -125,12 +125,14 @@ public class Main {
                     /* Print optimizations map */
                     if (debug_) {
                         System.out.println();
+                        System.out.println("------------- optimizations map --------------");
                         for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
                             System.out.println(entry.getKey() + ":");
                             for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
                                 System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
                             }
                         }
+                        System.out.println("---------------------------");
                     }
 
                     OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);

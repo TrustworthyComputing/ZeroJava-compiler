@@ -36,13 +36,13 @@ jtype(?meth, ?l) :- jumpInstr(?meth, ?l, ?label).
 jtype(?meth, ?l) :- cjumpInstr(?meth, ?l, ?label).
 
 // Last instruction of program
+// lastInstr(?meth, ?l) :-
+// 	instruction(?meth, ?l, ?smth),
+// 	!next(?meth, ?l, ?j).
+
 lastInstr(?meth, ?l) :-
 	instruction(?meth, ?l, ?smth),
-	!next(?meth, ?l, ?j).
-
-// lastInstr(?meth, ?l) :-
-// instruction(?meth, ?l, ?smth),
-// answerInstruction(?meth, ?l, ?smth).
+	answerInstruction(?meth, ?l, ?smth).
 
 // Live Variable at i
 live(?meth, ?var, ?i) :- varUse(?meth, ?i, ?var).

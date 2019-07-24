@@ -7,9 +7,8 @@ import java.io.*;
 
 public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<Instruction_t> instrList;
-    public Instruction_t answerInstruction;
+    public AnswerInstruction_t answerInstruction;
     public LinkedList<Var_t> varList;
-    public LinkedList<Next_t> nextList;
     public LinkedList<VarMove_t> varMoveList;
     public LinkedList<ConstMove_t> constMoveList;
     public LinkedList<BinOpMove_t> binOpMoveList;
@@ -23,10 +22,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public FactGeneratorVisitor() {
         instrList = new LinkedList<Instruction_t>();
         varList = new LinkedList<Var_t>();
-        nextList = new LinkedList<Next_t>();
         varMoveList = new LinkedList<VarMove_t>();
         constMoveList = new LinkedList<ConstMove_t>();
-        binOpMoveList =  new LinkedList<BinOpMove_t>();
+        binOpMoveList = new LinkedList<BinOpMove_t>();
         varUseList = new LinkedList<VarUse_t>();
         varDefList = new LinkedList<VarDef_t>();
         jumpList = new LinkedList<Jump_t>();
@@ -71,7 +69,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
                 this.ic1++;
                 instrList.addLast(new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\""));
                 if (str.toLowerCase().contains("answer".toLowerCase())) {
-                    answerInstruction = new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\"");
+                    answerInstruction = new AnswerInstruction_t("\""+argu+"\"", this.ic1, "\""+str+"\"");
                 }
             }
         }
@@ -118,25 +116,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         
         return instr;
     }
-
-    /**
-     * f0 -> ComparisonOps()
-     * f1 -> Register()
-     * f2 -> ","
-     * f3 -> Register()
-     * f4 -> ","
-     * f5 -> SimpleExp()
-     */
-     public String visit(ComparisonStmts n, String argu) throws Exception {
-         String op = n.f0.accept(this, argu);
-         String reg1 = n.f1.accept(this, argu);
-         String reg2 = n.f3.accept(this, argu);
-         String reg3 = n.f5.accept(this, argu);
-         String instr = op + ", " + reg1 + ", " + reg2 + ", " + reg3;
-         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg2+"\""));
-         varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg3+"\""));
-         return instr;
-     }
 
      /**
      * f0 -> "sw"
@@ -378,20 +357,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
     
     /**
-     * f0 -> "j"
-     *       | "cjmp"
-     *       | "cnjmp"
+     * f0 ->   "j"
+     *      | "beq"
+     *      | "bne"
+     *      | "blt"
+     *      | "ble"
+     *      | "bgt"
+     *      | "bge"
      */
     public String visit(JmpOps n, String argu) throws Exception {
-        return n.f0.choice.toString();
-    }
-    
-    /**
-     * f0 -> "j"
-     *       | "cjmp"
-     *       | "cnjmp"
-     */
-    public String visit(ComparisonOps n, String argu) throws Exception {
         return n.f0.choice.toString();
     }
     
