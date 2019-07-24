@@ -18,6 +18,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	
 	private boolean is_inline_meth_;
 	private String inline_meth_;
+	
+	private boolean is_or_;
 
 	public ZMIPSGenVisitor(Map<String, Method_t> st) {
 		this.L = new Label();
@@ -28,6 +30,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.result_ = new String();
 		this.is_inline_meth_ = false;
 		this.inline_meth_ = new String();
+		this.is_or_ = false;
 	}
 
 
@@ -336,23 +339,40 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f6 -> Statement()
 	*/
 	public BaseType visit(IfElseStatement n, BaseType argu) throws Exception {
-		String elselabel = L.new_label();
 		String endlabel = L.new_label();
-		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n"; //if cond not true go to elselabel
-			n.f4.accept(this, argu);
-			this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
-			this.inline_meth_ +=  elselabel + "\n";
-			n.f6.accept(this, argu);
-			this.inline_meth_ += endlabel + "\n";
+		String instr = ((Variable_t) n.f2.accept(this, argu)).getType();
+		if (L.is_label(instr)) {
+			String elselabel = instr;
+			if (this.is_inline_meth_) {
+				n.f4.accept(this, argu);
+				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				n.f4.accept(this, argu);
+				this.result_ += "j " + endlabel + "\n";
+				this.result_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.result_ += endlabel + "\n";
+			}
 		} else {
-			this.result_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n"; //if cond not true go to elselabel
-			n.f4.accept(this, argu);
-			this.result_ += "j $r0, $r0, " + endlabel + "\n";
-			this.result_ +=  elselabel + "\n";
-			n.f6.accept(this, argu);
-			this.result_ += endlabel + "\n";
+			String elselabel = L.new_label();
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += instr + ", " + elselabel + "\n";
+				n.f4.accept(this, argu);
+				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				this.result_ += instr + ", " + elselabel + "\n";
+				n.f4.accept(this, argu);
+				this.result_ += "j " + endlabel + "\n";
+				this.result_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.result_ += endlabel + "\n";
+			}
 		}
 		return null;
 	}
@@ -365,16 +385,27 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f4 -> Statement()
 	*/
 	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
-		String endlabel = L.new_label();
-		String cond = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += "cnjmp " + cond + ", " + cond + ", " + endlabel + "\n";
-			n.f4.accept(this, argu);
-			this.inline_meth_ += endlabel + "\n";
+		String instr = ((Variable_t) n.f2.accept(this, argu)).getType();
+		if (L.is_label(instr)) {
+			String endlabel = instr;
+			if (this.is_inline_meth_) {
+				n.f4.accept(this, argu);
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				n.f4.accept(this, argu);
+				this.result_ += endlabel + "\n";
+			}
 		} else {
-			this.result_ += "cnjmp " + cond + ", " + cond + ", " + endlabel + "\n";
-			n.f4.accept(this, argu);
-			this.result_ += endlabel + "\n";
+			String endlabel = L.new_label();
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += instr + ", " + endlabel + "\n";
+				n.f4.accept(this, argu);
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				this.result_ += instr + ", " + endlabel + "\n";
+				n.f4.accept(this, argu);
+				this.result_ += endlabel + "\n";
+			}
 		}
 		return null;
 	}
@@ -392,15 +423,15 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (this.is_inline_meth_) {
 			this.inline_meth_ += lstart + "\n";
 			String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.inline_meth_ += "cnjmp " + expr + ", " + expr + ", " + lend + "\n";
+			this.inline_meth_ += expr + ", " + lend + "\n";
 			n.f4.accept(this, argu);
-			this.inline_meth_ += "j $r0, $r0, " + lstart + "\n" + lend + "\n";
+			this.inline_meth_ += "j " + lstart + "\n" + lend + "\n";
 		} else {
 			this.result_ += lstart + "\n";
 			String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.result_ += "cnjmp " + expr + ", " + expr + ", " + lend + "\n";
+			this.result_ += expr + ", " + lend + "\n";
 			n.f4.accept(this, argu);
-			this.result_ += "j $r0, $r0, " + lstart + "\n" + lend + "\n";
+			this.result_ += "j " + lstart + "\n" + lend + "\n";
 		}
 		return null;
 	}
@@ -525,6 +556,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | BinaryExpression()
      *       | ArrayLookup()
      *       | MethodCall()
+     *       | TernaryExpression()
      *       | PrimaryExpression()
      */
 	public BaseType visit(Expression n, BaseType argu) throws Exception {
@@ -580,19 +612,15 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = new String("$r" + ++glob_temp_cnt_);
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cnjmp " + t1 + ", " + t1 + ", " + l1 + "\n");
+			this.inline_meth_ += new String(t1 + ", " + l1 + "\n");
 			String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.inline_meth_ += new String("cnjmp " + t2 + ", " + t2 + ", " + l1 + "\n");
-			this.inline_meth_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.inline_meth_ += new String(l1 + "\n");
+			this.inline_meth_ += new String(t2 + ", " + l1 + "\n");
 		} else {
-			this.result_ += new String("cnjmp " + t1 + ", " + t1 + ", " + l1 + "\n");
+			this.result_ += new String(t1 + ", " + l1 + "\n");
 			String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.result_ += new String("cnjmp " + t2 + ", " + t2 + ", " + l1 + "\n");
-			this.result_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.result_ += new String(l1 + "\n");
+			this.result_ += new String(t2 + ", " + l1 + "\n");
 		}
-		return new Variable_t(ret, null);
+		return new Variable_t(l1, null);
 	}
 	
 	/**
@@ -604,27 +632,20 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String l1 = L.new_label();
 		String l2 = L.new_label();
 		String ret = new String("$r" + ++glob_temp_cnt_);
+		this.is_or_ = true;
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
+		this.is_or_ = false;
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
 		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cnjmp " + t1 + ", " + t1 + ", " + l1 + "\n");
-			this.inline_meth_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.inline_meth_ += new String("j $r0, $r0, " + l2 + "\n");
+			this.inline_meth_ += new String(t1 + ", " + l1 + "\n");
+			this.inline_meth_ += new String(t2 + ", " + l2 + "\n");
 			this.inline_meth_ += new String(l1 + "\n");
-			String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.inline_meth_ += new String("cnjmp " + t2 + ", " + t2 + ", " + l2 + "\n");
-			this.inline_meth_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.inline_meth_ += new String(l2 + "\n");
 		} else {
-			this.result_ += new String("cnjmp " + t1 + ", " + t1 + ", " + l1 + "\n");
-			this.result_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.result_ += new String("j $r0, $r0, " + l2 + "\n");
+			this.result_ += new String(t1 + ", " + l1 + "\n");
+			this.result_ += new String(t2 + ", " + l2 + "\n");
 			this.result_ += new String(l1 + "\n");
-			String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-			this.result_ += new String("cnjmp " + t2 + ", " + t2 + ", " + l2 + "\n");
-			this.result_ += new String("move " + ret + ", " + ret + ", 1\n");
-			this.result_ += new String(l2 + "\n");
 		}
-		return new Variable_t(ret, null);
+		return new Variable_t(l2, null);
 	}
 	
 	/**
@@ -635,12 +656,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(EqExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpe " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		} else {
-			this.result_ += new String("cmpe " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		}
-		return new Variable_t(t1, null);
+		String instr = (this.is_or_) ? new String("beq " + t1 + ", " + t2) : new String("bne " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 	
 	/**
@@ -651,12 +668,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(NeqExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpne " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		} else {
-			this.result_ += new String("cmpne " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		}
-		return new Variable_t(t1, null);
+		String instr = (this.is_or_) ? new String("bne " + t1 + ", " + t2) : new String("beq " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 	
 	/**
@@ -667,12 +680,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpg " + t2 + ", " +  t2 + ", " + t1 + "\n");
-		} else {
-			this.result_ += new String("cmpg " + t2 + ", " +  t2 + ", " + t1 + "\n");
-		}
-		return new Variable_t(t2, null);
+		String instr = (this.is_or_) ? new String("blt " + t1 + ", " + t2) : new String("bge " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 	
 	/**
@@ -683,12 +692,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpg " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		} else {
-			this.result_ += new String("cmpg " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		}
-		return new Variable_t(t1, null);
+		String instr = (this.is_or_) ? new String("bgt " + t1 + ", " + t2) : new String("ble " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 	
 	/**
@@ -699,12 +704,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(LessEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpge " + t2 + ", " +  t2 + ", " + t1 + "\n");
-		} else {
-			this.result_ += new String("cmpge " + t2 + ", " +  t2 + ", " + t1 + "\n");
-		}
-		return new Variable_t(t2, null);
+		String instr = (this.is_or_) ? new String("ble " + t1 + ", " + t2) : new String("bgt " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 	
 	/**
@@ -715,12 +716,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(GreaterEqualThanExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getType();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getType();
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += new String("cmpge " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		} else {
-			this.result_ += new String("cmpge " + t1 + ", " +  t1 + ", " + t2 + "\n");
-		}
-		return new Variable_t(t1, null);
+		String instr = (this.is_or_) ? new String("bge " + t1 + ", " + t2) : new String("blt " + t1 + ", " + t2);
+		return new Variable_t(instr, null);
 	}
 
 	
@@ -835,29 +832,45 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f6 -> Expression()
      */
 	public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
-		String elselabel = L.new_label();
 		String endlabel = L.new_label();
-		String cond = ((Variable_t) n.f1.accept(this, argu)).getType();
+		String instr = ((Variable_t) n.f1.accept(this, argu)).getType();
 		String res = new String("$r" + ++glob_temp_cnt_);
-		
-		if (this.is_inline_meth_) {
-			this.inline_meth_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n";
-			String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
-			this.inline_meth_ += "move " + res + ", " + res + ", " + if_var + "\n";
-			this.inline_meth_ += "j $r0, $r0, " + endlabel + "\n";
-			this.inline_meth_ += elselabel + "\n";
-			String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
-			this.inline_meth_ += "move " + res + ", " + res + ", " + else_var + "\n";
-			this.inline_meth_ += endlabel + "\n";
+		if (L.is_label(instr)) {
+			String elselabel = instr;
+			if (this.is_inline_meth_) {
+				n.f4.accept(this, argu);
+				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				n.f4.accept(this, argu);
+				this.result_ += "j " + endlabel + "\n";
+				this.result_ +=  elselabel + "\n";
+				n.f6.accept(this, argu);
+				this.result_ += endlabel + "\n";
+			}
 		} else {
-			this.result_ += "cnjmp " + cond + ", " + cond + ", " + elselabel + "\n";
-			String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
-			this.result_ += "move " + res + ", " + res + ", " + if_var + "\n";
-			this.result_ += "j $r0, $r0, " + endlabel + "\n";
-			this.result_ += elselabel + "\n";
-			String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
-			this.result_ += "move " + res + ", " + res + ", " + else_var + "\n";
-			this.result_ += endlabel + "\n";
+			String elselabel = L.new_label();
+			if (this.is_inline_meth_) {
+				this.inline_meth_ += instr + ", " + elselabel + "\n";
+				String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
+				this.inline_meth_ += "move " + res + ", " + res + ", "  + if_var + "\n";
+				this.inline_meth_ += "j " + endlabel + "\n";
+				this.inline_meth_ +=  elselabel + "\n";
+				String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
+				this.inline_meth_ += "move " + res + ", " + res + ", "  + else_var + "\n";
+				this.inline_meth_ += endlabel + "\n";
+			} else {
+				this.result_ += instr + ", " + elselabel + "\n";
+				String if_var = ((Variable_t) n.f4.accept(this, argu)).getType();
+				this.result_ += "move " + res + ", " + res + ", "  + if_var + "\n";
+				this.result_ += "j " + endlabel + "\n";
+				this.result_ +=  elselabel + "\n";
+				String else_var = ((Variable_t) n.f6.accept(this, argu)).getType();
+				this.result_ += "move " + res + ", " + res + ", "  + else_var + "\n";
+				this.result_ += endlabel + "\n";
+			}
 		}
 		return new Variable_t(res, null);
 	}
