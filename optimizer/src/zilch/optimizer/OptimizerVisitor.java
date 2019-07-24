@@ -552,31 +552,40 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Register n, String argu) throws Exception {
         String reg = n.f0.toString();
+        // If it is a destination register return
         if (this.is_dst) { return reg; }
 
-        String copy_opt = optimisationMap.get("copyProp").get(argu + instr_cnt);
-        String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" + instr_cnt);
-        if (copy_opt_2 != null) { // if two constant propagations in the same line
-            copy_opt = copy_opt_2;
+        // Check for copy propagation optimizations for reg2
+        String copy_opt_1 = optimisationMap.get("copyProp").get(argu + instr_cnt);
+        if (copy_opt_1 != null) {
+            if (getTemp(copy_opt_1).equals(reg)) {
+                return getOpt(copy_opt_1, false);
+            }
         }
-        if (copy_opt != null) {
-            if (getTemp(copy_opt).equals(reg)) {
-                return getOpt(copy_opt, false);
+        // Check for copy propagation optimizations for reg3
+        String copy_opt_2 = optimisationMap.get("copyProp").get(argu + "-sec-" + instr_cnt);
+        if (copy_opt_2 != null) {
+            if (getTemp(copy_opt_2).equals(reg)) {
+                return getOpt(copy_opt_2, false);
             }
         }
         
-        String const_opt = optimisationMap.get("constProp").get(argu + instr_cnt);
+        // Check for constant propagation optimizations for reg2
+        String const_opt_1 = optimisationMap.get("constProp").get(argu + instr_cnt);
+        if (const_opt_1 != null) {
+            if (getTemp(const_opt_1).equals(reg)) {
+                return reg + "&" + getOpt(const_opt_1, true);
+            }
+        }
+        // Check for constant propagation optimizations for reg3
         String const_opt_2 = optimisationMap.get("constProp").get(argu + "-sec-" + instr_cnt);
-        if (const_opt_2 != null) { // if two constant propagations in the same line
-            const_opt = const_opt_2;
+        if (const_opt_2 != null) {
+            if (getTemp(const_opt_2).equals(reg)) {
+                return reg + "&" + getOpt(const_opt_2, true);
+            } 
         }
-        if (const_opt == null) { return reg; }
-        if (getTemp(const_opt).equals(reg)) {
-            return reg + "&" + getOpt(const_opt, true);
-        } 
-        if (copy_opt != null && getTemp(copy_opt).equals(getTemp(const_opt)) && getTemp(copy_opt).equals(reg)) {
-            return getOpt(copy_opt, false);
-        }
+        
+        // If no optimizations found, return register
         return reg;
     }
 
