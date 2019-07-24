@@ -21,14 +21,19 @@ void main(void) {
 		j = i - 1; 
 		arrj = arr[j];
 		while ((j >= 0) && (arrj > key)) { 
-			arrj = arr[j];
 			arr[j + 1] = arr[j];
 			j--;
+			arrj = arr[j];
 		}
 		
 		arr[j + 1] = key; 
 		i++;
 	}
 
+	i = 0;
+	while (i < N) {
+		printf("%d\n",arr[i]);
+		i++;
+	}
 	Prover.answer(arr[0]);
 }
