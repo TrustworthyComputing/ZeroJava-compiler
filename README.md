@@ -1,9 +1,9 @@
-# ![alt text][zilch] Zilch to ZMIPS compiler [![License MIT][badge-license]](LICENSE)
+# ![alt text][zilch] Zilch to zMIPS compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to ZMIPS.
+A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to zMIPS.
 
 ## Zilch Language
-Zilch is a custom designed language for easy translation to ZMIPS and thus easy Zero-Knowledge Proofs creation.
+Zilch is a custom designed language for easy translation to zMIPS and thus easy Zero-Knowledge Proofs creation.
 Below we briefly describe the language.
 
 Zilch has one main method and also supports arbitrary methods.
@@ -68,49 +68,47 @@ Zilch files use the `.zl` extension.
 
 
 ### Built in Zilch Functions
-| Built in Zilch Function Name       	| Description and corresponding ZMIPS command 			|
+| Built in Zilch Function Name       	| Description and corresponding zMIPS command 			|
 |---------------------------------------|-----------------------------------------------------------|
 | `Prover.answer(int result);`			| `answer`: returns the result 								|
 | `Out.print(int variable);`			| `print`: prints the contents of `variable` 				|
-| `PrimaryTape.read(int dst);`			| `read dst dst 0`: consumes next word from public tape		|
-| `PrivateTape.read(int dst);`			| `read dst dst 1`: consumes next word from private tape 	|
-| `PrimaryTape.seek(int dst, int idx);`	| `seek dst idx 0`: consumes `idx`th word from public tape	|
-| `PrivateTape.seek(int dst, int idx);` | `seek dst idx 1`: consumes `idx`th word from private tape	|
+| `PrimaryTape.read(int dst);`			| `pubread dst`: consumes next word from public tape		|
+| `PrivateTape.read(int dst);`			| `secread dst`: consumes next word from private tape 		|
+| `PrimaryTape.seek(int dst, int idx);`	| `pubseek dst, idx`: consumes `idx`th word from public tape |
+| `PrivateTape.seek(int dst, int idx);` | `secseek dst idx`: consumes `idx`th word from private tape |
 
 
 Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluates to b if the value of a is true, and otherwise to c.
 
-## ZMIPS ISA
-| Instruction        | Description                                              |
-|--------------------|----------------------------------------------------------|
-| and $ri, $rj, A    | $ri, = $rj & A                                           |
-| or $ri, $rj, A     | $ri, = $rj \| A                                          |
-| xor $ri, $rj, A    | $ri, = $rj ^ A                                           |
-| not $ri, $rj, A    | $ri, = !A                                                |
-| add $ri, $rj, A    | $ri, = $rj + A                                           |
-| sub $ri, $rj, A    | $ri, = $rj - A                                           |
-| mult $ri, $rj, A   | $ri, = $rj * A                                           |
-| sll $ri, $rj, A    | $ri, = $rj << A                                          |
-| srl $ri, $rj, A    | $ri, = $rj >> A                                          |
-| cmpe $ri, $rj, A   | flag = $rj == A                                          |
-| cmpne $ri, $rj, A  | flag = $rj != A                                          |
-| cmpg $ri, $rj, A   | flag = $rj > A                                           |
-| cmpge $ri, $rj, A  | flag = $rj >= A                                          |
-| beq $ri, $rj, A    | if $ri == $rj goto A                                     |
-| bne $ri, $rj, A    | if $ri != $rj goto A                                     |
-| bgt $ri, $rj, A    | if $ri > $rj goto A                                      |
-| bge $ri, $rj, A    | if $ri >= $rj goto A                                     |
-| blt $ri, $rj, A    | if $ri < $rj goto A                                      |
-| ble $ri, $rj, A    | if $ri <= $rj goto A                                     |
-| move $ri, $rj, A   | $ri = A                                                  |
-| read $ri, $rj, A   | $ri = (A == 0) ? next from public : next from private    |
-| seek $ri, $rj, A   | $ri = (A == 0) ? public[$rj] : $ri = private[$rj]        |
-| j $ri, $rj, A      | goto label A                                             |
-| cjmp $ri, $rj, A   | if (flag) then goto label A                              |
-| cnjmp $ri, $rj, A  | if (!flag) then goto label A                             |
-| sw $ri, A($rj)     | [A+$rj] = $ri                                            |
-| lw $ri, A($rj)     | $ri = [A+$rj]                                            |
-| answer $ri, $rj, A | return A                                                 |
+## zMIPS ISA
+| Instruction         | Description                                             |
+|---------------------|---------------------------------------------------------|
+| move $ri, $rj, A    | $ri = A                                                 |
+| and $ri, $rj, A     | $ri, = $rj & A                                          |
+| or $ri, $rj, A      | $ri, = $rj \| A                                         |
+| xor $ri, $rj, A     | $ri, = $rj ^ A                                          |
+| not $ri, $rj, A     | $ri, = !A                                               |
+| add $ri, $rj, A     | $ri, = $rj + A                                          |
+| sub $ri, $rj, A     | $ri, = $rj - A                                          |
+| mult $ri, $rj, A    | $ri, = $rj * A                                          |
+| sll $ri, $rj, A     | $ri, = $rj << A                                         |
+| srl $ri, $rj, A     | $ri, = $rj >> A                                         |
+| beq $ri, $rj, A     | if $ri == $rj goto A                                    |
+| bne $ri, $rj, A     | if $ri != $rj goto A                                    |
+| bgt $ri, $rj, A     | if $ri > $rj goto A                                     |
+| bge $ri, $rj, A     | if $ri >= $rj goto A                                    |
+| blt $ri, $rj, A     | if $ri < $rj goto A                                     |
+| ble $ri, $rj, A     | if $ri <= $rj goto A                                    |
+| j $ri, $rj, A       | goto label A                                            |
+| pubread $ri, $rj, A | $ri = next from public 									|
+| secread $ri, $rj, A | $ri = next from private				    				|
+| pubseek $ri, $rj, A | $ri = public[A]						         			|
+| secseek $ri, $rj, A | $ri = private[A]	   					     			|
+| sw $ri, A($rj)      | [A+$rj] = $ri                                           |
+| lw $ri, A($rj)      | $ri = [A+$rj]                                           |
+| print $ri, $rj, A   | print ri	                                            |
+| println $ri, $rj, A | print ri + newline	                                    |
+| answer $ri, $rj, A  | return ri                                               |
 
 
 ## Compilation & Execution:
@@ -118,9 +116,9 @@ To compile the compiler type `make`.
 
 In order to make the Zilch compiler (`zc`) and the Zilch interpreter (`zi`) scripts executable type `chmod +x ./zc` and `chmod +x ./zi`.
 
-Use the `zi` script to simulate Zilch programs and the `zc` script to compile Zilch programs to ZMIPS assembly code.
+Use the `zi` script to simulate Zilch programs and the `zc` script to compile Zilch programs to zMIPS assembly code.
 
-Our compiler also supports ZMIPS analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
+Our compiler also supports zMIPS analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
 
 Below are some usage examples and we also demonstrate the optimizer.
 
@@ -150,7 +148,7 @@ void main(void) {
 }
 ```
 
-Which generates the following four lines of ZMIPS assembly:
+Which generates the following four lines of zMIPS assembly:
 ```
 move $r2, $r2, 13
 add $r2, $r2, 7
@@ -196,14 +194,14 @@ void main(void) {
 }
 ```
 
-Which generates the following ZMIPS code:
+Which generates the following zMIPS code:
 ```
 move $r1, $r1, 0
 __L1__
 move $r4, $r4, 5
 cmpg $r4, $r4, $r1
 cnjmp $r4, $r4, __L2__
-read $r2, $r2, 0
+pubread $r2, $r2, 0
 add $r5, $r3, $r2
 move $r3, $r3, $r5
 add $r6, $r1, 1
@@ -237,7 +235,7 @@ void main(void) {
 }
 ```
 
-Which generates the following ZMIPS code:
+Which generates the following zMIPS code:
 ```
 move $r1, $r1, 30
 move $r2, $r2, $r1
@@ -259,7 +257,7 @@ add $r3, $r1, 40
 add $r7, $r3, 30
 answer $r7, $r7, $r7
 ```
-the ZMIPS assembly output is optimized.
+the zMIPS assembly output is optimized.
 
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
