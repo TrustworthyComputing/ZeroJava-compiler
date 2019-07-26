@@ -81,34 +81,36 @@ Zilch files use the `.zl` extension.
 Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluates to b if the value of a is true, and otherwise to c.
 
 ## zMIPS ISA
-| Instruction         | Description                                             |
-|---------------------|---------------------------------------------------------|
-| move $ri, $rj, A    | $ri = A                                                 |
-| and $ri, $rj, A     | $ri, = $rj & A                                          |
-| or $ri, $rj, A      | $ri, = $rj \| A                                         |
-| xor $ri, $rj, A     | $ri, = $rj ^ A                                          |
-| not $ri, $rj, A     | $ri, = !A                                               |
-| add $ri, $rj, A     | $ri, = $rj + A                                          |
-| sub $ri, $rj, A     | $ri, = $rj - A                                          |
-| mult $ri, $rj, A    | $ri, = $rj * A                                          |
-| sll $ri, $rj, A     | $ri, = $rj << A                                         |
-| srl $ri, $rj, A     | $ri, = $rj >> A                                         |
-| beq $ri, $rj, A     | if $ri == $rj goto A                                    |
-| bne $ri, $rj, A     | if $ri != $rj goto A                                    |
-| bgt $ri, $rj, A     | if $ri > $rj goto A                                     |
-| bge $ri, $rj, A     | if $ri >= $rj goto A                                    |
-| blt $ri, $rj, A     | if $ri < $rj goto A                                     |
-| ble $ri, $rj, A     | if $ri <= $rj goto A                                    |
-| j $ri, $rj, A       | goto label A                                            |
-| pubread $ri, $rj, A | $ri = next from public 									|
-| secread $ri, $rj, A | $ri = next from private				    				|
-| pubseek $ri, $rj, A | $ri = public[A]						         			|
-| secseek $ri, $rj, A | $ri = private[A]	   					     			|
-| sw $ri, A($rj)      | [A+$rj] = $ri                                           |
-| lw $ri, A($rj)      | $ri = [A+$rj]                                           |
-| print $ri, $rj, A   | print ri	                                            |
-| println $ri, $rj, A | print ri + newline	                                    |
-| answer $ri, $rj, A  | return ri                                               |
+| Instruction         | Description                 |
+|---------------------|-----------------------------|
+| move $ri, $rj, A    | $ri = A                     |
+| and $ri, $rj, A     | $ri, = $rj & A              |
+| or $ri, $rj, A      | $ri, = $rj \| A             |
+| xor $ri, $rj, A     | $ri, = $rj ^ A              |
+| not $ri, $rj, A     | $ri, = !A                   |
+| add $ri, $rj, A     | $ri, = $rj + A              |
+| sub $ri, $rj, A     | $ri, = $rj - A              |
+| mult $ri, $rj, A    | $ri, = $rj * A              |
+| sll $ri, $rj, A     | $ri, = $rj << A             |
+| srl $ri, $rj, A     | $ri, = $rj >> A             |
+| beq $ri, $rj, A     | if $ri == $rj goto A        |
+| beqz $ri, $rj, A    | if $ri == 0 goto A          |
+| bnez $ri, $rj, A    | if $ri != 0 goto A          |
+| bne $ri, $rj, A     | if $ri != $rj goto A        |
+| bgt $ri, $rj, A     | if $ri > $rj goto A         |
+| bge $ri, $rj, A     | if $ri >= $rj goto A        |
+| blt $ri, $rj, A     | if $ri < $rj goto A         |
+| ble $ri, $rj, A     | if $ri <= $rj goto A        |
+| j $ri, $rj, A       | goto label A                |
+| pubread $ri, $rj, A | $ri = next from public 		|
+| secread $ri, $rj, A | $ri = next from private		|
+| pubseek $ri, $rj, A | $ri = public[A]				|
+| secseek $ri, $rj, A | $ri = private[A]	   		|
+| sw $ri, A($rj)      | [A+$rj] = $ri               |
+| lw $ri, A($rj)      | $ri = [A+$rj]               |
+| print $ri, $rj, A   | print ri	                |
+| println $ri, $rj, A | print ri + newline	        |
+| answer $ri, $rj, A  | return ri                   |
 
 
 ## Compilation & Execution:
