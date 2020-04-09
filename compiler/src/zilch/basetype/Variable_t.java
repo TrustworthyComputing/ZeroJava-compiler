@@ -1,4 +1,4 @@
-package base_type;
+package basetype;
 
 public class Variable_t extends BaseType {
 	public String type;
@@ -24,6 +24,10 @@ public class Variable_t extends BaseType {
     }
 
     public void printVar() {
+		System.out.print(this.type + " " + this.getName());
+	}
+
+	public void printVarWithTemp() {
 		System.out.print(var_temp + ") " + this.type + " " + this.getName() + " " + var_num);
 	}
 }

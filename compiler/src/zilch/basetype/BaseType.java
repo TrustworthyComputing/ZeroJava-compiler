@@ -1,5 +1,4 @@
-// package base_type;
-package base_type;
+package basetype;
 
 public class BaseType {
 	private String name;
@@ -8,8 +7,8 @@ public class BaseType {
 		this.name = name;
 	}
 
-    public String getName() {
-    	return this.name;
-    }
+	public String getName() {
+		return this.name;
+	}
 
 }

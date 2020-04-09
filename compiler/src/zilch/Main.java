@@ -1,80 +1,59 @@
+import basetype.*;
 import syntaxtree.*;
 import visitor.*;
-import symbol_table.*;
-import zmips_generator.*;
+import symboltable.*;
+import typecheck.*;
+import zmipsgenerator.*;
 import java.io.*;
 import java.util.Map;
-import java.util.HashMap;
-import base_type.*;
 
 public class Main {
-       
     public static void main (String [] args){
-        if (args.length < 1) {
-            System.err.println("Usage: java Main <inputFile1.zl> [<inputFile2.zl>] ...");
+        if (args.length < 1){
+            System.err.println("Usage: java Main <inputFile1> [<inputFile2>] ...");
             System.exit(1);
         }
         FileInputStream fis = null;
-        for (String arg : args) {
+        int i = -1;
+        while (++i < args.length) {
             try {
-                fis = new FileInputStream(arg);
-                ZilchParser parser = new ZilchParser(fis);
+                fis = new FileInputStream(args[i]);
+                MiniJavaParser parser = new MiniJavaParser(fis);
                 Goal root = parser.Goal();
-                SymbolTableVisitor stvisitor = new SymbolTableVisitor();
+                VisitClasses firstvisit = new VisitClasses();
                 try {
-                    root.accept(stvisitor);
-                    Map<String, Method_t> symbol_table = stvisitor.getSymbolTable();
-                    ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table);
+                    root.accept(firstvisit);
+                    SymbolTableVisitor secondvisit = new SymbolTableVisitor(firstvisit.getClassList());
+                    root.accept(secondvisit);
+                    Map<String, Class_t> symbol_table = secondvisit.getSymbolTable();
+                    secondvisit.printSymbolTable();
+                    TypeCheckVisitor type_checker = new TypeCheckVisitor(symbol_table);
+                    root.accept(type_checker, null);
+                    System.out.println("\nType Check Completed Successfully!\n");
+
+
+                    ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table, secondvisit.glob_temp_cnt);
                     root.accept(generator, null);
-                    // stvisitor.printST();
-                    /* Write the generated code to the same directory as .zmips file */
-                    File fp = new File(arg);
-                    String ext = getFileExtension(fp);
-                    String name = getFileNameWithoutExt(fp);
-                    String path = getFilePath(fp);
-                    if (! ext.equals("zl")) {
-                        throw new IOException("Input files should end with a '.zl' extension.");
-                    }
-                    String outfile = path + "/" + name + ".zmips";
-                    PrintWriter out = new PrintWriter(outfile);
-                    out.print(generator.result_);
+                    File fp = new File(args[i]);
+                    String path = fp.getPath();
+                    path = path.substring(0, path.lastIndexOf('.'));
+                    PrintWriter out = new PrintWriter(path + ".zmips");
+                    out.print(generator.getCode());
+                    System.out.print(generator.getCode());
                     out.close();
-                    // Print it to stdout as well
-                    System.out.println(outfile + "\n");
-                    System.out.print(generator.result_);
                 } catch (Exception ex) {
-                    System.out.println("\n" + ex.getMessage() + "\n");
+                    System.out.println("\n\nAn error occured: " + ex.getMessage() + "\n\n");
                 }
-            } catch(ParseException ex) {
-                System.err.println(ex.getMessage());
-            } catch(FileNotFoundException ex) {
+            } catch(Exception ex) {
                 System.err.println(ex.getMessage());
             } finally {
                 try {
-                    if (fis != null) { fis.close(); }
+                    if (fis != null)
+                        fis.close();
                 } catch(IOException ex) {
                     System.err.println(ex.getMessage());
                 }
             }
         }
     }
-    
-    private static String getFileExtension(File file) {
-        String fileName = file.getName();
-        if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
-        }
-        return "";
-    }
-    
-    private static String getFilePath(File file) {
-        String filepath = file.getPath();
-        return filepath.substring(0, filepath.lastIndexOf('/'));
-    }
-    
-    private static String getFileNameWithoutExt(File file) {
-        String filename = file.getName();
-        return filename.substring(0, filename.lastIndexOf('.'));
-    }
-
 }
