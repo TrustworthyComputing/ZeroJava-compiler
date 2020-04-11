@@ -305,11 +305,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(AssignmentStatement n, BaseType argu) throws Exception {
 		String id = n.f0.accept(this, argu).getName();
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getType();
-		Variable_t var;
 		// if a local var
 		Method_t meth = (Method_t) argu;
 		if (meth != null) {
-			var = meth.methContainsVar(id);
+			Variable_t var = meth.methContainsVar(id);
 			if (var == null) { // didnt find the var in method, so its a field of the class
 				Class_t cl = st_.get(meth.getFromClass().getName());
 				if (cl == null) {
@@ -328,7 +327,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			if (cl == null) {
 				throw new Exception("something went wrong at AssignmentStatement 2");
 			}
-			var = cl.classContainsVar(id);
+			Variable_t var = cl.classContainsVar(id);
 			// class field
 			if (var != null) {
 				this.code_.append("sw " + expr + ", " + var.getNum()*4 + "($r0)\n");
@@ -596,8 +595,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.code_.append(return_address + "\n");
 		String ret = new String("$r" + ++globals_);
         this.code_.append("move " + ret + ", " + ret + ", $v0\n");
-        Variable_t v = new Variable_t(ret, null);
-        v.setRegister(meth.getType());
+        Variable_t v = new Variable_t(ret, null, meth.getType());
 		return v;
 	}
 
@@ -696,9 +694,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		if (cl != null) {
 			Variable_t var = cl.classContainsVar(id);
 			if (var != null) {								// and id is a field of that class
-				Variable_t v = new Variable_t(var.getRegister(), id);
-				v.setRegister(cl.getName());
-				return v;
+				return new Variable_t(var.getRegister(), id, cl.getName());
 			} else {										// is a method
 				Method_t meth = cl.getMethod(id);
 				if (meth == null) { throw new Exception("something went wrong 1"); }
@@ -708,9 +704,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			Method_t meth = (Method_t) argu;
 			Variable_t var = meth.methContainsVar(id);
 			if (var != null) {								// if a parameter or a local var
-				Variable_t v = new Variable_t(var.getRegister(), id);
-				v.setRegister(var.getType());
-				return v;
+				return new Variable_t(var.getRegister(), id, var.getType());
 			} else {										// a field of class
 				cl = st_.get(meth.getFromClass().getName());
 				if (cl == null) {
@@ -722,30 +716,26 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				}
 				String newreg = "$r" + ++globals_;
 				this.code_.append("lw " + newreg + ", " + var.getNum()*4 + "($r0)\n");
-				Variable_t v = new Variable_t(newreg, id);
-				v.setRegister(var.getType());
-				return v;
+				return new Variable_t(newreg, id, var.getType());
 			}
 		}
 	}
 
 	/**
-	* f0 -> "this"
-	*/
+	 * f0 -> "this"
+	 */
 	public BaseType visit(ThisExpression n, BaseType argu) throws Exception {
-		Variable_t var = new Variable_t("$r0", "this");
 		Class_t cl = ((Method_t) argu).getFromClass();
-		var.setRegister(cl.getName());
-		return var;
+		return new Variable_t("$r0", "this", cl.getName());
 	}
 
 	/**
-	* f0 -> "new"
-	* f1 -> "int"
-	* f2 -> "["
-	* f3 -> Expression()
-	* f4 -> "]"
-	*/
+	 * f0 -> "new"
+	 * f1 -> "int"
+	 * f2 -> "["
+	 * f3 -> Expression()
+	 * f4 -> "]"
+	 */
 	public BaseType visit(ArrayAllocationExpression n, BaseType argu) throws Exception {
 		String lstart = labels_.new_label();
 		String lend = labels_.new_label();
@@ -779,11 +769,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	* f0 -> "new"
-	* f1 -> Identifier()
-	* f2 -> "("
-	* f3 -> ")"
-	*/
+	 * f0 -> "new"
+	 * f1 -> Identifier()
+	 * f2 -> "("
+	 * f3 -> ")"
+	 */
 	public BaseType visit(AllocationExpression n, BaseType argu) throws Exception {
 		String id = n.f1.accept(this, argu).getName();
         Class_t cl = st_.get(id);
@@ -799,18 +789,17 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         this.code_.append("sw " + vtable + ", 0(" + t + ")\n");
 		String zero = new String("$r" + ++globals_);
         this.code_.append("move " + zero + " 0\n");
-        for (int i = 1 ; i <= cl.getNumVars() ; i++)
-        	this.code_.append("sw " + zero + ", " + i*4 + "(" + t + ")\n");
+        for (int i = 1 ; i <= cl.getNumVars() ; i++) {
+			this.code_.append("sw " + zero + ", " + i*4 + "(" + t + ")\n");
+		}
         this.code_.append("\n");
-        Variable_t var = new Variable_t(t, id);
-        var.setRegister(id);
-		return var;
+		return new Variable_t(t, id, id);
 	}
 
 	/**
-	* f0 -> "!"
-	* f1 -> Clause()
-	*/
+	 * f0 -> "!"
+	 * f1 -> Clause()
+	 */
 	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
 		String ret = new String("$r" + ++globals_);
 		String t = ((Variable_t) n.f1.accept(this, argu)).getType();
@@ -821,10 +810,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	* f0 -> "("
-	* f1 -> Expression()
-	* f2 -> ")"
-	*/
+	 * f0 -> "("
+	 * f1 -> Expression()
+	 * f2 -> ")"
+	 */
 	public BaseType visit(BracketExpression n, BaseType argu) throws Exception {
 		return n.f1.accept(this, argu);
 	}
