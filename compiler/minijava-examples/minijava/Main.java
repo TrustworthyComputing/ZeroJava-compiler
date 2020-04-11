@@ -9,7 +9,7 @@ class Main {
 
 }
 class ArrayTest {
-	int weee;
+    int weee;
     int wre;
     int aaa;
     public int test(int num){

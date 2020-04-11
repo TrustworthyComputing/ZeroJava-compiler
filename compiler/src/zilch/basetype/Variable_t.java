@@ -1,33 +1,57 @@
 package basetype;
 
 public class Variable_t extends BaseType {
-	public String type;
-	public int var_num;
-	public String var_temp;
+
+	private String type_;
+	private int num;
+	private String reg;
 
 	public Variable_t(String type, String name) {
 	    super(name);
-	    this.type = type;
-	    this.var_temp = null;
+	    this.type_ = type;
+	    this.reg = null;
+	}
+
+	public Variable_t(String type, String name, String reg) {
+	    super(name);
+	    this.type_ = type;
+	    this.reg = reg;
 	}
 
 	public String getType() {
-        return this.type;
+		return this.type_;
+	}
+
+	public void setType(String type) {
+        this.type_ = type;
     }
 
-    public String getRegister() {
-        return this.var_temp;
-    }
+	public int getNum() {
+		return this.num;
+	}
 
-    public int getVarNum() {
-        return this.var_num;
+	public void setNum(int num) {
+		this.num = num;
+	}
+
+	public String getRegister() {
+		return this.reg;
+	}
+
+	public void setRegister(String reg) {
+        this.reg = reg;
     }
 
     public void printVar() {
-		System.out.print(this.type + " " + this.getName());
+		System.out.print(this.type_ + " " + this.getName());
 	}
 
-	public void printVarWithTemp() {
-		System.out.print(var_temp + ") " + this.type + " " + this.getName() + " " + var_num);
+	public void printVarDetails() {
+		System.out.println( "Type: " + this.type_ +
+							"\nName: " + this.getName() +
+							"\nReg: " + this.reg +
+							"\nNum: " + this.num + "\n"
+							);
 	}
+
 }

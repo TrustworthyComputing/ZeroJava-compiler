@@ -114,9 +114,9 @@ Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluate
 
 
 ## Compilation & Execution:
-To compile the compiler type `make`.
+To compile the compiler type_ `make`.
 
-In order to make the Zilch compiler (`zc`) and the Zilch interpreter (`zi`) scripts executable type `chmod +x ./zc` and `chmod +x ./zi`.
+In order to make the Zilch compiler (`zc`) and the Zilch interpreter (`zi`) scripts executable type_ `chmod +x ./zc` and `chmod +x ./zi`.
 
 Use the `zi` script to simulate Zilch programs and the `zc` script to compile Zilch programs to zMIPS assembly code.
 

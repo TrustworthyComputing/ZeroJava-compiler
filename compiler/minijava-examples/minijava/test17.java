@@ -1,6 +1,6 @@
 class test17{
     public static void main(String[] a){
-	System.out.println(new Test().start());
+        System.out.println(new Test().start());
     }
 }
 
@@ -10,30 +10,30 @@ class Test{
 
     public int start(){
 
-	Test test;
+        Test test;
 
-	test = new Test();
+        test = new Test();
 
-	i = 10;
+        i = 10;
 
-	i = i + ((test.first(this)).second());
+        i = i + ((test.first(this)).second());
 
-	return i;
+        return i;
     }
 
     public Test first(Test test2){
 
-	Test test3;
+        Test test3;
 
-	test3 = test2;
+        test3 = test2;
 
-	return test3;
+        return test3;
     }
 
     public int second(){
+        
+        i = i + 10;
 
-	i = i + 10;
-
-	return i;
+        return i;
     }
 }

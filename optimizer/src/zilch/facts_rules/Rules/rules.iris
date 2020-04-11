@@ -27,11 +27,11 @@ label(?meth, ?line) :-
 	cjumpInstr(?meth, ?i, ?lab),
 	instruction(?meth, ?line, ?lab).
 
-// move type
+// move type_
 move(?meth, ?l, ?var, ?v) :- constmove(?meth, ?l, ?var, ?v).
 move(?meth, ?l, ?var, ?v) :- varMove(?meth, ?l, ?var, ?v).
 
-// Jump type
+// Jump type_
 jtype(?meth, ?l) :- jumpInstr(?meth, ?l, ?label).
 jtype(?meth, ?l) :- cjumpInstr(?meth, ?l, ?label).
 

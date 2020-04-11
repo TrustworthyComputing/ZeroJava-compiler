@@ -1,0 +1,54 @@
+la $r3, __Test1_vTable__
+move $r4, $r4, 1000	; 12
+sw $r4, 0($r3)
+la $r5, __Test1_foo__
+sw $r5, 0($r4)
+la $r6, __Test1_bar__
+sw $r6, 4($r4)
+la $r7, __Test1_buz__
+sw $r7, 8($r4)
+
+move $r8, $r8, 1012	; 12
+la $r10 __Test1_vTable__
+lw $r9, 0($r10)
+sw $r9, 0($r8)
+move $r11 0
+sw $r11, 4($r8)
+sw $r11, 8($r8)
+
+move $r13, $r13, $r8
+lw $r12, 0($r13)
+lw $r14, 4($r12)
+move $r15, $r15, 11
+move $r16, $r16, 12
+move $a0, $a0, $r13 ; this object
+move $a1, $a1, $r16
+move $a2, $a2, $r15
+la $ra, $ra, __L_1__
+jr $r14
+__L_1__
+move $r17, $r17, $v0
+print $r17, $r17, $r17
+
+
+__Test1_foo__
+move $v0, $v0, $a1
+jr $ra
+
+__Test1_bar__
+lw $r18, 4($r0)
+move $r19, $r19, 1000
+sw $r19, 4($r0)
+mult $r20, $a2, $a1
+move $v0, $v0, $r20
+jr $ra
+
+__Test1_buz__
+move $r22, $r22, 3
+move $r23, $r23, 4
+mult $r21, $r22, $r23
+move $v0, $v0, $r21
+jr $ra
+
+__Test1_vTable__
+

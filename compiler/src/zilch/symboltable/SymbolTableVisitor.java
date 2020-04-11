@@ -9,11 +9,11 @@ import basetype.*;
 public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
 
     private Map<String, Class_t> st_;
-    public int glob_temp_cnt;
+    private int globals_;
 
     public SymbolTableVisitor(Map<String, Class_t> st) {
         st_ = st;
-        glob_temp_cnt = 0;
+        globals_ = 0;
     }
 
     public Map<String, Class_t> getSymbolTable() {
@@ -26,6 +26,10 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
             clazz.printClass();
             System.out.println();
         }
+    }
+
+    public int getGlobalsNumber() {
+        return this.globals_;
     }
 
     /**
@@ -72,7 +76,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
         m.addParam(v);
         String classname = n.f1.accept(this).getName();
         Class_t mainclass = st_.get(classname);
-        mainclass.isMain = true;
+        mainclass.setIsMain();
         if (! mainclass.addMethod(m)) {
             throw new Exception("Method " + m.getName() + " already exists!");
         }
@@ -148,18 +152,59 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
         n.f0.accept(this);
         String id = n.f1.accept(this).getName();
         n.f2.accept(this);
-        String did = n.f3.accept(this).getName();
+        String parent_id = n.f3.accept(this).getName();
         n.f4.accept(this);
         n.f5.accept(this);
         n.f6.accept(this);
         n.f7.accept(this);
         Class_t newClass = st_.get(id);
-        Class_t parentClass = st_.get(did);
-        parentClass.class_vars_map.forEach((k, v) -> newClass.copyVar(v) );
+        Class_t parentClass = st_.get(parent_id);
         // add Class Variables
         if (n.f5.present()) {
             for (int i = 0 ; i < n.f5.size() ; i++) {
-                newClass.copyVar((Variable_t) n.f5.nodes.get(i).accept(this)); // if variable isnt unique
+                Variable_t var = (Variable_t) n.f5.nodes.get(i).accept(this);
+                if (! newClass.addVar( var) ) { // if variable isnt unique
+                    throw new Exception("Class " + id + ": Variable " + var.getName() + " already exists.");
+                }
+                String vartype = var.getType();
+                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                    throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
+                }
+            }
+        }
+        //add variables from parent-class
+        parentClass.class_vars_map.forEach((k, v) -> newClass.copyVar(v) );
+        // add Class Methods
+        if (n.f6.present()) {
+            for (int i = 0 ; i < n.f6.size() ; i++) {
+                Method_t m = (Method_t) n.f6.nodes.get(i).accept(this);
+
+                // if method isnt unique
+                if (!newClass.addMethod(m)) {
+                    throw new Exception("Class " + id + ": Method " + m.getName() + " already exists!");
+                } else if (parentClass.classContainsMeth(m.getName())) { // if the parent-class has a method with this name
+                    if (!parentClass.checkMethod(m)) { // and if it isnt exactly the same error
+                        throw new Exception("Class " + id + ": Method " + m.getName() + " is extended but has a different prototype from the first one!");
+                    }
+                }
+                String vartype = m.getType();
+                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                    throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
+                }
+                // if the parent-class hasnt a method with this classname
+                if (!parentClass.classContainsMeth(m.getName())) {
+                    newClass.addMethod(m);
+                } else { // replace method
+                    int k = 0;
+                    for (Map.Entry<String, Method_t> entry : newClass.class_methods_map.entrySet()) {
+                        if (entry.getKey().equals(m.getName())) {
+                            m.setFromClass(newClass);
+                            m.setMethNum(k + 1);
+                            entry.setValue(m);
+                        }
+                        k++;
+                    }
+                }
             }
         }
         //add methods from parent-class
@@ -167,27 +212,8 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
             if (parentsMeth.getName().equals("main")) {
                 continue ;
             }
-            newClass.copyMethod(parentsMeth);
-            newClass.meth_cnt = parentClass.meth_cnt;
-        }
-        // add Class Methods
-        if (n.f6.present()) {
-            for (int i = 0 ; i < n.f6.size() ; i++) {
-                Method_t m = (Method_t) n.f6.nodes.get(i).accept(this);
-                if (!parentClass.classContainsMeth(m.getName())) {  // if the parent-class hasnt a method with this classname
-                    newClass.addMethod(m);
-                } else { // replace method
-                    int k = 0;
-                    for (Map.Entry<String, Method_t> entry : newClass.class_methods_map.entrySet()) {
-                        if (entry.getKey().equals(m.getName())) {
-                            m.comesFrom = newClass;
-                            m.meth_num = k+1;
-                            entry.setValue(m);
-                        }
-                        k++;
-                    }
-                }
-            }
+            newClass.addMethod(parentsMeth);
+            newClass.setNumMethods(parentClass.getNumMethods());
         }
         return null;
     }
@@ -198,10 +224,10 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f2 -> ";"
      */
     public BaseType visit(VarDeclaration n) throws Exception {
-        String type = n.f0.accept(this).getName();
+        String type_ = n.f0.accept(this).getName();
         String var_id = n.f1.accept(this).getName();
         n.f2.accept(this);
-        return new Variable_t(type, var_id);
+        return new Variable_t(type_, var_id);
     }
 
     /**
@@ -221,32 +247,27 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      */
     public BaseType visit(MethodDeclaration n) throws Exception {
         n.f0.accept(this);
-        String type = n.f1.accept(this).getName();
+        String type_ = n.f1.accept(this).getName();
         String meth_name = n.f2.accept(this).getName();
+        Method_t meth = new Method_t(type_, meth_name);
         n.f3.accept(this);
-        Method_t m = (Method_t) n.f4.accept(this);
-        n.f5.accept(this);
-        n.f6.accept(this);
-        n.f7.accept(this);
-        n.f8.accept(this);
-        n.f9.accept(this);
-        n.f10.accept(this);
-        n.f11.accept(this);
-        n.f12.accept(this);
-        Method_t meth = new Method_t(type, meth_name);
         // add parameters to method
         if (n.f4.present()) {
+            Method_t m = (Method_t) n.f4.accept(this);
             for (int i = 0 ; i < m.method_params.size() ; i++) {
-                boolean found = false;
-                meth.addParam((Variable_t) m.method_params.get(i));
-                String vartype = ((Variable_t) m.method_params.get(i)).getType();
+                Variable_t param = m.method_params.get(i);
+                meth.addParam(param);
+                String vartype = param.getType();
                 if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
                     throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist!");
                 }
             }
         }
+        n.f5.accept(this);
+        n.f6.accept(this);
         // add method Variables
         if (n.f7.present()) {
+            n.f7.accept(this);
             for (int i = 0 ; i < n.f7.size() ; i++) {
                 if (!meth.addVar((Variable_t) n.f7.nodes.get(i).accept(this))) {
                     throw new Exception("Method " + meth_name + ": Variable " + n.f7.nodes.get(i).accept(this).getName() + " already exists!");
@@ -257,8 +278,13 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
                 }
             }
         }
-        if (glob_temp_cnt < meth.par_cnt) {
-            glob_temp_cnt = meth.par_cnt;
+        n.f8.accept(this);
+        n.f9.accept(this);
+        n.f10.accept(this);
+        n.f11.accept(this);
+        n.f12.accept(this);
+        if (globals_ < meth.getNumParameters()) {
+            globals_ = meth.getNumParameters();
         }
         return meth;
     }
@@ -281,9 +307,9 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f1 -> Identifier()
      */
     public BaseType visit(FormalParameter n) throws Exception {
-        String type = n.f0.accept(this).getName();
+        String type_ = n.f0.accept(this).getName();
         String id = n.f1.accept(this).getName();
-        return new Variable_t(type, id);
+        return new Variable_t(type_, id);
     }
 
     /**

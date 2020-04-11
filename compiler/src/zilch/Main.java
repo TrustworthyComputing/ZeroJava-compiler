@@ -26,13 +26,12 @@ public class Main {
                     SymbolTableVisitor secondvisit = new SymbolTableVisitor(firstvisit.getClassList());
                     root.accept(secondvisit);
                     Map<String, Class_t> symbol_table = secondvisit.getSymbolTable();
-                    secondvisit.printSymbolTable();
+                    // secondvisit.printSymbolTable();
                     TypeCheckVisitor type_checker = new TypeCheckVisitor(symbol_table);
                     root.accept(type_checker, null);
-                    System.out.println("\nType Check Completed Successfully!\n");
+                    // System.out.println("\nType Check Completed Successfully!\n");
 
-
-                    ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table, secondvisit.glob_temp_cnt);
+                    ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table, secondvisit.getGlobalsNumber());
                     root.accept(generator, null);
                     File fp = new File(args[i]);
                     String path = fp.getPath();

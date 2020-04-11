@@ -3,31 +3,52 @@ package basetype;
 import java.util.*;
 
 public class Class_t extends BaseType {
+
     public Map<String, Method_t> class_methods_map;
     public Map<String, Variable_t> class_vars_map;
 
     private String parent; // if extended
-    public int meth_cnt;
-    public int var_cnt;
-    public boolean isMain;
+    private int num_methods_;
+    private int num_vars_;
+    private boolean is_main;
 
     public Class_t(String name, String parent) {
         super(name);
         class_methods_map = new LinkedHashMap<>();
         class_vars_map = new LinkedHashMap<>();
         this.parent = parent;
-        this.meth_cnt = 0;
-        this.var_cnt = 0;
-        this.isMain = false;
+        this.num_methods_ = 0;
+        this.num_vars_ = 0;
+        this.is_main = false;
+    }
+
+    public void setIsMain() {
+        this.is_main = true;
+    }
+
+    public boolean isMain() {
+        return this.is_main;
+    }
+
+    public void setNumMethods(int num_methods) {
+        this.num_methods_ = num_methods;
+    }
+
+    public int getNumMethods() {
+        return this.num_methods_;
+    }
+
+    public int getNumVars() {
+        return this.num_vars_;
     }
 
     public boolean addMethod(Method_t meth) {
         if (class_methods_map.containsKey(meth.getName())) {
             return false;
         }
-        meth.comesFrom = this;
-        this.meth_cnt++;
-        meth.meth_num = this.meth_cnt;
+        meth.setFromClass(this);
+        this.num_methods_++;
+        meth.setMethNum(this.num_methods_);
         class_methods_map.put(meth.getName(), meth);
         return true;
     }
@@ -36,16 +57,16 @@ public class Class_t extends BaseType {
         Method_t newMeth = new Method_t(meth.getType(), meth.getName());
         newMeth.method_params = meth.method_params;
         newMeth.method_vars = meth.method_vars;
-        newMeth.comesFrom = meth.comesFrom;
-        newMeth.var_cnt = meth.var_cnt;
-        newMeth.par_cnt = meth.par_cnt;
-        newMeth.meth_num = meth.meth_num;
+        newMeth.setFromClass(meth.getFromClass());
+        newMeth.setNumVars(meth.getNumVars());
+        newMeth.setNumParameters(meth.getNumParameters());
+        newMeth.setMethNum(meth.getMethNum());
         class_methods_map.put(meth.getName(), newMeth);
     }
 
     public void copyVar(Variable_t var) {
-        this.var_cnt++;
-        var.var_num = this.var_cnt;
+        this.num_vars_++;
+        var.setNum(this.num_vars_);
         class_vars_map.put(var.getName(), var);
     }
 
@@ -53,8 +74,8 @@ public class Class_t extends BaseType {
         if (class_vars_map.containsKey(var.getName())) {
             return false;
         }
-        this.var_cnt++;
-        var.var_num = this.var_cnt;
+        this.num_vars_++;
+        var.setNum(this.num_vars_);
         class_vars_map.put(var.getName(), var);
         return true;
     }

@@ -67,7 +67,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
             for (int i = 0 ; i < n.f0.size() ; i++) {
                 String str = n.f0.elementAt(i).accept(this, argu);
                 this.ic1++;
-                instrList.addLast(new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\""));
+                instrList.add(new Instruction_t("\""+argu+"\"", this.ic1, "\""+str+"\""));
                 if (str.toLowerCase().contains("answer".toLowerCase())) {
                     answerInstruction = new AnswerInstruction_t("\""+argu+"\"", this.ic1, "\""+str+"\"");
                 }
@@ -109,9 +109,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String instr = op + ", " + reg1 + ", " + reg2 + ", " + label;
         
         if (op.equals("j")) {
-            jumpList.addLast(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
+            jumpList.add(new Jump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
         } else {
-            cjumpList.addLast(new Cjump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
+            cjumpList.add(new Cjump_t("\""+argu+"\"", this.ic2, "\""+label+"\""));
         }
         
         return instr;
@@ -131,12 +131,12 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String idx = n.f3.accept(this, argu);
         String addr = n.f5.accept(this, argu);
         String op = "sw " + src + ", " + idx + "(" + addr + ")";
-        varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
+        varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
         if (addr.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
         }
         if (addr.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
         }
         return op;
     }
@@ -155,12 +155,12 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String idx = n.f3.accept(this, argu);
         String addr = n.f5.accept(this, argu);
         String op = "lw " + dst + ", " + idx + "(" + addr + ")";
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         if (addr.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+addr+"\""));
         }
         if (addr.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+idx+"\""));
         }
         return op;
     }
@@ -181,12 +181,12 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src == null) { return null; }
         String instr = op + " " + dst + ", " + sec_reg + ", " + src;
         if (src.startsWith("$r")) {
-            varMoveList.addLast(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
+            varMoveList.add(new VarMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src+"\""));
         } else if (src.matches("[0-9]+")) {
-            constMoveList.addLast(new ConstMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(src) ));
+            constMoveList.add(new ConstMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", Integer.parseInt(src) ));
         }
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
 
@@ -205,14 +205,14 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String src2 = n.f5.accept(this, argu);
         if (src2 == null) { return null; }
         String instr = op + " " + dst + ", " + src1 + ", " + src2;
-        varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src1+"\""));
+        varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src1+"\""));
         if (src2.startsWith("$r")) { // if third argument is not immediate
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+src2+"\""));
         }
 
-        binOpMoveList.addLast(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\"", "\""+src2+"\""));
+        binOpMoveList.add(new BinOpMove_t("\""+argu+"\"", this.ic2, "\""+dst+"\"", "\""+src1+"\"", "\""+src2+"\""));
         
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return instr;
     }
 
@@ -228,7 +228,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String reg = n.f5.accept(this, argu);
         String op = "print " + reg + ", " + reg + ", " + reg;
         if (reg != null && reg.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
         return op;
     }
@@ -245,7 +245,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String reg = n.f3.accept(this, argu);
         String op = "answer " + reg + ", " + reg + ", " + reg;
         if (reg != null && reg.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+reg+"\""));
         }
         return op;
     }
@@ -263,9 +263,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String tape = n.f5.accept(this, argu);
         String op = "pubread " + dst + ", " + dst + ", " + tape;
         if (tape != null && tape.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
     
@@ -282,9 +282,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String tape = n.f5.accept(this, argu);
         String op = "secread " + dst + ", " + dst + ", " + tape;
         if (tape != null && tape.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
     
@@ -302,12 +302,12 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String tape = n.f5.accept(this, argu);
         String op = "pubseek " + dst + ", " + sec_reg + ", " + tape;
         if (sec_reg != null && sec_reg.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
         if (tape != null && tape.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
     
@@ -325,12 +325,12 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String tape = n.f5.accept(this, argu);
         String op = "secseek " + dst + ", " + sec_reg + ", " + tape;
         if (sec_reg != null && sec_reg.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+sec_reg+"\""));
         }
         if (tape != null && tape.startsWith("$r")) {
-            varUseList.addLast(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
+            varUseList.add(new VarUse_t("\""+argu+"\"", this.ic2, "\""+tape+"\""));
         }
-        varDefList.addLast(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
+        varDefList.add(new VarDef_t("\""+argu+"\"", this.ic2, "\""+dst+"\""));
         return op;
     }
 
@@ -389,7 +389,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
                 return v;
             }
         }
-        varList.addLast(var);
+        varList.add(var);
         return v;
     } 
 

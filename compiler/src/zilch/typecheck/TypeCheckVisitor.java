@@ -20,7 +20,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         if (var.getType() == null) {
             String inMethod = meth.methContains(var.getName());
             if (inMethod == null) {   // if not found in the function, we should seek in the class
-                Variable_t inclassvar = meth.comesFrom.classContainsVar(var.getName());
+                Variable_t inclassvar = meth.getFromClass().classContainsVar(var.getName());
                 if (inclassvar == null) {
                     throw new Exception("Undecleared Variable " + var.getName());
                 }
@@ -175,7 +175,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
         retType = findType(retType, meth);
         if (!meth.getType().equals(retType.getType())) {
-            throw new Exception("Error at " + methName + " declaration, type is " + methType + " and return type is "+ retType.getType() + ", meth " +meth.comesFrom.getName());
+            throw new Exception("Error at " + methName + " declaration, type_ is " + methType + " and return type_ is "+ retType.getType() + ", meth " +meth.getFromClass().getName());
         }
         return null;
     }
@@ -538,10 +538,10 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     */
     public BaseType visit(MessageSend n, BaseType argu) throws Exception {
         Variable_t clazz = (Variable_t) n.f0.accept(this, argu);
-        clazz = findType(clazz, (Method_t) argu);                       // now clazz.type() is the type of PrimaryExp
+        clazz = findType(clazz, (Method_t) argu);                       // now clazz.type_() is the type_ of PrimaryExp
         Variable_t id = (Variable_t) n.f2.accept(this, argu);
         Class_t cl = st_.get(clazz.getType());
-        if (!cl.classContainsMeth(id.getName()))                        // check if class primary expr type contains method identifier
+        if (!cl.classContainsMeth(id.getName()))                        // check if class primary expr type_ contains method identifier
             throw new Exception("Method " + id.getName() + " is not declared in class " + clazz.getType());
         Method_t existingmeth = cl.getMethod(id.getName());             // get method identifier (also parameters etc)
         Method_t keepParams = (Method_t) n.f4.accept(this, argu);
@@ -585,7 +585,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     public BaseType visit(ExpressionList n, BaseType argu) throws Exception {
         Variable_t expr =  (Variable_t) n.f0.accept(this, argu);
         Method_t meth = (Method_t) n.f1.accept(this, argu);
-        meth.method_params.addLast(expr);
+        meth.method_params.add(expr);
         return meth;
     }
 
@@ -597,7 +597,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         // create a linked list of variables. (parameters list)
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
-                meth.method_params.addLast( (Variable_t)n.f0.nodes.get(i).accept(this, argu) );
+                meth.method_params.add( (Variable_t)n.f0.nodes.get(i).accept(this, argu) );
             }
         }
         return meth;
@@ -667,7 +667,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     */
     public BaseType visit(ThisExpression n, BaseType argu) throws Exception {
         n.f0.accept(this, argu);
-        Variable_t var = new Variable_t(((Method_t) argu).comesFrom.getName(), null);
+        Variable_t var = new Variable_t(((Method_t) argu).getFromClass().getName(), null);
         return var;
     }
 
@@ -704,7 +704,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         n.f3.accept(this, argu);
         // if class does not exist
         if (st_.get(classname.getType()) == null) {
-            throw new Exception("Cannot declare " + classname + " type. This class does not exist!");
+            throw new Exception("Cannot declare " + classname + " type_. This class does not exist!");
         }
         return classname;
     }
@@ -720,7 +720,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         if (t.getType().equals("boolean")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Error: Not Clause, " + t + " type given. Can apply only to boolean!");
+        throw new Exception("Error: Not Clause, " + t + " type_ given. Can apply only to boolean!");
     }
 
     /**
