@@ -447,15 +447,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> Clause()
     */
     public BaseType visit(AndExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("boolean") && t2.equals("boolean")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '&&': " + t1 + " " + t2);
     }
 
     /**
@@ -464,15 +464,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f2 -> Clause()
      */
     public BaseType visit(OrExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("boolean") && t2.equals("boolean")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '||': " + t1 + " " + t2);
     }
 
     /**
@@ -481,15 +481,17 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f2 -> Clause()
      */
     public BaseType visit(EqualExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("boolean") && t2.equals("boolean")) {
+            return new Variable_t("boolean", null);
+        } else if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '==': " + t1 + " " + t2);
     }
 
     /**
@@ -498,15 +500,17 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f2 -> Clause()
      */
     public BaseType visit(NotEqualExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("boolean") && t2.equals("boolean")) {
+            return new Variable_t("boolean", null);
+        } else if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '!=': " + t1 + " " + t2);
     }
 
     /**
@@ -515,15 +519,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     */
     public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '<': " + t1 + " " + t2);
     }
 
     /**
@@ -532,15 +536,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f2 -> PrimaryExpression()
      */
     public BaseType visit(LessThanOrEqualExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '<=': " + t1 + " " + t2);
     }
 
     /**
@@ -549,15 +553,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     */
     public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '>': " + t1 + " " + t2);
     }
 
     /**
@@ -566,15 +570,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f2 -> PrimaryExpression()
      */
     public BaseType visit(GreaterThanOrEqualExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '>=': " + t1 + " " + t2);
     }
 
     /**
@@ -583,15 +587,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     */
     public BaseType visit(PlusExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("int", null);
         }
-        throw new Exception("Addition between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '+': " + t1 + " " + t2);
     }
 
     /**
@@ -600,15 +604,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     */
     public BaseType visit(MinusExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("int", null);
         }
-        throw new Exception("Substraction between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '-': " + t1 + " " + t2);
     }
 
     /**
@@ -617,15 +621,15 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     */
     public BaseType visit(TimesExpression n, BaseType argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
             return new Variable_t("int", null);
         }
-        throw new Exception("Multiply between different types: " + t1.getType() + " " + t2.getType());
+        throw new Exception("Bad operand types for operator '*': " + t1 + " " + t2);
     }
 
     /**
