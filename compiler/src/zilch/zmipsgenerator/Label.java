@@ -27,7 +27,7 @@ public class Label {
 		StringBuilder error_code = new StringBuilder();
 		if (this.may_have_error_) {
 			error_code.append("__Runtime_Error__\n");
-			error_code.append("move $r10, 0xffffffffffffffff\t\t; Runtime error\n");
+			error_code.append("move $r10, 0xffffffffffffffff\t\t# Runtime error\n");
 			error_code.append("answer $r10\n");
 		}
 		return error_code.toString();

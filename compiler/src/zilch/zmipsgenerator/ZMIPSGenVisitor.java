@@ -371,7 +371,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.code_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
 		this.code_.append("cnjmp " + error_label + "\n");
 		// if idx <= 0 goto error
-		this.code_.append("cmpge $zero, " + idx + "\n"); // 0 >= idx
+		this.code_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
 		this.code_.append("cjmp " + error_label + "\n");
 		// skip length
 		String temp_array = newRegister();
@@ -552,14 +552,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		// if idx >= arr.length goto error
 		this.code_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
 		this.code_.append("cnjmp " + error_label + "\n");
-		// if idx <= 0 goto error
-		this.code_.append("cmpge $zero, " + idx + "\n"); // 0 >= idx
+		// if idx < 0 goto error
+		this.code_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
 		this.code_.append("cjmp " + error_label + "\n");
 		// skip length
 		String temp_array = newRegister();
 		String ret = newRegister();
 		this.code_.append("add " + temp_array + ", " + array + ", 1\n");
-		this.code_.append("lw " + ret + "," + idx + "(" + temp_array + ")\n");
+		this.code_.append("lw " + ret + ", " + idx + "(" + temp_array + ")\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -761,7 +761,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String len = ((Variable_t) n.f3.accept(this, argu)).getRegister();
 		String array = newRegister();
 		// check if given length > 0
-		this.code_.append("cmpg " + len + ", 0\t\t\t\t; Check if length is > 0\n");
+		this.code_.append("cmpg " + len + ", 0\t\t\t\t# Check if length is > 0\n");
 		this.code_.append("cnjmp " + error_label + "\n");
 		// store array length in first position
 		this.code_.append("move " + array + ", $hp\n");
