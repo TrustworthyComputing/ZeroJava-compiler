@@ -8,7 +8,12 @@ package syntaxtree;
  * Grammar production:
  * f0 -> AndExpression()
  *       | OrExpression()
- *       | CompareExpression()
+ *       | EqualExpression()
+ *       | NotEqualExpression()
+ *       | LessThanExpression()
+ *       | LessThanOrEqualExpression()
+ *       | GreaterThanExpression()
+ *       | GreaterThanOrEqualExpression()
  *       | PlusExpression()
  *       | MinusExpression()
  *       | TimesExpression()

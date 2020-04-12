@@ -35,6 +35,9 @@ TOKEN :
 	| < DOT: "." >
 	| < ASSIGN: "=" >
 	| < LT: "<" >
+	| < LTE: "<=" >
+	| < GT: ">" >
+	| < GTE: ">=" >
 	| < PLUS: "+" >
 	| < MINUS: "-" >
 	| < AND : "&&" >
@@ -270,15 +273,6 @@ void ArrayAssignmentStatement() :
 	Identifier() "[" Expression() "]" "=" Expression() ";"
 }
 
-// void IfStatement() :
-// {}
-// {
-// 	LOOKAHEAD(IfthenElseStatement()) IfthenElseStatement()
-// 	"if" "(" Expression() ")" Statement()
-// 	( "else" Statement() )?
-// }
-
-
 void IfStatement() :
 {}
 {
@@ -326,8 +320,23 @@ void Expression() :
 	LOOKAHEAD( Clause() "||" )
 	OrExpression()
 |
+	LOOKAHEAD( PrimaryExpression() "==" )
+	EqualExpression()
+|
+	LOOKAHEAD( PrimaryExpression() "!=" )
+	NotEqualExpression()
+|
 	LOOKAHEAD( PrimaryExpression() "<" )
-	CompareExpression()
+	LessThanExpression()
+|
+	LOOKAHEAD( PrimaryExpression() "<=" )
+	LessThanOrEqualExpression()
+|
+	LOOKAHEAD( PrimaryExpression() ">" )
+	GreaterThanExpression()
+|
+	LOOKAHEAD( PrimaryExpression() ">=" )
+	GreaterThanOrEqualExpression()
 |
 	LOOKAHEAD( PrimaryExpression() "+" )
 	PlusExpression()
@@ -362,10 +371,40 @@ void OrExpression() :
 	Clause() "||" Clause()
 }
 
-void CompareExpression() :
+void EqualExpression() :
+{}
+{
+	PrimaryExpression() "==" PrimaryExpression()
+}
+
+void NotEqualExpression() :
+{}
+{
+	PrimaryExpression() "!=" PrimaryExpression()
+}
+
+void LessThanExpression() :
 {}
 {
 	PrimaryExpression() "<" PrimaryExpression()
+}
+
+void LessThanOrEqualExpression() :
+{}
+{
+	PrimaryExpression() "<=" PrimaryExpression()
+}
+
+void GreaterThanExpression() :
+{}
+{
+	PrimaryExpression() ">" PrimaryExpression()
+}
+
+void GreaterThanOrEqualExpression() :
+{}
+{
+	PrimaryExpression() ">=" PrimaryExpression()
 }
 
 void PlusExpression() :

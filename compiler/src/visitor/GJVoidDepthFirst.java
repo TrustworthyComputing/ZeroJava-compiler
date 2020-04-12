@@ -406,7 +406,12 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    /**
     * f0 -> AndExpression()
     *       | OrExpression()
-    *       | CompareExpression()
+    *       | EqualExpression()
+    *       | NotEqualExpression()
+    *       | LessThanExpression()
+    *       | LessThanOrEqualExpression()
+    *       | GreaterThanExpression()
+    *       | GreaterThanOrEqualExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -443,10 +448,65 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "=="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(EqualExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "!="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(NotEqualExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-   public void visit(CompareExpression n, A argu) throws Exception {
+   public void visit(LessThanExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessThanOrEqualExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterThanExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterThanOrEqualExpression n, A argu) throws Exception {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);

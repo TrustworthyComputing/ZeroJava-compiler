@@ -458,7 +458,12 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    /**
     * f0 -> AndExpression()
     *       | OrExpression()
-    *       | CompareExpression()
+    *       | EqualExpression()
+    *       | NotEqualExpression()
+    *       | LessThanExpression()
+    *       | LessThanOrEqualExpression()
+    *       | GreaterThanExpression()
+    *       | GreaterThanOrEqualExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -499,10 +504,75 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "=="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(EqualExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "!="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(NotEqualExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-   public R visit(CompareExpression n) throws Exception {
+   public R visit(LessThanExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(LessThanOrEqualExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanOrEqualExpression n) throws Exception {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);

@@ -248,7 +248,12 @@ public interface GJVisitor<R,A> {
    /**
     * f0 -> AndExpression()
     *       | OrExpression()
-    *       | CompareExpression()
+    *       | EqualExpression()
+    *       | NotEqualExpression()
+    *       | LessThanExpression()
+    *       | LessThanOrEqualExpression()
+    *       | GreaterThanExpression()
+    *       | GreaterThanOrEqualExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -275,10 +280,45 @@ public interface GJVisitor<R,A> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "=="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(EqualExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "!="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(NotEqualExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-   public R visit(CompareExpression n, A argu) throws Exception;
+   public R visit(LessThanExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(LessThanOrEqualExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanOrEqualExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

@@ -248,7 +248,12 @@ public interface GJNoArguVisitor<R> {
    /**
     * f0 -> AndExpression()
     *       | OrExpression()
-    *       | CompareExpression()
+    *       | EqualExpression()
+    *       | NotEqualExpression()
+    *       | LessThanExpression()
+    *       | LessThanOrEqualExpression()
+    *       | GreaterThanExpression()
+    *       | GreaterThanOrEqualExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -275,10 +280,45 @@ public interface GJNoArguVisitor<R> {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "=="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(EqualExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "!="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(NotEqualExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-   public R visit(CompareExpression n) throws Exception;
+   public R visit(LessThanExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(LessThanOrEqualExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanExpression n) throws Exception;
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public R visit(GreaterThanOrEqualExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

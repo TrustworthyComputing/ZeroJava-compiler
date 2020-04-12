@@ -382,30 +382,6 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         throw new Exception("If-condition is not a boolean Expression!");
     }
 
-    // /**
-    // * f0 -> "if"
-    // * f1 -> "("
-    // * f2 -> Expression()
-    // * f3 -> ")"
-    // * f4 -> Statement()
-    // * f5 -> ( "else" Statement() )?
-    // */
-    // public BaseType visit(IfStatement n, BaseType argu) throws Exception {
-    //     n.f0.accept(this, argu);
-    //     n.f1.accept(this, argu);
-    //     Variable_t expr = (Variable_t) n.f2.accept(this, argu);
-    //     n.f3.accept(this, argu);
-    //     n.f4.accept(this, argu);
-    //     n.f5.accept(this, argu);
-    //     if (expr.getType() == null) {
-    //         expr = findType(expr, (Method_t)argu);
-    //     }
-    //     if (expr.getType().equals("boolean")) {
-    //         return null;
-    //     }
-    //     throw new Exception("If-condition is not a boolean Expression!");
-    // }
-
     /**
     * f0 -> "while"
     * f1 -> "("
@@ -452,7 +428,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
 
     /**
     * f0 -> AndExpression()
-    *       | CompareExpression()
+    *       | LessThanExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -483,11 +459,113 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     }
 
     /**
+     * f0 -> Clause()
+     * f1 -> "||"
+     * f2 -> Clause()
+     */
+    public BaseType visit(OrExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+     * f0 -> Clause()
+     * f1 -> "=="
+     * f2 -> Clause()
+     */
+    public BaseType visit(EqualExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+     * f0 -> Clause()
+     * f1 -> "!="
+     * f2 -> Clause()
+     */
+    public BaseType visit(NotEqualExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("boolean") && t2.getType().equals("boolean")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Logical And between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
     * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(CompareExpression n, BaseType argu) throws Exception {
+    public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "<="
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(LessThanOrEqualExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+    public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return new Variable_t("boolean", null);
+        }
+        throw new Exception("Compare between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> ">="
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(GreaterThanOrEqualExpression n, BaseType argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t t2 = (Variable_t) n.f2.accept(this, argu);

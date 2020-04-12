@@ -396,7 +396,12 @@ public class DepthFirstVisitor implements Visitor {
    /**
     * f0 -> AndExpression()
     *       | OrExpression()
-    *       | CompareExpression()
+    *       | EqualExpression()
+    *       | NotEqualExpression()
+    *       | LessThanExpression()
+    *       | LessThanOrEqualExpression()
+    *       | GreaterThanExpression()
+    *       | GreaterThanOrEqualExpression()
     *       | PlusExpression()
     *       | MinusExpression()
     *       | TimesExpression()
@@ -433,10 +438,65 @@ public class DepthFirstVisitor implements Visitor {
 
    /**
     * f0 -> PrimaryExpression()
+    * f1 -> "=="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(EqualExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "!="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(NotEqualExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-   public void visit(CompareExpression n) throws Exception {
+   public void visit(LessThanExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(LessThanOrEqualExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">"
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterThanExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> PrimaryExpression()
+    * f1 -> ">="
+    * f2 -> PrimaryExpression()
+    */
+   public void visit(GreaterThanOrEqualExpression n) throws Exception {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
