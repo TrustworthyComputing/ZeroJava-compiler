@@ -23,7 +23,7 @@ SPECIAL_TOKEN : /* COMMENTS */
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-TOKEN : 
+TOKEN :
 {
   < LPAREN: "(" >
 | < RPAREN: ")" >
@@ -37,9 +37,9 @@ TOKEN :
 | < LT: "<" >
 | < PLUS: "+" >
 | < MINUS: "-" >
-| < AND : "&&" >   
-| < NOT : "!" >   
-| < BOOLEAN: "boolean" >   
+| < AND : "&&" >
+| < NOT : "!" >
+| < BOOLEAN: "boolean" >
 | < CLASS: "class" >
 | < INTERFACE: "interface" >
 | < ELSE: "else" >
@@ -47,7 +47,7 @@ TOKEN :
 | < FALSE: "false" >
 | < IF: "if" >
 | < WHILE: "while" >
-| < INTEGER: "int" >   
+| < INTEGER: "int" >
 | < LENGTH: "length" >
 | < MAIN: "main" >
 | < NEW: "new" >
@@ -58,7 +58,8 @@ TOKEN :
 | < THIS: "this" >
 | < TRUE: "true" >
 | < PRINT: "System.out.println" >
-| < VOID: "void" >         
+// | < ANSWER: "System.out.println" >
+| < VOID: "void" >
 }
 
 TOKEN : /* LITERALS */
@@ -127,14 +128,14 @@ void MainClass() :
 {}
 {
   "class" Identifier() "{"
-    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"   
+    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"
     "{" ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* "}"
   "}"
 }
 
-void TypeDeclaration() :  
+void TypeDeclaration() :
 {}
-{ 
+{
   LOOKAHEAD(3)
   ClassDeclaration()
 |
@@ -144,8 +145,8 @@ void TypeDeclaration() :
 void ClassDeclaration() :
 {}
 {
-  "class" Identifier() "{" ( VarDeclaration() )* 
-                           ( MethodDeclaration() )* 
+  "class" Identifier() "{" ( VarDeclaration() )*
+                           ( MethodDeclaration() )*
                        "}"
 }
 
@@ -153,23 +154,23 @@ void ClassExtendsDeclaration() :
 {}
 {
   "class" Identifier() "extends" Identifier()
-                       "{" ( VarDeclaration() )* 
-                           ( MethodDeclaration() )* 
+                       "{" ( VarDeclaration() )*
+                           ( MethodDeclaration() )*
                        "}"
 }
 
-void VarDeclaration() :  
-{}
-{ 
-  Type() Identifier() ";"      
-}
-
-void MethodDeclaration() :  
+void VarDeclaration() :
 {}
 {
-  "public" Type() Identifier() 
-  "(" ( FormalParameterList() )? ")"   
-  "{" ( LOOKAHEAD(2) VarDeclaration() )* 
+  Type() Identifier() ";"
+}
+
+void MethodDeclaration() :
+{}
+{
+  "public" Type() Identifier()
+  "(" ( FormalParameterList() )? ")"
+  "{" ( LOOKAHEAD(2) VarDeclaration() )*
       ( Statement() )* "return" Expression() ";" "}"
 }
 
@@ -207,7 +208,7 @@ void Type() :
 |
   IntegerType()
 |
-  Identifier()     
+  Identifier()
 }
 
 void ArrayType() :
@@ -232,7 +233,7 @@ void Statement() :
 {}
 {
   Block()
-| 
+|
   LOOKAHEAD(2)
   AssignmentStatement()
 |
@@ -267,13 +268,13 @@ void ArrayAssignmentStatement() :
 void IfStatement() :
 {}
 {
-  "if" "(" Expression() ")" Statement() "else" Statement() 
+  "if" "(" Expression() ")" Statement() "else" Statement()
 }
 
 void WhileStatement() :
 {}
 {
-  "while" "(" Expression() ")" Statement() 
+  "while" "(" Expression() ")" Statement()
 }
 
 void PrintStatement() :
@@ -308,18 +309,18 @@ void Expression() :
 |
   LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
   MessageSend()
-| 
+|
   Clause()
 }
 
 void AndExpression() :
-{} 
+{}
 {
   Clause() "&&" Clause()
 }
 
 void CompareExpression() :
-{} 
+{}
 {
   PrimaryExpression() "<" PrimaryExpression()
 }
@@ -357,7 +358,7 @@ void ArrayLength() :
 void MessageSend() :
 {}
 {
-  PrimaryExpression() "." Identifier() 
+  PrimaryExpression() "." Identifier()
   "(" ( ExpressionList() )? ")"
 }
 
@@ -403,7 +404,7 @@ void PrimaryExpression() :
   ArrayAllocationExpression()
 |
   AllocationExpression()
-|   
+|
   BracketExpression()
 }
 

@@ -3,6 +3,8 @@
 *.zmips
 *.txt
 *.out
+*-jtb.jj
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

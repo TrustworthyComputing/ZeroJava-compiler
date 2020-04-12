@@ -14,3 +14,4 @@ execute:
 
 clean:
 	$(RM) -f *.class *~ basetype/*.class symboltable/*.class syntaxtree/*.class visitor/*.class typecheck/*.class zmipsgenerator/*.class
+	$(RM) -f miniJava-jtb.jj JavaCharStream.java MiniJavaParser.java MiniJavaParserConstants.java MiniJavaParserTokenManager.java ParseException.java Token.java TokenMgrError.java
