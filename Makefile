@@ -1,10 +1,10 @@
 all: compile
 
 compile:
-	cd compiler/src/zilch && $(MAKE)
-	cd optimizer/src/zilch && $(MAKE)
+	cd compiler/src && $(MAKE)
+	cd optimizer/src && $(MAKE)
 
 clean:
-	cd compiler/src/zilch && $(MAKE) clean
-	cd optimizer/src/zilch && $(MAKE) clean
-	rm ./compiler/zilch-examples/*.zmips
+	cd compiler/src && $(MAKE) clean
+	cd optimizer/src && $(MAKE) clean
+	$(RM) ./compiler/zilch-examples/*.zmips

@@ -13,4 +13,4 @@ execute:
 	java Main
 
 clean:
-	rm -f *.class *~ basetype/*.class symboltable/*.class syntaxtree/*.class visitor/*.class typecheck/*.class zmipsgenerator/*.class
+	$(RM) -f *.class *~ basetype/*.class symboltable/*.class syntaxtree/*.class visitor/*.class typecheck/*.class zmipsgenerator/*.class
