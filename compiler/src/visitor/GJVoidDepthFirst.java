@@ -267,6 +267,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public void visit(Statement n, A argu) throws Exception {
       n.f0.accept(this, argu);
@@ -321,8 +322,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public void visit(IfStatement n, A argu) throws Exception {
       n.f0.accept(this, argu);
@@ -331,7 +331,6 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
       n.f5.accept(this, argu);
-      n.f6.accept(this, argu);
    }
 
    /**
@@ -350,7 +349,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -365,7 +364,23 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public void visit(AnswerStatement n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+   }
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -385,6 +400,17 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     * f2 -> Clause()
     */
    public void visit(AndExpression n, A argu) throws Exception {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public void visit(OrExpression n, A argu) throws Exception {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);

@@ -162,6 +162,7 @@ public interface GJVisitor<R,A> {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public R visit(Statement n, A argu) throws Exception;
 
@@ -197,8 +198,7 @@ public interface GJVisitor<R,A> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public R visit(IfStatement n, A argu) throws Exception;
 
@@ -212,7 +212,7 @@ public interface GJVisitor<R,A> {
    public R visit(WhileStatement n, A argu) throws Exception;
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -221,7 +221,17 @@ public interface GJVisitor<R,A> {
    public R visit(PrintStatement n, A argu) throws Exception;
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public R visit(AnswerStatement n, A argu) throws Exception;
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -239,6 +249,13 @@ public interface GJVisitor<R,A> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n, A argu) throws Exception;
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n, A argu) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

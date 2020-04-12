@@ -296,6 +296,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | IfStatement()
 	*       | WhileStatement()
 	*       | PrintStatement()
+	*       | AnswerStatement()
 	*/
 	public BaseType visit(Statement n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
@@ -387,19 +388,23 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> Expression()
 	* f3 -> ")"
 	* f4 -> Statement()
-	* f5 -> "else"
-	* f6 -> Statement()
+	* f5 -> ( "else" Statement() )?
 	*/
 	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
-		String elselabel = labels_.newLabel();
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.code_.append("cmpg " + cond + ", 0\n");
-		this.code_.append("cnjmp " + elselabel + "\n");
-		n.f4.accept(this, argu);
-		this.code_.append("j " + endlabel + "\n");
-		this.code_.append(elselabel + "\n");
-		n.f6.accept(this, argu);
+		if (n.f5.present()) { // if then else
+			String elselabel = labels_.newLabel();
+			this.code_.append("cnjmp " + elselabel + "\n");
+			n.f4.accept(this, argu);
+			this.code_.append("j " + endlabel + "\n");
+			this.code_.append(elselabel + "\n");
+			n.f5.accept(this, argu);
+		} else { // if then
+			this.code_.append("cnjmp " + endlabel + "\n");
+			n.f4.accept(this, argu);
+		}
 		this.code_.append(endlabel + "\n");
 		return null;
 	}
@@ -425,12 +430,12 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	 * f0 -> "System.out.println"
-	 * f1 -> "("
-	 * f2 -> Expression()
-	 * f3 -> ")"
-	 * f4 -> ";"
-	 */
+     * f0 -> <PRINT>
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
 	public BaseType visit(PrintStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.code_.append("print " + t + "\n");
@@ -438,25 +443,39 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	 * f0 -> AndExpression()
-	 *       | CompareExpression()
-	 *       | PlusExpression()
-	 *       | MinusExpression()
-	 *       | TimesExpression()
-	 *       | ArrayLookup()
-	 *       | ArrayLength()
-	 *       | MessageSend()
-	 *       | Clause()
-	 */
+     * f0 -> <ANSWER>
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+	public BaseType visit(AnswerStatement n, BaseType argu) throws Exception {
+		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("answer " + t + "\n");
+		return null;
+	}
+
+	/**
+     * f0 -> AndExpression()
+     *       | OrExpression()
+     *       | CompareExpression()
+     *       | PlusExpression()
+     *       | MinusExpression()
+     *       | TimesExpression()
+     *       | ArrayLookup()
+     *       | ArrayLength()
+     *       | MessageSend()
+     *       | Clause()
+     */
 	public BaseType visit(Expression n, BaseType argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
 	/**
-	* f0 -> Clause()
-	* f1 -> "&&"
-	* f2 -> Clause()
-	*/
+     * f0 -> Clause()
+     * f1 -> "&&"
+     * f2 -> Clause()
+     */
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -473,6 +492,27 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.code_.append("cjmp " + istrue2 + "\n");
 		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append(istrue2 + "\n");
+		return new Variable_t(null, null, ret);
+	}
+
+	/**
+	* f0 -> Clause()
+	* f1 -> "||"
+	* f2 -> Clause()
+	*/
+	// TODO
+	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		String end_label = labels_.newLabel();
+		String ret = newRegister();
+		this.code_.append("move " + ret + ", 1\n");
+		this.code_.append("cmpg " + t1 + ", 0\n");
+		this.code_.append("cjmp " + end_label + "\n"); // if (t1) goto end
+		this.code_.append("cmpg " + t2 + ", 0\n");
+		this.code_.append("cjmp " + end_label + "\n"); // if (t2) goto end
+		this.code_.append("move " + ret + ", 0\n"); // else set ret to 0
+		this.code_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 

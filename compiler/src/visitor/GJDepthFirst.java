@@ -303,6 +303,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public R visit(Statement n, A argu) throws Exception {
       return n.f0.accept(this, argu);
@@ -363,8 +364,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public R visit(IfStatement n, A argu) throws Exception {
       R _ret=null;
@@ -374,7 +374,6 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
       n.f5.accept(this, argu);
-      n.f6.accept(this, argu);
       return _ret;
    }
 
@@ -396,7 +395,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -413,7 +412,25 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    }
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public R visit(AnswerStatement n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      return _ret;
+   }
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -433,6 +450,19 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n, A argu) throws Exception {
       R _ret=null;
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);

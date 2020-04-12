@@ -6,7 +6,7 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> "System.out.println"
+ * f0 -> <PRINT>
  * f1 -> "("
  * f2 -> Expression()
  * f3 -> ")"

@@ -7,6 +7,7 @@ package syntaxtree;
 /**
  * Grammar production:
  * f0 -> AndExpression()
+ *       | OrExpression()
  *       | CompareExpression()
  *       | PlusExpression()
  *       | MinusExpression()

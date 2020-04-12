@@ -1,10 +1,10 @@
 options {
-  JAVA_UNICODE_ESCAPE = true;
-  STATIC = false;
+	JAVA_UNICODE_ESCAPE = true;
+	STATIC = false;
 }
 
 PARSER_BEGIN(MiniJavaParser)
-  public class MiniJavaParser {}
+	public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
 SKIP : /* WHITE SPACE */
@@ -25,89 +25,90 @@ SPECIAL_TOKEN : /* COMMENTS */
 
 TOKEN :
 {
-  < LPAREN: "(" >
-| < RPAREN: ")" >
-| < LSQPAREN: "[" >
-| < RSQPAREN: "]" >
-| < LBRACE: "{" >
-| < RBRACE: "}" >
-| < SEMICOLON: ";" >
-| < DOT: "." >
-| < ASSIGN: "=" >
-| < LT: "<" >
-| < PLUS: "+" >
-| < MINUS: "-" >
-| < AND : "&&" >
-| < NOT : "!" >
-| < BOOLEAN: "boolean" >
-| < CLASS: "class" >
-| < INTERFACE: "interface" >
-| < ELSE: "else" >
-| < EXTENDS: "extends" >
-| < FALSE: "false" >
-| < IF: "if" >
-| < WHILE: "while" >
-| < INTEGER: "int" >
-| < LENGTH: "length" >
-| < MAIN: "main" >
-| < NEW: "new" >
-| < PUBLIC: "public" >
-| < RETURN: "return" >
-| < STATIC: "static" >
-| < STRING: "String" >
-| < THIS: "this" >
-| < TRUE: "true" >
-| < PRINT: "System.out.println" >
-// | < ANSWER: "System.out.println" >
-| < VOID: "void" >
+	< LPAREN: "(" >
+	| < RPAREN: ")" >
+	| < LSQPAREN: "[" >
+	| < RSQPAREN: "]" >
+	| < LBRACE: "{" >
+	| < RBRACE: "}" >
+	| < SEMICOLON: ";" >
+	| < DOT: "." >
+	| < ASSIGN: "=" >
+	| < LT: "<" >
+	| < PLUS: "+" >
+	| < MINUS: "-" >
+	| < AND : "&&" >
+	| < OR : "||" >
+	| < NOT : "!" >
+	| < BOOLEAN: "boolean" >
+	| < CLASS: "class" >
+	| < INTERFACE: "interface" >
+	| < ELSE: "else" >
+	| < EXTENDS: "extends" >
+	| < FALSE: "false" >
+	| < IF: "if" >
+	| < WHILE: "while" >
+	| < INTEGER: "int" >
+	| < LENGTH: "length" >
+	| < MAIN: "main" >
+	| < NEW: "new" >
+	| < PUBLIC: "public" >
+	| < RETURN: "return" >
+	| < STATIC: "static" >
+	| < STRING: "String" >
+	| < THIS: "this" >
+	| < TRUE: "true" >
+	| < PRINT: "System.out.println" >
+	| < ANSWER: "Prover.answer" >
+	| < VOID: "void" >
 }
 
 TOKEN : /* LITERALS */
 {
-  < INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+	< INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
 }
 
 TOKEN : /* IDENTIFIERS */
 {
-  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+	< IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |
-  < #LETTER:
-      [
-       "\u0024",
-       "\u0041"-"\u005a",
-       "\u005f",
-       "\u0061"-"\u007a",
-       "\u00c0"-"\u00d6",
-       "\u00d8"-"\u00f6",
-       "\u00f8"-"\u00ff",
-       "\u0100"-"\u1fff",
-       "\u3040"-"\u318f",
-       "\u3300"-"\u337f",
-       "\u3400"-"\u3d2d",
-       "\u4e00"-"\u9fff",
-       "\uf900"-"\ufaff"
-      ]
-  >
+	< #LETTER:
+		[
+		"\u0024",
+		"\u0041"-"\u005a",
+		"\u005f",
+		"\u0061"-"\u007a",
+		"\u00c0"-"\u00d6",
+		"\u00d8"-"\u00f6",
+		"\u00f8"-"\u00ff",
+		"\u0100"-"\u1fff",
+		"\u3040"-"\u318f",
+		"\u3300"-"\u337f",
+		"\u3400"-"\u3d2d",
+		"\u4e00"-"\u9fff",
+		"\uf900"-"\ufaff"
+		]
+	>
 |
-  < #DIGIT:
-      [
-       "\u0030"-"\u0039",
-       "\u0660"-"\u0669",
-       "\u06f0"-"\u06f9",
-       "\u0966"-"\u096f",
-       "\u09e6"-"\u09ef",
-       "\u0a66"-"\u0a6f",
-       "\u0ae6"-"\u0aef",
-       "\u0b66"-"\u0b6f",
-       "\u0be7"-"\u0bef",
-       "\u0c66"-"\u0c6f",
-       "\u0ce6"-"\u0cef",
-       "\u0d66"-"\u0d6f",
-       "\u0e50"-"\u0e59",
-       "\u0ed0"-"\u0ed9",
-       "\u1040"-"\u1049"
-      ]
-  >
+	< #DIGIT:
+		[
+		"\u0030"-"\u0039",
+		"\u0660"-"\u0669",
+		"\u06f0"-"\u06f9",
+		"\u0966"-"\u096f",
+		"\u09e6"-"\u09ef",
+		"\u0a66"-"\u0a6f",
+		"\u0ae6"-"\u0aef",
+		"\u0b66"-"\u0b6f",
+		"\u0be7"-"\u0bef",
+		"\u0c66"-"\u0c6f",
+		"\u0ce6"-"\u0cef",
+		"\u0d66"-"\u0d6f",
+		"\u0e50"-"\u0e59",
+		"\u0ed0"-"\u0ed9",
+		"\u1040"-"\u1049"
+		]
+	>
 }
 
 
@@ -119,346 +120,366 @@ TOKEN : /* IDENTIFIERS */
 void Goal() :
 {}
 {
-  MainClass()
-  ( TypeDeclaration() )*
-  <EOF>
+	MainClass()
+	( TypeDeclaration() )*
+	<EOF>
 }
 
 void MainClass() :
 {}
 {
-  "class" Identifier() "{"
-    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"
-    "{" ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* "}"
-  "}"
+	"class" Identifier() "{"
+		"public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"
+		"{" ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* "}"
+	"}"
 }
 
 void TypeDeclaration() :
 {}
 {
-  LOOKAHEAD(3)
-  ClassDeclaration()
+	LOOKAHEAD(3)
+	ClassDeclaration()
 |
-  ClassExtendsDeclaration()
+	ClassExtendsDeclaration()
 }
 
 void ClassDeclaration() :
 {}
 {
-  "class" Identifier() "{" ( VarDeclaration() )*
-                           ( MethodDeclaration() )*
-                       "}"
+	"class" Identifier() "{"
+		( VarDeclaration() )*
+		( MethodDeclaration() )*
+	"}"
 }
 
 void ClassExtendsDeclaration() :
 {}
 {
-  "class" Identifier() "extends" Identifier()
-                       "{" ( VarDeclaration() )*
-                           ( MethodDeclaration() )*
-                       "}"
+	"class" Identifier() "extends" Identifier() "{"
+		( VarDeclaration() )*
+		( MethodDeclaration() )*
+	"}"
 }
 
 void VarDeclaration() :
 {}
 {
-  Type() Identifier() ";"
+	Type() Identifier() ";"
 }
 
 void MethodDeclaration() :
 {}
 {
-  "public" Type() Identifier()
-  "(" ( FormalParameterList() )? ")"
-  "{" ( LOOKAHEAD(2) VarDeclaration() )*
-      ( Statement() )* "return" Expression() ";" "}"
+	"public" Type() Identifier() "(" ( FormalParameterList() )? ")" "{"
+		( LOOKAHEAD(2) VarDeclaration() )*
+		( Statement() )*
+		"return" Expression() ";"
+	"}"
 }
 
 void FormalParameterList() :
 {}
 {
-  FormalParameter() FormalParameterTail()
+	FormalParameter() FormalParameterTail()
 }
 
 void FormalParameter() :
 {}
 {
-  Type() Identifier()
+	Type() Identifier()
 }
 
 void FormalParameterTail() :
 {}
 {
-  ( FormalParameterTerm() )*
+	( FormalParameterTerm() )*
 }
 
 void FormalParameterTerm() :
 {}
 {
-  "," FormalParameter()
+	"," FormalParameter()
 }
 
 void Type() :
 {}
 {
-  LOOKAHEAD(3)
-  ArrayType()
+	LOOKAHEAD(3)
+	ArrayType()
 |
-  BooleanType()
+	BooleanType()
 |
-  IntegerType()
+	IntegerType()
 |
-  Identifier()
+	Identifier()
 }
 
 void ArrayType() :
 {}
 {
-  "int" "[" "]"
+	"int" "[" "]"
 }
 
 void BooleanType() :
 {}
 {
-  "boolean"
+	"boolean"
 }
 
 void IntegerType() :
 {}
 {
-  "int"
+	"int"
 }
 
 void Statement() :
 {}
 {
-  Block()
+	Block()
 |
-  LOOKAHEAD(2)
-  AssignmentStatement()
+	LOOKAHEAD(2)
+	AssignmentStatement()
 |
-  LOOKAHEAD(2)
-  ArrayAssignmentStatement()
+	LOOKAHEAD(2)
+	ArrayAssignmentStatement()
 |
-  IfStatement()
+	IfStatement()
 |
-  WhileStatement()
+	WhileStatement()
 |
-  PrintStatement()
+	PrintStatement()
+|
+	AnswerStatement()
 }
 
 void Block() :
 {}
 {
-  "{" ( Statement() )* "}"
+	"{" ( Statement() )* "}"
 }
 
 void AssignmentStatement() :
 {}
 {
-  Identifier() "=" Expression() ";"
+	Identifier() "=" Expression() ";"
 }
 
 void ArrayAssignmentStatement() :
 {}
 {
-  Identifier() "[" Expression() "]" "=" Expression() ";"
+	Identifier() "[" Expression() "]" "=" Expression() ";"
 }
 
 void IfStatement() :
 {}
 {
-  "if" "(" Expression() ")" Statement() "else" Statement()
+	"if" "(" Expression() ")" Statement()
+	( "else" Statement() )?
 }
 
 void WhileStatement() :
 {}
 {
-  "while" "(" Expression() ")" Statement()
+	"while" "(" Expression() ")" Statement()
 }
 
 void PrintStatement() :
 {}
 {
-  "System.out.println" "(" Expression() ")" ";"
+	<PRINT> "(" Expression() ")" ";"
+}
+
+void AnswerStatement() :
+{}
+{
+	<ANSWER> "(" Expression() ")" ";"
 }
 
 void Expression() :
 {}
 {
-  LOOKAHEAD( Clause() "&&" )
-  AndExpression()
+	LOOKAHEAD( Clause() "&&" )
+	AndExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "<" )
-  CompareExpression()
+	LOOKAHEAD( Clause() "||" )
+	OrExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "+" )
-  PlusExpression()
+	LOOKAHEAD( PrimaryExpression() "<" )
+	CompareExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "-" )
-  MinusExpression()
+	LOOKAHEAD( PrimaryExpression() "+" )
+	PlusExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "*" )
-  TimesExpression()
+	LOOKAHEAD( PrimaryExpression() "-" )
+	MinusExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "[" )
-  ArrayLookup()
+	LOOKAHEAD( PrimaryExpression() "*" )
+	TimesExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "." "length" )
-  ArrayLength()
+	LOOKAHEAD( PrimaryExpression() "[" )
+	ArrayLookup()
 |
-  LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
-  MessageSend()
+	LOOKAHEAD( PrimaryExpression() "." "length" )
+	ArrayLength()
 |
-  Clause()
+	LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
+	MessageSend()
+|
+	Clause()
 }
 
 void AndExpression() :
 {}
 {
-  Clause() "&&" Clause()
+	Clause() "&&" Clause()
+}
+
+void OrExpression() :
+{}
+{
+	Clause() "||" Clause()
 }
 
 void CompareExpression() :
 {}
 {
-  PrimaryExpression() "<" PrimaryExpression()
+	PrimaryExpression() "<" PrimaryExpression()
 }
 
 void PlusExpression() :
 {}
 {
-  PrimaryExpression() "+" PrimaryExpression()
+	PrimaryExpression() "+" PrimaryExpression()
 }
 
 void MinusExpression() :
 {}
 {
-  PrimaryExpression() "-" PrimaryExpression()
+	PrimaryExpression() "-" PrimaryExpression()
 }
 
 void TimesExpression() :
 {}
 {
-  PrimaryExpression() "*" PrimaryExpression()
+	PrimaryExpression() "*" PrimaryExpression()
 }
 
 void ArrayLookup() :
 {}
 {
-  PrimaryExpression() "[" PrimaryExpression() "]"
+	PrimaryExpression() "[" PrimaryExpression() "]"
 }
 
 void ArrayLength() :
 {}
 {
-  PrimaryExpression() "." "length"
+	PrimaryExpression() "." "length"
 }
 
 void MessageSend() :
 {}
 {
-  PrimaryExpression() "." Identifier()
-  "(" ( ExpressionList() )? ")"
+	PrimaryExpression() "." Identifier() "(" ( ExpressionList() )? ")"
 }
 
 void ExpressionList() :
 {}
 {
-  Expression() ExpressionTail()
+	Expression() ExpressionTail()
 }
 
 void ExpressionTail() :
 {}
 {
-  ( ExpressionTerm() )*
+	( ExpressionTerm() )*
 }
 
 void ExpressionTerm() :
 {}
 {
-  "," Expression()
+	"," Expression()
 }
 
 void Clause() :
 {}
 {
-    NotExpression()
-  | PrimaryExpression()
+	NotExpression()
+|
+	PrimaryExpression()
 }
 
 void PrimaryExpression() :
 {}
 {
-  IntegerLiteral()
+	IntegerLiteral()
 |
-  TrueLiteral()
+	TrueLiteral()
 |
-  FalseLiteral()
+	FalseLiteral()
 |
-  Identifier()
+	Identifier()
 |
-  ThisExpression()
+	ThisExpression()
 |
-  LOOKAHEAD(3)
-  ArrayAllocationExpression()
+	LOOKAHEAD(3)
+	ArrayAllocationExpression()
 |
-  AllocationExpression()
+	AllocationExpression()
 |
-  BracketExpression()
+	BracketExpression()
 }
 
 void IntegerLiteral() :
 {}
 {
-  <INTEGER_LITERAL>
+	<INTEGER_LITERAL>
 }
 
 
 void TrueLiteral() :
 {}
 {
-  "true"
+	"true"
 }
 
 void FalseLiteral() :
 {}
 {
-  "false"
+	"false"
 }
 
 void Identifier() :
 {}
 {
-  <IDENTIFIER>
+	<IDENTIFIER>
 }
 
 void ThisExpression() :
 {}
 {
-  "this"
+	"this"
 }
 
 void ArrayAllocationExpression() :
 {}
 {
-  "new" "int" "[" Expression() "]"
+	"new" "int" "[" Expression() "]"
 }
 
 void AllocationExpression() :
 {}
 {
-  "new" Identifier() "(" ")"
+	"new" Identifier() "(" ")"
 }
 
 void NotExpression() :
 {}
 {
-  "!" Clause()
+	"!" Clause()
 }
 
 void BracketExpression() :
 {}
 {
-  "(" Expression() ")"
+	"(" Expression() ")"
 }

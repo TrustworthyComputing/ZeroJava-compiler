@@ -162,6 +162,7 @@ public interface GJNoArguVisitor<R> {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public R visit(Statement n) throws Exception;
 
@@ -197,8 +198,7 @@ public interface GJNoArguVisitor<R> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public R visit(IfStatement n) throws Exception;
 
@@ -212,7 +212,7 @@ public interface GJNoArguVisitor<R> {
    public R visit(WhileStatement n) throws Exception;
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -221,7 +221,17 @@ public interface GJNoArguVisitor<R> {
    public R visit(PrintStatement n) throws Exception;
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public R visit(AnswerStatement n) throws Exception;
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -239,6 +249,13 @@ public interface GJNoArguVisitor<R> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n) throws Exception;
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n) throws Exception;
 
    /**
     * f0 -> PrimaryExpression()

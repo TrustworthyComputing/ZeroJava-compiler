@@ -41,55 +41,59 @@ public interface MiniJavaParserConstants {
   /** RegularExpression Id. */
   int AND = 21;
   /** RegularExpression Id. */
-  int NOT = 22;
+  int OR = 22;
   /** RegularExpression Id. */
-  int BOOLEAN = 23;
+  int NOT = 23;
   /** RegularExpression Id. */
-  int CLASS = 24;
+  int BOOLEAN = 24;
   /** RegularExpression Id. */
-  int INTERFACE = 25;
+  int CLASS = 25;
   /** RegularExpression Id. */
-  int ELSE = 26;
+  int INTERFACE = 26;
   /** RegularExpression Id. */
-  int EXTENDS = 27;
+  int ELSE = 27;
   /** RegularExpression Id. */
-  int FALSE = 28;
+  int EXTENDS = 28;
   /** RegularExpression Id. */
-  int IF = 29;
+  int FALSE = 29;
   /** RegularExpression Id. */
-  int WHILE = 30;
+  int IF = 30;
   /** RegularExpression Id. */
-  int INTEGER = 31;
+  int WHILE = 31;
   /** RegularExpression Id. */
-  int LENGTH = 32;
+  int INTEGER = 32;
   /** RegularExpression Id. */
-  int MAIN = 33;
+  int LENGTH = 33;
   /** RegularExpression Id. */
-  int NEW = 34;
+  int MAIN = 34;
   /** RegularExpression Id. */
-  int PUBLIC = 35;
+  int NEW = 35;
   /** RegularExpression Id. */
-  int RETURN = 36;
+  int PUBLIC = 36;
   /** RegularExpression Id. */
-  int STATIC = 37;
+  int RETURN = 37;
   /** RegularExpression Id. */
-  int STRING = 38;
+  int STATIC = 38;
   /** RegularExpression Id. */
-  int THIS = 39;
+  int STRING = 39;
   /** RegularExpression Id. */
-  int TRUE = 40;
+  int THIS = 40;
   /** RegularExpression Id. */
-  int PRINT = 41;
+  int TRUE = 41;
   /** RegularExpression Id. */
-  int VOID = 42;
+  int PRINT = 42;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 43;
+  int ANSWER = 43;
   /** RegularExpression Id. */
-  int IDENTIFIER = 44;
+  int VOID = 44;
   /** RegularExpression Id. */
-  int LETTER = 45;
+  int INTEGER_LITERAL = 45;
   /** RegularExpression Id. */
-  int DIGIT = 46;
+  int IDENTIFIER = 46;
+  /** RegularExpression Id. */
+  int LETTER = 47;
+  /** RegularExpression Id. */
+  int DIGIT = 48;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -118,6 +122,7 @@ public interface MiniJavaParserConstants {
     "\"+\"",
     "\"-\"",
     "\"&&\"",
+    "\"||\"",
     "\"!\"",
     "\"boolean\"",
     "\"class\"",
@@ -138,6 +143,7 @@ public interface MiniJavaParserConstants {
     "\"this\"",
     "\"true\"",
     "\"System.out.println\"",
+    "\"Prover.answer\"",
     "\"void\"",
     "<INTEGER_LITERAL>",
     "<IDENTIFIER>",

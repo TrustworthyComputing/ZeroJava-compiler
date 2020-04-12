@@ -303,6 +303,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public R visit(Statement n) throws Exception {
       return n.f0.accept(this);
@@ -363,8 +364,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public R visit(IfStatement n) throws Exception {
       R _ret=null;
@@ -374,7 +374,6 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
       n.f3.accept(this);
       n.f4.accept(this);
       n.f5.accept(this);
-      n.f6.accept(this);
       return _ret;
    }
 
@@ -396,7 +395,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -413,7 +412,25 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    }
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public R visit(AnswerStatement n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      return _ret;
+   }
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -433,6 +450,19 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f2 -> Clause()
     */
    public R visit(AndExpression n) throws Exception {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public R visit(OrExpression n) throws Exception {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);

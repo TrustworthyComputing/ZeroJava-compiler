@@ -56,6 +56,7 @@ TOKEN :
    | <PLUS: "+">
    | <MINUS: "-">
    | <AND: "&&">
+   | <OR: "||">
    | <NOT: "!">
    | <BOOLEAN: "boolean">
    | <CLASS: "class">
@@ -76,6 +77,7 @@ TOKEN :
    | <THIS: "this">
    | <TRUE: "true">
    | <PRINT: "System.out.println">
+   | <ANSWER: "Prover.answer">
    | <VOID: "void">
 }
 
@@ -501,6 +503,7 @@ Statement Statement() :
    IfStatement n4;
    WhileStatement n5;
    PrintStatement n6;
+   AnswerStatement n7;
 
    
 }
@@ -525,6 +528,9 @@ Statement Statement() :
    |
       n6=PrintStatement()
       { n0 = new NodeChoice(n6, 5); }
+   |
+      n7=AnswerStatement()
+      { n0 = new NodeChoice(n7, 6); }
    )
    
    { return new Statement(n0); }
@@ -611,9 +617,11 @@ IfStatement IfStatement() :
    NodeToken n5;
    Token n6;
    Statement n7;
-   NodeToken n8;
-   Token n9;
-   Statement n10;
+   NodeOptional n8 = new NodeOptional();
+   NodeSequence n9;
+   NodeToken n10;
+   Token n11;
+   Statement n12;
 
    
 }
@@ -623,10 +631,16 @@ IfStatement IfStatement() :
    n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
    n7=Statement()
-   n9="else" { n8 = JTBToolkit.makeNodeToken(n9); }
-   n10=Statement()
+   (
+      { n9 = new NodeSequence(2); }
+      n11="else" { n10 = JTBToolkit.makeNodeToken(n11); }
+      { n9.addNode(n10); }
+      n12=Statement()
+      { n9.addNode(n12); }
+      { n8.addNode(n9); }
+   )?
    
-   { return new IfStatement(n0,n2,n4,n5,n7,n8,n10); }
+   { return new IfStatement(n0,n2,n4,n5,n7,n8); }
 }
 
 WhileStatement WhileStatement() :
@@ -667,7 +681,7 @@ PrintStatement PrintStatement() :
    
 }
 {
-   n1="System.out.println" { n0 = JTBToolkit.makeNodeToken(n1); }
+   n1=<PRINT> { n0 = JTBToolkit.makeNodeToken(n1); }
    n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
    n4=Expression()
    n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
@@ -676,18 +690,43 @@ PrintStatement PrintStatement() :
    { return new PrintStatement(n0,n2,n4,n5,n7); }
 }
 
+AnswerStatement AnswerStatement() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   Expression n4;
+   NodeToken n5;
+   Token n6;
+   NodeToken n7;
+   Token n8;
+
+   
+}
+{
+   n1=<ANSWER> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3="(" { n2 = JTBToolkit.makeNodeToken(n3); }
+   n4=Expression()
+   n6=")" { n5 = JTBToolkit.makeNodeToken(n6); }
+   n8=";" { n7 = JTBToolkit.makeNodeToken(n8); }
+   
+   { return new AnswerStatement(n0,n2,n4,n5,n7); }
+}
+
 Expression Expression() :
 {
    NodeChoice n0;
    AndExpression n1;
-   CompareExpression n2;
-   PlusExpression n3;
-   MinusExpression n4;
-   TimesExpression n5;
-   ArrayLookup n6;
-   ArrayLength n7;
-   MessageSend n8;
-   Clause n9;
+   OrExpression n2;
+   CompareExpression n3;
+   PlusExpression n4;
+   MinusExpression n5;
+   TimesExpression n6;
+   ArrayLookup n7;
+   ArrayLength n8;
+   MessageSend n9;
+   Clause n10;
 
    
 }
@@ -697,36 +736,40 @@ Expression Expression() :
       n1=AndExpression()
       { n0 = new NodeChoice(n1, 0); }
    |
-      LOOKAHEAD(PrimaryExpression() "<")
-      n2=CompareExpression()
+      LOOKAHEAD(Clause() "||")
+      n2=OrExpression()
       { n0 = new NodeChoice(n2, 1); }
    |
-      LOOKAHEAD(PrimaryExpression() "+")
-      n3=PlusExpression()
+      LOOKAHEAD(PrimaryExpression() "<")
+      n3=CompareExpression()
       { n0 = new NodeChoice(n3, 2); }
    |
-      LOOKAHEAD(PrimaryExpression() "-")
-      n4=MinusExpression()
+      LOOKAHEAD(PrimaryExpression() "+")
+      n4=PlusExpression()
       { n0 = new NodeChoice(n4, 3); }
    |
-      LOOKAHEAD(PrimaryExpression() "*")
-      n5=TimesExpression()
+      LOOKAHEAD(PrimaryExpression() "-")
+      n5=MinusExpression()
       { n0 = new NodeChoice(n5, 4); }
    |
-      LOOKAHEAD(PrimaryExpression() "[")
-      n6=ArrayLookup()
+      LOOKAHEAD(PrimaryExpression() "*")
+      n6=TimesExpression()
       { n0 = new NodeChoice(n6, 5); }
    |
-      LOOKAHEAD(PrimaryExpression() "." "length")
-      n7=ArrayLength()
+      LOOKAHEAD(PrimaryExpression() "[")
+      n7=ArrayLookup()
       { n0 = new NodeChoice(n7, 6); }
    |
-      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
-      n8=MessageSend()
+      LOOKAHEAD(PrimaryExpression() "." "length")
+      n8=ArrayLength()
       { n0 = new NodeChoice(n8, 7); }
    |
-      n9=Clause()
+      LOOKAHEAD(PrimaryExpression() "." Identifier() "(")
+      n9=MessageSend()
       { n0 = new NodeChoice(n9, 8); }
+   |
+      n10=Clause()
+      { n0 = new NodeChoice(n10, 9); }
    )
    
    { return new Expression(n0); }
@@ -747,6 +790,23 @@ AndExpression AndExpression() :
    n3=Clause()
    
    { return new AndExpression(n0,n1,n3); }
+}
+
+OrExpression OrExpression() :
+{
+   Clause n0;
+   NodeToken n1;
+   Token n2;
+   Clause n3;
+
+   
+}
+{
+   n0=Clause()
+   n2="||" { n1 = JTBToolkit.makeNodeToken(n2); }
+   n3=Clause()
+   
+   { return new OrExpression(n0,n1,n3); }
 }
 
 CompareExpression CompareExpression() :

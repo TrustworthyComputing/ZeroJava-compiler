@@ -6,37 +6,33 @@ package syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> "if"
+ * f0 -> <ANSWER>
  * f1 -> "("
  * f2 -> Expression()
  * f3 -> ")"
- * f4 -> Statement()
- * f5 -> ( "else" Statement() )?
+ * f4 -> ";"
  */
-public class IfStatement implements Node {
+public class AnswerStatement implements Node {
    public NodeToken f0;
    public NodeToken f1;
    public Expression f2;
    public NodeToken f3;
-   public Statement f4;
-   public NodeOptional f5;
+   public NodeToken f4;
 
-   public IfStatement(NodeToken n0, NodeToken n1, Expression n2, NodeToken n3, Statement n4, NodeOptional n5) {
+   public AnswerStatement(NodeToken n0, NodeToken n1, Expression n2, NodeToken n3, NodeToken n4) {
       f0 = n0;
       f1 = n1;
       f2 = n2;
       f3 = n3;
       f4 = n4;
-      f5 = n5;
    }
 
-   public IfStatement(Expression n0, Statement n1, NodeOptional n2) {
-      f0 = new NodeToken("if");
+   public AnswerStatement(Expression n0) {
+      f0 = new NodeToken("Prover.answer");
       f1 = new NodeToken("(");
       f2 = n0;
       f3 = new NodeToken(")");
-      f4 = n1;
-      f5 = n2;
+      f4 = new NodeToken(";");
    }
 
    public void accept(visitor.Visitor v) throws Exception {

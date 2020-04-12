@@ -20,26 +20,26 @@ hs_err_pid*
 *.tar.gz
 *.html
 
-compiler/src/zilch/zilch-jtb.jj
-compiler/src/zilch/ZilchParser.java
-compiler/src/zilch/ZilchParserConstants.java
-compiler/src/zilch/ZilchParserTokenManager.java
-compiler/src/zilch/ParseException.java
-compiler/src/zilch/Token.java
-compiler/src/zilch/TokenMgrError.java
-compiler/src/zilch/JavaCharStream.java
-compiler/src/zilch/syntaxtree/*
-compiler/src/zilch/visitor/*
+compiler/src/zilch-jtb.jj
+compiler/src/ZilchParser.java
+compiler/src/ZilchParserConstants.java
+compiler/src/ZilchParserTokenManager.java
+compiler/src/ParseException.java
+compiler/src/Token.java
+compiler/src/TokenMgrError.java
+compiler/src/JavaCharStream.java
+compiler/src/syntaxtree/*
+compiler/src/visitor/*
 
-optimizer/src/zilch/zmips-jtb.jj
-optimizer/src/zilch/ZMIPSParser.java
-optimizer/src/zilch/ZMIPSParserConstants.java
-optimizer/src/zilch/ZMIPSParserTokenManager.java
-optimizer/src/zilch/ParseException.java
-optimizer/src/zilch/Token.java
-optimizer/src/zilch/TokenMgrError.java
-optimizer/src/zilch/JavaCharStream.java
-optimizer/src/zilch/syntaxtree/*
-optimizer/src/zilch/visitor/*
+optimizer/src/zmips-jtb.jj
+optimizer/src/ZMIPSParser.java
+optimizer/src/ZMIPSParserConstants.java
+optimizer/src/ZMIPSParserTokenManager.java
+optimizer/src/ParseException.java
+optimizer/src/Token.java
+optimizer/src/TokenMgrError.java
+optimizer/src/JavaCharStream.java
+optimizer/src/syntaxtree/*
+optimizer/src/visitor/*
 
-optimizer/src/zilch/facts_rules/Facts/*
+optimizer/src/facts_rules/Facts/*

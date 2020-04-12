@@ -257,6 +257,7 @@ public class DepthFirstVisitor implements Visitor {
     *       | IfStatement()
     *       | WhileStatement()
     *       | PrintStatement()
+    *       | AnswerStatement()
     */
    public void visit(Statement n) throws Exception {
       n.f0.accept(this);
@@ -311,8 +312,7 @@ public class DepthFirstVisitor implements Visitor {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
    public void visit(IfStatement n) throws Exception {
       n.f0.accept(this);
@@ -321,7 +321,6 @@ public class DepthFirstVisitor implements Visitor {
       n.f3.accept(this);
       n.f4.accept(this);
       n.f5.accept(this);
-      n.f6.accept(this);
    }
 
    /**
@@ -340,7 +339,7 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
-    * f0 -> "System.out.println"
+    * f0 -> <PRINT>
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
@@ -355,7 +354,23 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
+    * f0 -> <ANSWER>
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> ";"
+    */
+   public void visit(AnswerStatement n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+   }
+
+   /**
     * f0 -> AndExpression()
+    *       | OrExpression()
     *       | CompareExpression()
     *       | PlusExpression()
     *       | MinusExpression()
@@ -375,6 +390,17 @@ public class DepthFirstVisitor implements Visitor {
     * f2 -> Clause()
     */
    public void visit(AndExpression n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+   }
+
+   /**
+    * f0 -> Clause()
+    * f1 -> "||"
+    * f2 -> Clause()
+    */
+   public void visit(OrExpression n) throws Exception {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);

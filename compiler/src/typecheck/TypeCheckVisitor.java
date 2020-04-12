@@ -332,8 +332,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> "else"
-    * f6 -> Statement()
+    * f5 -> ( "else" Statement() )?
     */
     public BaseType visit(IfStatement n, BaseType argu) throws Exception {
         n.f0.accept(this, argu);
@@ -342,7 +341,6 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
         n.f5.accept(this, argu);
-        n.f6.accept(this, argu);
         if (expr.getType() == null) {
             expr = findType(expr, (Method_t)argu);
         }
