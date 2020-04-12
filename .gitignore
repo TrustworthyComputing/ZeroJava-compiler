@@ -20,10 +20,10 @@ hs_err_pid*
 *.tar.gz
 *.html
 
-compiler/src/zilch-jtb.jj
-compiler/src/ZilchParser.java
-compiler/src/ZilchParserConstants.java
-compiler/src/ZilchParserTokenManager.java
+compiler/src/MiniJava-jtb.jj
+compiler/src/MiniJavaParser.java
+compiler/src/MiniJavaParserConstants.java
+compiler/src/MiniJavaParserTokenManager.java
 compiler/src/ParseException.java
 compiler/src/Token.java
 compiler/src/TokenMgrError.java
