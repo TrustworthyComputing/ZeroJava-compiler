@@ -193,14 +193,30 @@ public interface GJVoidVisitor<A> {
    public void visit(ArrayAssignmentStatement n, A argu) throws Exception;
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public void visit(IfStatement n, A argu) throws Exception;
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public void visit(IfStatement n, A argu) throws Exception;
+   public void visit(IfthenStatement n, A argu) throws Exception;
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public void visit(IfthenElseStatement n, A argu) throws Exception;
 
    /**
     * f0 -> "while"

@@ -359,14 +359,40 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    }
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public R visit(IfStatement n, A argu) throws Exception {
+      return n.f0.accept(this, argu);
+   }
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public R visit(IfStatement n, A argu) throws Exception {
+   public R visit(IfthenStatement n, A argu) throws Exception {
+      R _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public R visit(IfthenElseStatement n, A argu) throws Exception {
       R _ret=null;
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
@@ -374,6 +400,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
       n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
       return _ret;
    }
 

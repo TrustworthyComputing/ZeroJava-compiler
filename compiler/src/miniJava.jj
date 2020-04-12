@@ -270,11 +270,33 @@ void ArrayAssignmentStatement() :
 	Identifier() "[" Expression() "]" "=" Expression() ";"
 }
 
+// void IfStatement() :
+// {}
+// {
+// 	LOOKAHEAD(IfthenElseStatement()) IfthenElseStatement()
+// 	"if" "(" Expression() ")" Statement()
+// 	( "else" Statement() )?
+// }
+
+
 void IfStatement() :
 {}
 {
+	LOOKAHEAD(IfthenElseStatement())
+	IfthenElseStatement()
+|
+	IfthenStatement()
+}
+
+void IfthenStatement() :
+{}
+{
 	"if" "(" Expression() ")" Statement()
-	( "else" Statement() )?
+}
+void IfthenElseStatement() :
+{}
+{
+	"if" "(" Expression() ")" Statement() "else" Statement()
 }
 
 void WhileStatement() :

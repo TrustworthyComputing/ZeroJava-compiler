@@ -383,28 +383,49 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	}
 
 	/**
-	* f0 -> "if"
-	* f1 -> "("
-	* f2 -> Expression()
-	* f3 -> ")"
-	* f4 -> Statement()
-	* f5 -> ( "else" Statement() )?
-	*/
+	 * f0 -> IfthenElseStatement()
+	 *       | IfthenStatement()
+	 */
 	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+	   return n.f0.accept(this, argu);
+	}
+
+	/**
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     * f5 -> "else"
+     * f6 -> Statement()
+     */
+	public BaseType visit(IfthenElseStatement n, BaseType argu) throws Exception {
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.code_.append("cmpg " + cond + ", 0\n");
-		if (n.f5.present()) { // if then else
-			String elselabel = labels_.newLabel();
-			this.code_.append("cnjmp " + elselabel + "\n");
-			n.f4.accept(this, argu);
-			this.code_.append("j " + endlabel + "\n");
-			this.code_.append(elselabel + "\n");
-			n.f5.accept(this, argu);
-		} else { // if then
-			this.code_.append("cnjmp " + endlabel + "\n");
-			n.f4.accept(this, argu);
-		}
+		String elselabel = labels_.newLabel();
+		this.code_.append("cnjmp " + elselabel + "\n");
+		n.f4.accept(this, argu);
+		this.code_.append("j " + endlabel + "\n");
+		this.code_.append(elselabel + "\n");
+		n.f6.accept(this, argu);
+		this.code_.append(endlabel + "\n");
+		return null;
+	}
+
+	/**
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     */
+	public BaseType visit(IfthenStatement n, BaseType argu) throws Exception {
+		String endlabel = labels_.newLabel();
+		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("cmpg " + cond + ", 0\n");
+		this.code_.append("cnjmp " + endlabel + "\n");
+		n.f4.accept(this, argu);
 		this.code_.append(endlabel + "\n");
 		return null;
 	}

@@ -307,20 +307,45 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public void visit(IfStatement n) throws Exception {
+      n.f0.accept(this);
+   }
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public void visit(IfStatement n) throws Exception {
+   public void visit(IfthenStatement n) throws Exception {
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+   }
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public void visit(IfthenElseStatement n) throws Exception {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
       n.f3.accept(this);
       n.f4.accept(this);
       n.f5.accept(this);
+      n.f6.accept(this);
    }
 
    /**

@@ -193,14 +193,30 @@ public interface GJNoArguVisitor<R> {
    public R visit(ArrayAssignmentStatement n) throws Exception;
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public R visit(IfStatement n) throws Exception;
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public R visit(IfStatement n) throws Exception;
+   public R visit(IfthenStatement n) throws Exception;
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public R visit(IfthenElseStatement n) throws Exception;
 
    /**
     * f0 -> "while"

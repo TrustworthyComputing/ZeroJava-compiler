@@ -327,20 +327,26 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     }
 
     /**
-    * f0 -> "if"
-    * f1 -> "("
-    * f2 -> Expression()
-    * f3 -> ")"
-    * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
-    */
+     * f0 -> IfthenElseStatement()
+     *       | IfthenStatement()
+     */
     public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+       return n.f0.accept(this, argu);
+    }
+
+    /**
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     */
+    public BaseType visit(IfthenStatement n, BaseType argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
         if (expr.getType() == null) {
             expr = findType(expr, (Method_t)argu);
         }
@@ -349,6 +355,56 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         }
         throw new Exception("If-condition is not a boolean Expression!");
     }
+
+    /**
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     * f5 -> "else"
+     * f6 -> Statement()
+     */
+    public BaseType visit(IfthenElseStatement n, BaseType argu) throws Exception {
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t expr = (Variable_t) n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        n.f5.accept(this, argu);
+        n.f6.accept(this, argu);
+        if (expr.getType() == null) {
+            expr = findType(expr, (Method_t)argu);
+        }
+        if (expr.getType().equals("boolean")) {
+            return null;
+        }
+        throw new Exception("If-condition is not a boolean Expression!");
+    }
+
+    // /**
+    // * f0 -> "if"
+    // * f1 -> "("
+    // * f2 -> Expression()
+    // * f3 -> ")"
+    // * f4 -> Statement()
+    // * f5 -> ( "else" Statement() )?
+    // */
+    // public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+    //     n.f0.accept(this, argu);
+    //     n.f1.accept(this, argu);
+    //     Variable_t expr = (Variable_t) n.f2.accept(this, argu);
+    //     n.f3.accept(this, argu);
+    //     n.f4.accept(this, argu);
+    //     n.f5.accept(this, argu);
+    //     if (expr.getType() == null) {
+    //         expr = findType(expr, (Method_t)argu);
+    //     }
+    //     if (expr.getType().equals("boolean")) {
+    //         return null;
+    //     }
+    //     throw new Exception("If-condition is not a boolean Expression!");
+    // }
 
     /**
     * f0 -> "while"

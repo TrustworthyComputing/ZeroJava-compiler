@@ -193,14 +193,30 @@ public interface Visitor {
    public void visit(ArrayAssignmentStatement n) throws Exception;
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public void visit(IfStatement n) throws Exception;
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public void visit(IfStatement n) throws Exception;
+   public void visit(IfthenStatement n) throws Exception;
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public void visit(IfthenElseStatement n) throws Exception;
 
    /**
     * f0 -> "while"

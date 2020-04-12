@@ -193,14 +193,30 @@ public interface GJVisitor<R,A> {
    public R visit(ArrayAssignmentStatement n, A argu) throws Exception;
 
    /**
+    * f0 -> IfthenElseStatement()
+    *       | IfthenStatement()
+    */
+   public R visit(IfStatement n, A argu) throws Exception;
+
+   /**
     * f0 -> "if"
     * f1 -> "("
     * f2 -> Expression()
     * f3 -> ")"
     * f4 -> Statement()
-    * f5 -> ( "else" Statement() )?
     */
-   public R visit(IfStatement n, A argu) throws Exception;
+   public R visit(IfthenStatement n, A argu) throws Exception;
+
+   /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+   public R visit(IfthenElseStatement n, A argu) throws Exception;
 
    /**
     * f0 -> "while"
