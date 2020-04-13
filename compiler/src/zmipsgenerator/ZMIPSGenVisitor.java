@@ -746,6 +746,28 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		return new Variable_t(meth.getType(), null, ret);
 	}
 
+    /**
+     * f0 -> <PUBLIC_READ>
+     * f1 -> "("
+     * f2 -> ")"
+     */
+    public BaseType visit(PublicReadExpression n, BaseType argu) throws Exception {
+		String t = newRegister();
+		this.code_.append("pubread " + t + "\n");
+		return new Variable_t("int", null, t);
+    }
+
+	/**
+     * f0 -> <PRIVATE_READ>
+     * f1 -> "("
+     * f2 -> ")"
+     */
+    public BaseType visit(PrivateReadExpression n, BaseType argu) throws Exception {
+		String t = newRegister();
+		this.code_.append("secread " + t + "\n");
+		return new Variable_t("int", null, t);
+    }
+
   	/**
      * f0 -> Expression()
      * f1 -> ExpressionTail()

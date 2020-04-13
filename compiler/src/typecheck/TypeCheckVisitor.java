@@ -715,6 +715,24 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     }
 
     /**
+     * f0 -> <PUBLIC_READ>
+     * f1 -> "("
+     * f2 -> ")"
+     */
+    public BaseType visit(PublicReadExpression n, BaseType argu) throws Exception {
+        return new Variable_t("int", null);
+    }
+
+    /**
+     * f0 -> <PRIVATE_READ>
+     * f1 -> "("
+     * f2 -> ")"
+     */
+    public BaseType visit(PrivateReadExpression n, BaseType argu) throws Exception {
+        return new Variable_t("int", null);
+    }
+
+    /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */

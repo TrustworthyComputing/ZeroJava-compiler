@@ -63,6 +63,8 @@ TOKEN :
 	| < TRUE: "true" >
 	| < PRINT: "System.out.println" >
 	| < ANSWER: "Prover.answer" >
+	| < PUBLIC_READ: "PublicTape.read" >
+	| < PRIVATE_READ: "PrivateTape.read" >
 	| < VOID: "void" >
 }
 
@@ -356,6 +358,12 @@ void Expression() :
 	LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
 	MessageSend()
 |
+	LOOKAHEAD( <PUBLIC_READ> )
+	PublicReadExpression()
+|
+	LOOKAHEAD( <PRIVATE_READ> )
+	PrivateReadExpression()
+|
 	Clause()
 }
 
@@ -441,6 +449,18 @@ void MessageSend() :
 {}
 {
 	PrimaryExpression() "." Identifier() "(" ( ExpressionList() )? ")"
+}
+
+void PublicReadExpression() :
+{}
+{
+	<PUBLIC_READ> "(" ")"
+}
+
+void PrivateReadExpression() :
+{}
+{
+	<PRIVATE_READ> "(" ")"
 }
 
 void ExpressionList() :
