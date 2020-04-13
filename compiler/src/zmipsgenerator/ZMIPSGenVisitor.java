@@ -12,13 +12,16 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	private Label labels_;
 	private Map<String, Class_t> st_;
 	private int globals_;
+	private int sp_;
 	private int hp_;
+	private final int INIT_STACK_OFFSET_ = 100;
 	private final int INIT_HEAP_OFFSET_ = 0;
 
     public ZMIPSGenVisitor(Map<String, Class_t> st, int globals) {
 		this.labels_ = new Label();
         this.st_ = st;
         this.globals_ = globals;
+		this.sp_ = INIT_STACK_OFFSET_;
 		this.hp_ = INIT_HEAP_OFFSET_;
 	}
 
@@ -37,7 +40,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				continue;
 			}
 			String vtable_reg = newRegister();
-			this.asm_.append("move " + vtable_reg + ", " + hp_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
+			this.asm_.append("move " + vtable_reg + ", " + hp_ + "\t\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
 			cl.setVTableAddress(hp_);
 			hp_ += cl.getNumMethods();
 			int i = 0;
@@ -63,7 +66,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
 		this.asm_.append(labels_.getErrorCode());
-		this.asm_.insert(0, "move $hp, " + hp_ + "\t\t\t# initialize heap pointer\n\n");
+		this.asm_.insert(0, "move $hp, " + hp_ + "\t\t\t\t# initialize heap pointer\n\n");
+		this.asm_.insert(0, "move $sp, " + sp_ + "\t\t\t# initialize stack pointer\n");
 		return null;
 	}
 
@@ -193,6 +197,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         n.f8.accept(this, meth);
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
         this.asm_.append("move $v0, " + retType.getRegister() + "\n");
+
+		// load $ra from the stack frame
+		this.asm_.append("lw $ra, 0($sp)\t\t\t# load $ra from stack\n");
+		this.asm_.append("add $sp, $sp, 1\n");
+
         this.asm_.append("jr $ra\n");
         return null;
 	}
@@ -838,6 +847,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	    }
 		String return_address = labels_.newLabel();
         this.asm_.append("la $ra, " + return_address + "\n");
+
+		this.asm_.append("sub $sp, $sp, 1\n");
+		this.asm_.append("sw $ra, 0($sp)\t\t\t# store $ra to the stack\n");
+
         this.asm_.append("jr " + methreg + "\n");
 		this.asm_.append(return_address + "\n");
 		String ret = newRegister();
@@ -1062,7 +1075,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String vtable = newRegister();
 		this.asm_.append("move " + new_obj + ", $hp\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
 		this.asm_.append("add $hp, $hp, " + (cl.getNumVars() + 1) + "\n");
-        this.asm_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t# load vTable address\n");
+        this.asm_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t\t# load " + cl.getName() + " vTable address\n");
         this.asm_.append("sw " + vtable + ", 0(" + new_obj + ")\n");
         for (int i = 1 ; i <= cl.getNumVars() ; i++) {
 			this.asm_.append("sw $zero, " + i + "(" + new_obj + ")\n");
