@@ -427,16 +427,29 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     }
 
     /**
-    * f0 -> AndExpression()
-    *       | LessThanExpression()
-    *       | PlusExpression()
-    *       | MinusExpression()
-    *       | TimesExpression()
-    *       | ArrayLookup()
-    *       | ArrayLength()
-    *       | MessageSend()
-    *       | Clause()
-    */
+     * f0 -> AndExpression()
+     *       | OrExpression()
+     *       | BinAndExpression()
+     *       | BinOrExpression()
+     *       | BinXorExpression()
+     *       | ShiftLeftExpression()
+     *       | ShiftRightExpression()
+     *       | EqualExpression()
+     *       | NotEqualExpression()
+     *       | LessThanExpression()
+     *       | LessThanOrEqualExpression()
+     *       | GreaterThanExpression()
+     *       | GreaterThanOrEqualExpression()
+     *       | PlusExpression()
+     *       | MinusExpression()
+     *       | TimesExpression()
+     *       | ArrayLookup()
+     *       | ArrayLength()
+     *       | MessageSend()
+     *       | PublicReadExpression()
+     *       | PrivateReadExpression()
+     *       | Clause()
+     */
     public BaseType visit(Expression n, BaseType argu) throws Exception {
         return n.f0.accept(this, argu);
     }
@@ -473,6 +486,91 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
             return new Variable_t("boolean", null);
         }
         throw new Exception("Bad operand types for operator '||': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "&"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinAndExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '&': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "|"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinOrExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '|': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "^"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinXorExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '^': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "<<"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(ShiftLeftExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '<<': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> ">>"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(ShiftRightExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '>>': " + t1 + " " + t2);
     }
 
     /**

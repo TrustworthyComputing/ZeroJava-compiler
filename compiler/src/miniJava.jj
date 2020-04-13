@@ -43,6 +43,14 @@ TOKEN :
 	| < AND : "&&" >
 	| < OR : "||" >
 	| < NOT : "!" >
+
+	| < BINAND : "&" >
+	| < BINOR : "|" >
+	| < BINNOT : "~" >
+	| < BINXOR : "^" >
+	| < SLL : "<<" >
+	| < SRL : ">>" >
+
 	| < BOOLEAN: "boolean" >
 	| < CLASS: "class" >
 	| < INTERFACE: "interface" >
@@ -322,6 +330,21 @@ void Expression() :
 	LOOKAHEAD( Clause() "||" )
 	OrExpression()
 |
+	LOOKAHEAD( PrimaryExpression() "&" )
+	BinAndExpression()
+|
+	LOOKAHEAD( PrimaryExpression() "|" )
+	BinOrExpression()
+|
+	LOOKAHEAD( PrimaryExpression() "^" )
+	BinXorExpression()
+|
+	LOOKAHEAD( PrimaryExpression() "<<" )
+	ShiftLeftExpression()
+|
+	LOOKAHEAD( PrimaryExpression() ">>" )
+	ShiftRightExpression()
+|
 	LOOKAHEAD( PrimaryExpression() "==" )
 	EqualExpression()
 |
@@ -377,6 +400,36 @@ void OrExpression() :
 {}
 {
 	Clause() "||" Clause()
+}
+
+void BinAndExpression() :
+{}
+{
+	PrimaryExpression() "&" PrimaryExpression()
+}
+
+void BinOrExpression() :
+{}
+{
+	PrimaryExpression() "|" PrimaryExpression()
+}
+
+void BinXorExpression() :
+{}
+{
+	PrimaryExpression() "^" PrimaryExpression()
+}
+
+void ShiftLeftExpression() :
+{}
+{
+	PrimaryExpression() "<<" PrimaryExpression()
+}
+
+void ShiftRightExpression() :
+{}
+{
+	PrimaryExpression() ">>" PrimaryExpression()
 }
 
 void EqualExpression() :

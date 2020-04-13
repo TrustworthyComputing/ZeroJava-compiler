@@ -464,16 +464,25 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
      * f0 -> AndExpression()
      *       | OrExpression()
+     *       | BinAndExpression()
+     *       | BinOrExpression()
+     *       | BinXorExpression()
+     *       | ShiftLeftExpression()
+     *       | ShiftRightExpression()
      *       | EqualExpression()
      *       | NotEqualExpression()
      *       | LessThanExpression()
      *       | LessThanOrEqualExpression()
+     *       | GreaterThanExpression()
+     *       | GreaterThanOrEqualExpression()
      *       | PlusExpression()
      *       | MinusExpression()
      *       | TimesExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
+     *       | PublicReadExpression()
+     *       | PrivateReadExpression()
      *       | Clause()
      */
 	public BaseType visit(Expression n, BaseType argu) throws Exception {
@@ -523,6 +532,71 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.code_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "&"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinAndExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("and " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "|"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinOrExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("or " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "^"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(BinXorExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("xor " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "<<"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(ShiftLeftExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("sll " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> ">>"
+     * f2 -> PrimaryExpression()
+     */
+    public BaseType visit(ShiftRightExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("srl " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
 
 	/**
 	* f0 -> PrimaryExpression()
