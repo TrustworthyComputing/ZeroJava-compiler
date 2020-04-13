@@ -8,22 +8,22 @@ import basetype.*;
 
 public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
-	private StringBuilder code_;
+	private StringBuilder asm_;
 	private Label labels_;
 	private Map<String, Class_t> st_;
 	private int globals_;
-	private int vtables_heap_;
-	private final int init_heap_offset_ = 1000;
+	private int hp_;
+	private final int INIT_HEAP_OFFSET_ = 0;
 
     public ZMIPSGenVisitor(Map<String, Class_t> st, int globals) {
 		this.labels_ = new Label();
         this.st_ = st;
         this.globals_ = globals;
-		this.vtables_heap_ = init_heap_offset_;
+		this.hp_ = INIT_HEAP_OFFSET_;
 	}
 
-	public String getCode() {
-		return code_.toString();
+	public String getASM() {
+		return asm_.toString();
 	}
 
 	public String newRegister() {
@@ -37,19 +37,19 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				continue;
 			}
 			String vtable_reg = newRegister();
-			this.code_.append("move " + vtable_reg + ", " + vtables_heap_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
-			cl.setVTableAddress(vtables_heap_);
-			vtables_heap_ += cl.getNumMethods();
+			this.asm_.append("move " + vtable_reg + ", " + hp_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
+			cl.setVTableAddress(hp_);
+			hp_ += cl.getNumMethods();
 			int i = 0;
 			for (Map.Entry<String, Method_t> methods : cl.class_methods_map.entrySet()) {
 				String newreg = newRegister();
 				Method_t meth = methods.getValue();
 				String meth_label = new String("__" + meth.getFromClass().getName() + "_" + meth.getName() + "__");
-				this.code_.append("la " + newreg + ", " + meth_label  + "\n");
-				this.code_.append("sw " + newreg + ", " + i  + "(" + vtable_reg + ")\n");
+				this.asm_.append("la " + newreg + ", " + meth_label  + "\n");
+				this.asm_.append("sw " + newreg + ", " + i  + "(" + vtable_reg + ")\n");
 				i++;
 			}
-			this.code_.append("\n");
+			this.asm_.append("\n");
     	}
 	}
 
@@ -62,8 +62,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
-		this.code_.append(labels_.getErrorCode());
-		this.code_.insert(0, "move $hp, " + vtables_heap_ + "\t\t\t# initialize heap pointer\n\n");
+		this.asm_.append(labels_.getErrorCode());
+		this.asm_.insert(0, "move $hp, " + hp_ + "\t\t\t# initialize heap pointer\n\n");
 		return null;
 	}
 
@@ -88,14 +88,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f17 -> "}"
 	*/
 	public BaseType visit(MainClass n, BaseType argu) throws Exception {
-		this.code_ = new StringBuilder();
+		this.asm_ = new StringBuilder();
 		String id = n.f1.accept(this, argu).getName();
         Class_t mainclazz = st_.get(id);
         Method_t meth = mainclazz.getMethod("main");
         initVtables();
 		n.f14.accept(this, meth);
 		n.f15.accept(this, meth);
-		// this.code_.append("\n");
+		// this.asm_.append("\n");
 		return null;
 	}
 
@@ -160,7 +160,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			} else {
 				throw new Exception("VarDeclaration Errror 1");
 			}
-			this.code_.append("move " + newreg + ", 0\n");
+			this.asm_.append("move " + newreg + ", 0\n");
 		} else {																	// is a var (field) of a class
 			Class_t cl = st_.get(meth.getName());
 			if (cl == null) {
@@ -188,12 +188,12 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
 		String methName = n.f2.accept(this, argu).getName();
         Method_t meth = ((Class_t) argu).getMethod(methName);
-        this.code_.append("\n__" + ((Class_t) argu).getName()+ "_" + methName + "__\n");
+        this.asm_.append("\n__" + ((Class_t) argu).getName()+ "_" + methName + "__\n");
         n.f7.accept(this, meth);
         n.f8.accept(this, meth);
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
-        this.code_.append("move $v0, " + retType.getRegister() + "\n");
-        this.code_.append("jr $ra\n");
+        this.asm_.append("move $v0, " + retType.getRegister() + "\n");
+        this.asm_.append("jr $ra\n");
         return null;
 	}
 
@@ -314,11 +314,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				var = cl.classContainsVar(id);
 				// class field
 				if (var != null) {
-					this.code_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+					this.asm_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
 				}
 				return null;
 			}
-			this.code_.append("move " +  var.getRegister() + ", " + expr +"\n");
+			this.asm_.append("move " +  var.getRegister() + ", " + expr +"\n");
 		} else { // if a field of a class
 			Class_t cl = st_.get(meth.getFromClass().getName());
 			if (cl == null) {
@@ -327,7 +327,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			Variable_t var = cl.classContainsVar(id);
 			// class field
 			if (var != null) {
-				this.code_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				this.asm_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
 			}
 		}
 		return null;
@@ -346,19 +346,19 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String length = newRegister();
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.code_.append("lw " + length + ", 0(" + array + ")\n"); // load length
+		this.asm_.append("lw " + length + ", 0(" + array + ")\n"); // load length
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		// if idx >= arr.length goto error
-		this.code_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
-		this.code_.append("cnjmp " + error_label + "\n");
+		this.asm_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
+		this.asm_.append("cnjmp " + error_label + "\n");
 		// if idx <= 0 goto error
-		this.code_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
-		this.code_.append("cjmp " + error_label + "\n");
+		this.asm_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
+		this.asm_.append("cjmp " + error_label + "\n");
 		// skip length
 		String temp_array = newRegister();
-		this.code_.append("add " + temp_array + ", " + array + ", 1\n");
+		this.asm_.append("add " + temp_array + ", " + array + ", 1\n");
 		String expr = ((Variable_t) n.f5.accept(this, argu)).getRegister();
-		this.code_.append("sw " + expr + ", " + idx + "(" + temp_array + ")\n");
+		this.asm_.append("sw " + expr + ", " + idx + "(" + temp_array + ")\n");
 		return new Variable_t(null, null, temp_array);
 	}
 
@@ -382,14 +382,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(IfthenElseStatement n, BaseType argu) throws Exception {
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("cmpg " + cond + ", 0\n");
+		this.asm_.append("cmpg " + cond + ", 0\n");
 		String elselabel = labels_.newLabel();
-		this.code_.append("cnjmp " + elselabel + "\n");
+		this.asm_.append("cnjmp " + elselabel + "\n");
 		n.f4.accept(this, argu);
-		this.code_.append("j " + endlabel + "\n");
-		this.code_.append(elselabel + "\n");
+		this.asm_.append("j " + endlabel + "\n");
+		this.asm_.append(elselabel + "\n");
 		n.f6.accept(this, argu);
-		this.code_.append(endlabel + "\n");
+		this.asm_.append(endlabel + "\n");
 		return null;
 	}
 
@@ -403,10 +403,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(IfthenStatement n, BaseType argu) throws Exception {
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("cmpg " + cond + ", 0\n");
-		this.code_.append("cnjmp " + endlabel + "\n");
+		this.asm_.append("cmpg " + cond + ", 0\n");
+		this.asm_.append("cnjmp " + endlabel + "\n");
 		n.f4.accept(this, argu);
-		this.code_.append(endlabel + "\n");
+		this.asm_.append(endlabel + "\n");
 		return null;
 	}
 
@@ -420,13 +420,13 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
 		String start_label = labels_.newLabel();
 		String end_label = labels_.newLabel();
-		this.code_.append(start_label + "\n");
+		this.asm_.append(start_label + "\n");
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("cmpg " + expr + ", 0\n");
-		this.code_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("cmpg " + expr + ", 0\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
 		n.f4.accept(this, argu);
-		this.code_.append("j " + start_label + "\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("j " + start_label + "\n");
+		this.asm_.append(end_label + "\n");
 		return null;
 	}
 
@@ -439,7 +439,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
 	public BaseType visit(PrintStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("print " + t + "\n");
+		this.asm_.append("print " + t + "\n");
 		return null;
 	}
 
@@ -452,7 +452,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
 	public BaseType visit(AnswerStatement n, BaseType argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("answer " + t + "\n");
+		this.asm_.append("answer " + t + "\n");
 		return null;
 	}
 
@@ -497,16 +497,16 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String istrue1 = labels_.newLabel();
 		String istrue2 = labels_.newLabel();
 		String ret = newRegister();
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append("cmpg " + exp1 + ", 0\n");
-		this.code_.append("cjmp " + istrue1 + "\n");
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("jmp " + istrue2 + "\n"); 	// early termination
-		this.code_.append(istrue1 + "\n");
-		this.code_.append("cmpg " + exp2 + ", 0\n");
-		this.code_.append("cjmp " + istrue2 + "\n");
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append(istrue2 + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append("cmpg " + exp1 + ", 0\n");
+		this.asm_.append("cjmp " + istrue1 + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("jmp " + istrue2 + "\n"); 	// early termination
+		this.asm_.append(istrue1 + "\n");
+		this.asm_.append("cmpg " + exp2 + ", 0\n");
+		this.asm_.append("cjmp " + istrue2 + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append(istrue2 + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -520,13 +520,13 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String end_label = labels_.newLabel();
 		String ret = newRegister();
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append("cmpg " + exp1 + ", 0\n");
-		this.code_.append("cjmp " + end_label + "\n"); // if (exp1) goto end
-		this.code_.append("cmpg " + exp2 + ", 0\n");
-		this.code_.append("cjmp " + end_label + "\n"); // if (exp2) goto end
-		this.code_.append("move " + ret + ", 0\n"); // else set ret to 0
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append("cmpg " + exp1 + ", 0\n");
+		this.asm_.append("cjmp " + end_label + "\n"); // if (exp1) goto end
+		this.asm_.append("cmpg " + exp2 + ", 0\n");
+		this.asm_.append("cjmp " + end_label + "\n"); // if (exp2) goto end
+		this.asm_.append("move " + ret + ", 0\n"); // else set ret to 0
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -539,7 +539,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("and " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("and " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -552,7 +552,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("or " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("or " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -565,7 +565,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("xor " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("xor " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -576,7 +576,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     public BaseType visit(BinNotExpression n, BaseType argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f1.accept(this, argu)).getRegister();
-		this.code_.append("not " + ret + ", " + exp1 + "\n");
+		this.asm_.append("not " + ret + ", " + exp1 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -589,7 +589,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("sll " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("sll " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -602,7 +602,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("srl " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("srl " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -616,11 +616,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpe " + exp2 + ", " + exp1 + "\n");
-		this.code_.append("cnjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpe " + exp2 + ", " + exp1 + "\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -634,11 +634,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpe " + exp2 + ", " + exp1 + "\n");
-		this.code_.append("cjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpe " + exp2 + ", " + exp1 + "\n");
+		this.asm_.append("cjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -652,11 +652,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpg " + exp2 + ", " + exp1 + "\n");
-		this.code_.append("cnjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpg " + exp2 + ", " + exp1 + "\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -670,11 +670,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpge " + exp2 + ", " + exp1 + "\n");
-		this.code_.append("cnjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpge " + exp2 + ", " + exp1 + "\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -688,11 +688,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpg " + exp1 + ", " + exp2 + "\n");
-		this.code_.append("cnjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpg " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -706,11 +706,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
-		this.code_.append("move " + ret + ", 0\n");
-		this.code_.append("cmpge " + exp1 + ", " + exp2 + "\n");
-		this.code_.append("cnjmp " + end_label + "\n");
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append(end_label + "\n");
+		this.asm_.append("move " + ret + ", 0\n");
+		this.asm_.append("cmpge " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("cnjmp " + end_label + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append(end_label + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -723,7 +723,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("add " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("add " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -736,7 +736,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("sub " + ret + ", " +  exp1 + ", " + exp2 + "\n");
+		this.asm_.append("sub " + ret + ", " +  exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -749,7 +749,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("mult " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("mult " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
 
 	}
@@ -763,7 +763,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.code_.append("div " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		this.asm_.append("div " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -778,19 +778,19 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		// load length
-		this.code_.append("lw " + length + ", 0(" + array + ")\n");
+		this.asm_.append("lw " + length + ", 0(" + array + ")\n");
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		// if idx >= arr.length goto error
-		this.code_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
-		this.code_.append("cnjmp " + error_label + "\n");
+		this.asm_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
+		this.asm_.append("cnjmp " + error_label + "\n");
 		// if idx < 0 goto error
-		this.code_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
-		this.code_.append("cjmp " + error_label + "\n");
+		this.asm_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
+		this.asm_.append("cjmp " + error_label + "\n");
 		// skip length
 		String temp_array = newRegister();
 		String ret = newRegister();
-		this.code_.append("add " + temp_array + ", " + array + ", 1\n");
-		this.code_.append("lw " + ret + ", " + idx + "(" + temp_array + ")\n");
+		this.asm_.append("add " + temp_array + ", " + array + ", 1\n");
+		this.asm_.append("lw " + ret + ", " + idx + "(" + temp_array + ")\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -802,7 +802,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(ArrayLength n, BaseType argu) throws Exception {
 		String len = newRegister();
 		String exp = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.code_.append("lw " + len + ", 0(" + exp + ")\t\t# load array length\n");
+		this.asm_.append("lw " + len + ", 0(" + exp + ")\t\t# load array length\n");
 		return new Variable_t(null, null, len);
 	}
 
@@ -824,24 +824,24 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String vtable_addr = newRegister();
 		String thisreg = newRegister();
 		String methreg = newRegister();
-        this.code_.append("move " + thisreg + ", " + objreg + "\n"); 	// load the address of vtable
-        this.code_.append("lw " + vtable_addr + ", 0(" + thisreg + ")\n"); 	// load the address of vtable
-        this.code_.append("lw " + methreg + ", " + offset + "(" + vtable_addr + ")\n");	// load the right method from vtable
+        this.asm_.append("move " + thisreg + ", " + objreg + "\n"); 	// load the address of vtable
+        this.asm_.append("lw " + vtable_addr + ", 0(" + thisreg + ")\n"); 	// load the address of vtable
+        this.asm_.append("lw " + methreg + ", " + offset + "(" + vtable_addr + ")\n");	// load the right method from vtable
         // add params to method call
-		this.code_.append("move $a0, " + thisreg + "\t\t\t# this object\n");
+		this.asm_.append("move $a0, " + thisreg + "\t\t\t# this object\n");
         if (n.f4.present()) {														// if meth has params
 			Method_t params = (Method_t) n.f4.accept(this, argu);
 	        for (int i = 0 ; i < params.method_params.size() ; i++) {				// for every par
 				String parreg = new String("$a" + (i+1));
-				this.code_.append("move " + parreg + ", " + ((Variable_t) params.method_params.get(i)).getRegister() + "\n");
+				this.asm_.append("move " + parreg + ", " + ((Variable_t) params.method_params.get(i)).getRegister() + "\n");
 			}
 	    }
 		String return_address = labels_.newLabel();
-        this.code_.append("la $ra, " + return_address + "\n");
-        this.code_.append("jr " + methreg + "\n");
-		this.code_.append(return_address + "\n");
+        this.asm_.append("la $ra, " + return_address + "\n");
+        this.asm_.append("jr " + methreg + "\n");
+		this.asm_.append(return_address + "\n");
 		String ret = newRegister();
-        this.code_.append("move " + ret + ", $v0\n");
+        this.asm_.append("move " + ret + ", $v0\n");
 		return new Variable_t(meth.getType(), null, ret);
 	}
 
@@ -859,15 +859,15 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String endlabel = labels_.newLabel();
 		String elselabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f1.accept(this, argu)).getRegister();
-		this.code_.append("cmpg " + cond + ", 0\n");
-		this.code_.append("cnjmp " + elselabel + "\n");
+		this.asm_.append("cmpg " + cond + ", 0\n");
+		this.asm_.append("cnjmp " + elselabel + "\n");
 		String reg_if = ((Variable_t) n.f4.accept(this, argu)).getRegister();
-		this.code_.append("move " + res + ", " + reg_if + "\n");
-		this.code_.append("j " + endlabel + "\n");
-		this.code_.append(elselabel + "\n");
+		this.asm_.append("move " + res + ", " + reg_if + "\n");
+		this.asm_.append("j " + endlabel + "\n");
+		this.asm_.append(elselabel + "\n");
 		String reg_else = ((Variable_t) n.f6.accept(this, argu)).getRegister();
-		this.code_.append("move " + res + ", " + reg_else + "\n");
-		this.code_.append(endlabel + "\n");
+		this.asm_.append("move " + res + ", " + reg_else + "\n");
+		this.asm_.append(endlabel + "\n");
 		return new Variable_t("int", null, res);
     }
 
@@ -878,7 +878,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
     public BaseType visit(PublicReadExpression n, BaseType argu) throws Exception {
 		String t = newRegister();
-		this.code_.append("pubread " + t + "\n");
+		this.asm_.append("pubread " + t + "\n");
 		return new Variable_t("int", null, t);
     }
 
@@ -889,7 +889,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
     public BaseType visit(PrivateReadExpression n, BaseType argu) throws Exception {
 		String t = newRegister();
-		this.code_.append("secread " + t + "\n");
+		this.asm_.append("secread " + t + "\n");
 		return new Variable_t("int", null, t);
     }
 
@@ -956,7 +956,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
 		String ret = "$r" + ++globals_;
-		this.code_.append("move " + ret + ", " + n.f0.toString() + "\n");
+		this.asm_.append("move " + ret + ", " + n.f0.toString() + "\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -965,7 +965,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
 		String ret = newRegister();
-		this.code_.append("move " + ret + ", 1\n");
+		this.asm_.append("move " + ret + ", 1\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -974,7 +974,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
 		String ret = newRegister();
-		this.code_.append("move " + ret + ", 0\n");
+		this.asm_.append("move " + ret + ", 0\n");
 		return new Variable_t(null, null, ret);
 	}
 
@@ -1012,7 +1012,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 					return new Variable_t(null, id);
 				}
 				String newreg = "$r" + ++globals_;
-				this.code_.append("lw " + newreg + ", " + var.getNum() + "($a0)\t\t\t# read #" + var.getNum() + " field from this\n");
+				this.asm_.append("lw " + newreg + ", " + var.getNum() + "($a0)\t\t\t# read #" + var.getNum() + " field from this\n");
 				return new Variable_t(var.getType(), id, newreg);
 			}
 		}
@@ -1038,14 +1038,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String len = ((Variable_t) n.f3.accept(this, argu)).getRegister();
 		String array = newRegister();
 		// check if given length > 0
-		this.code_.append("cmpg " + len + ", 0\t\t\t\t# Check if length is > 0\n");
-		this.code_.append("cnjmp " + error_label + "\n");
+		this.asm_.append("cmpg " + len + ", 0\t\t\t\t# Check if length is > 0\n");
+		this.asm_.append("cnjmp " + error_label + "\n");
 		// store array length in first position
-		this.code_.append("move " + array + ", $hp\n");
-		this.code_.append("sw " + len + ", 0(" + array + ")\n");
+		this.asm_.append("move " + array + ", $hp\n");
+		this.asm_.append("sw " + len + ", 0(" + array + ")\n");
 		// increase heap pointer
-		this.code_.append("add " + len + ", " + len + ", 1\n");
-		this.code_.append("add $hp, $hp, " + len + "\n");
+		this.asm_.append("add " + len + ", " + len + ", 1\n");
+		this.asm_.append("add $hp, $hp, " + len + "\n");
 		return new Variable_t(null, null, array);
 	}
 
@@ -1060,17 +1060,12 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         Class_t cl = st_.get(id);
 		String new_obj = newRegister();
 		String vtable = newRegister();
-
-		// this.code_.append("move " + new_obj + ", " + vtables_heap_ + "\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
-		// vtables_heap_ += (cl.getNumVars() + 1);
-
-		this.code_.append("move " + new_obj + ", $hp\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
-		this.code_.append("add $hp, $hp, " + (cl.getNumVars() + 1) + "\n");
-
-        this.code_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t# load vTable address\n");
-        this.code_.append("sw " + vtable + ", 0(" + new_obj + ")\n");
+		this.asm_.append("move " + new_obj + ", $hp\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
+		this.asm_.append("add $hp, $hp, " + (cl.getNumVars() + 1) + "\n");
+        this.asm_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t# load vTable address\n");
+        this.asm_.append("sw " + vtable + ", 0(" + new_obj + ")\n");
         for (int i = 1 ; i <= cl.getNumVars() ; i++) {
-			this.code_.append("sw $zero, " + i + "(" + new_obj + ")\n");
+			this.asm_.append("sw $zero, " + i + "(" + new_obj + ")\n");
 		}
 		return new Variable_t(id, id, new_obj);
 	}
@@ -1082,8 +1077,8 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
 		String ret = newRegister();
 		String t = ((Variable_t) n.f1.accept(this, argu)).getRegister();
-		this.code_.append("move " + ret + ", 1\n");
-		this.code_.append("sub " + ret + ", " + ret + ", " + t + "\n");
+		this.asm_.append("move " + ret + ", 1\n");
+		this.asm_.append("sub " + ret + ", " + ret + ", " + t + "\n");
 		return new Variable_t(null, null, ret);
 	}
 

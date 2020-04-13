@@ -37,8 +37,8 @@ public class Main {
                     String path = fp.getPath();
                     path = path.substring(0, path.lastIndexOf('.'));
                     PrintWriter out = new PrintWriter(path + ".zmips");
-                    out.print(generator.getCode());
-                    System.out.print(generator.getCode());
+                    out.print(generator.getASM());
+                    System.out.print(generator.getASM());
                     out.close();
                 } catch (Exception ex) {
                     System.out.println("\n\nAn error occured: " + ex.getMessage() + "\n\n");
