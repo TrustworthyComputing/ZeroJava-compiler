@@ -5,6 +5,7 @@ class BinOps {
 		System.out.println(1 ^ 2);
 		System.out.println(4 << 1);
 		System.out.println(8 >> 1);
+		System.out.println(~10);
 		Prover.answer(0);
 	}
 }

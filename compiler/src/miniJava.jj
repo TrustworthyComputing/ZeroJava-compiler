@@ -43,14 +43,12 @@ TOKEN :
 	| < AND : "&&" >
 	| < OR : "||" >
 	| < NOT : "!" >
-
 	| < BINAND : "&" >
 	| < BINOR : "|" >
 	| < BINNOT : "~" >
 	| < BINXOR : "^" >
 	| < SLL : "<<" >
 	| < SRL : ">>" >
-
 	| < BOOLEAN: "boolean" >
 	| < CLASS: "class" >
 	| < INTERFACE: "interface" >
@@ -326,68 +324,53 @@ void Expression() :
 {
 	LOOKAHEAD( Clause() "&&" )
 	AndExpression()
-|
-	LOOKAHEAD( Clause() "||" )
+| 	LOOKAHEAD( Clause() "||" )
 	OrExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "&" )
+| 	LOOKAHEAD( PrimaryExpression() "&" )
 	BinAndExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "|" )
+| 	LOOKAHEAD( PrimaryExpression() "|" )
 	BinOrExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "^" )
+| 	LOOKAHEAD( PrimaryExpression() "^" )
 	BinXorExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "<<" )
+| 	LOOKAHEAD( "~" PrimaryExpression() )
+	BinNotExpression()
+| 	LOOKAHEAD( PrimaryExpression() "<<" )
 	ShiftLeftExpression()
-|
-	LOOKAHEAD( PrimaryExpression() ">>" )
+| 	LOOKAHEAD( PrimaryExpression() ">>" )
 	ShiftRightExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "==" )
+| 	LOOKAHEAD( PrimaryExpression() "==" )
 	EqualExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "!=" )
+| 	LOOKAHEAD( PrimaryExpression() "!=" )
 	NotEqualExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "<" )
+| 	LOOKAHEAD( PrimaryExpression() "<" )
 	LessThanExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "<=" )
+| 	LOOKAHEAD( PrimaryExpression() "<=" )
 	LessThanOrEqualExpression()
-|
-	LOOKAHEAD( PrimaryExpression() ">" )
+| 	LOOKAHEAD( PrimaryExpression() ">" )
 	GreaterThanExpression()
-|
-	LOOKAHEAD( PrimaryExpression() ">=" )
+| 	LOOKAHEAD( PrimaryExpression() ">=" )
 	GreaterThanOrEqualExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "+" )
+| 	LOOKAHEAD( PrimaryExpression() "+" )
 	PlusExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "-" )
+| 	LOOKAHEAD( PrimaryExpression() "-" )
 	MinusExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "*" )
+| 	LOOKAHEAD( PrimaryExpression() "*" )
 	TimesExpression()
-|
-	LOOKAHEAD( PrimaryExpression() "[" )
+| 	LOOKAHEAD( PrimaryExpression() "/" )
+	DivExpression()
+|	LOOKAHEAD( PrimaryExpression() "[" )
 	ArrayLookup()
-|
-	LOOKAHEAD( PrimaryExpression() "." "length" )
+| 	LOOKAHEAD( PrimaryExpression() "." "length" )
 	ArrayLength()
-|
-	LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
+|	LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
 	MessageSend()
-|
-	LOOKAHEAD( <PUBLIC_READ> )
+|	LOOKAHEAD( "(" Expression() ")" "?" )
+	TernaryExpression()
+|	LOOKAHEAD( <PUBLIC_READ> )
 	PublicReadExpression()
-|
-	LOOKAHEAD( <PRIVATE_READ> )
+| 	LOOKAHEAD( <PRIVATE_READ> )
 	PrivateReadExpression()
-|
-	Clause()
+| 	Clause()
 }
 
 void AndExpression() :
@@ -418,6 +401,12 @@ void BinXorExpression() :
 {}
 {
 	PrimaryExpression() "^" PrimaryExpression()
+}
+
+void BinNotExpression() :
+{}
+{
+	"~" PrimaryExpression()
 }
 
 void ShiftLeftExpression() :
@@ -486,6 +475,12 @@ void TimesExpression() :
 	PrimaryExpression() "*" PrimaryExpression()
 }
 
+void DivExpression() :
+{}
+{
+	PrimaryExpression() "/" PrimaryExpression()
+}
+
 void ArrayLookup() :
 {}
 {
@@ -502,6 +497,12 @@ void MessageSend() :
 {}
 {
 	PrimaryExpression() "." Identifier() "(" ( ExpressionList() )? ")"
+}
+
+void TernaryExpression() :
+{}
+{
+	"(" Expression() ")" "?" Expression() ":" Expression()
 }
 
 void PublicReadExpression() :

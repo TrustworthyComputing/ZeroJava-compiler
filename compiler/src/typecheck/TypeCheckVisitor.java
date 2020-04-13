@@ -432,6 +432,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | BinAndExpression()
      *       | BinOrExpression()
      *       | BinXorExpression()
+     *       | BinNotExpression()
      *       | ShiftLeftExpression()
      *       | ShiftRightExpression()
      *       | EqualExpression()
@@ -443,9 +444,11 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | PlusExpression()
      *       | MinusExpression()
      *       | TimesExpression()
+     *       | DivExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
+     *       | TernaryExpression()
      *       | PublicReadExpression()
      *       | PrivateReadExpression()
      *       | Clause()
@@ -537,6 +540,19 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
             return new Variable_t("int", null);
         }
         throw new Exception("Bad operand types for operator '^': " + t1 + " " + t2);
+    }
+
+    /**
+     * f0 -> "~"
+     * f1 -> PrimaryExpression()
+     */
+    public BaseType visit(BinNotExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f1.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        if (t1.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand type for operator '~': " + t1);
     }
 
     /**
@@ -732,6 +748,23 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
 
     /**
     * f0 -> PrimaryExpression()
+    * f1 -> "/"
+    * f2 -> PrimaryExpression()
+    */
+    public BaseType visit(DivExpression n, BaseType argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '/': " + t1 + " " + t2);
+    }
+
+    /**
+    * f0 -> PrimaryExpression()
     * f1 -> "["
     * f2 -> PrimaryExpression()
     * f3 -> "]"
@@ -810,6 +843,40 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
             }
         }
         return new Variable_t(existingmeth.getType(), null);
+    }
+
+    /**
+     * f0 -> "("
+     * f1 -> Expression()
+     * f2 -> ")"
+     * f3 -> "?"
+     * f4 -> Expression()
+     * f5 -> ":"
+     * f6 -> Expression()
+     */
+    public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
+        Variable_t expr = (Variable_t) n.f1.accept(this, argu);
+        expr = findType(expr, (Method_t) argu);
+        if (expr.getType() == null) {
+            expr = findType(expr, (Method_t)argu);
+        }
+        Variable_t expr_1 = (Variable_t) n.f4.accept(this, argu);
+        expr_1 = findType(expr_1, (Method_t) argu);
+        if (expr_1.getType() == null) {
+            expr_1 = findType(expr_1, (Method_t)argu);
+        }
+        Variable_t expr_2 = (Variable_t) n.f6.accept(this, argu);
+        expr_2 = findType(expr_2, (Method_t) argu);
+        if (expr_2.getType() == null) {
+            expr_2 = findType(expr_2, (Method_t)argu);
+        }
+        if (expr.getType().equals("boolean")) {
+            if (expr_1.getType().equals( expr_2.getType() ) ) {
+                return new Variable_t(expr_1.getType(), null);
+            }
+            throw new Exception("Ternary types missmatch: " + expr_1.getType() + " " + expr_2.getType());
+        }
+        throw new Exception("If-condition is not a boolean Expression!");
     }
 
     /**

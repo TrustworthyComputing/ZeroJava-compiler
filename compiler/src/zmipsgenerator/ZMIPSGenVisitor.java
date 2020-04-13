@@ -467,6 +467,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | BinAndExpression()
      *       | BinOrExpression()
      *       | BinXorExpression()
+     *       | BinNotExpression()
      *       | ShiftLeftExpression()
      *       | ShiftRightExpression()
      *       | EqualExpression()
@@ -478,6 +479,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | PlusExpression()
      *       | MinusExpression()
      *       | TimesExpression()
+     *       | DivExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
@@ -569,6 +571,17 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.code_.append("xor " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+    }
+
+	/**
+     * f0 -> "~"
+     * f1 -> PrimaryExpression()
+     */
+    public BaseType visit(BinNotExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+		this.code_.append("not " + ret + ", " + exp1 + "\n");
 		return new Variable_t(null, null, ret);
     }
 
@@ -742,6 +755,19 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 
 	/**
 	* f0 -> PrimaryExpression()
+	* f1 -> "/"
+	* f2 -> PrimaryExpression()
+	*/
+	public BaseType visit(DivExpression n, BaseType argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.code_.append("div " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+	}
+
+	/**
+	* f0 -> PrimaryExpression()
 	* f1 -> "["
 	* f2 -> PrimaryExpression()
 	* f3 -> "]"
@@ -819,6 +845,32 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         this.code_.append("move " + ret + ", $v0\n");
 		return new Variable_t(meth.getType(), null, ret);
 	}
+
+	/**
+     * f0 -> "("
+     * f1 -> Expression()
+     * f2 -> ")"
+     * f3 -> "?"
+     * f4 -> Expression()
+     * f5 -> ":"
+     * f6 -> Expression()
+     */
+    public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
+		String res = newRegister();
+		String endlabel = labels_.newLabel();
+		String elselabel = labels_.newLabel();
+		String cond = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+		this.code_.append("cmpg " + cond + ", 0\n");
+		this.code_.append("cnjmp " + elselabel + "\n");
+		String reg_if = ((Variable_t) n.f4.accept(this, argu)).getRegister();
+		this.code_.append("move " + res + ", " + reg_if + "\n");
+		this.code_.append("j " + endlabel + "\n");
+		this.code_.append(elselabel + "\n");
+		String reg_else = ((Variable_t) n.f6.accept(this, argu)).getRegister();
+		this.code_.append("move " + res + ", " + reg_else + "\n");
+		this.code_.append(endlabel + "\n");
+		return new Variable_t("int", null, res);
+    }
 
     /**
      * f0 -> <PUBLIC_READ>
