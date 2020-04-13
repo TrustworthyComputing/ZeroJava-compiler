@@ -1,10 +1,16 @@
 class Simple {
-
     public static void main(String [] a) {
-        System.out.println(new Test1().bar(11, 12));
-        // System.out.println(new Test1().buz());
+        Test1 t;
+        t = new Test1();
+        System.out.println(t.getFieldA());
+        System.out.println(t.getFieldB());
+        System.out.println(t.foo());
+        System.out.println(t.bar(5));
+        System.out.println(t.buz());
+        System.out.println(t.getFieldA());
+        System.out.println(t.getFieldB());
+        Prover.answer(0);
     }
-
 }
 
 class Test1 {
@@ -12,17 +18,26 @@ class Test1 {
     int fielda;
     int fieldb;
 
-    public int foo(int x) {
-        return x;
+    public int foo() {
+        return 5;
     }
 
-    public int bar(int p1, int p2) {
-        fielda = 1000;
-        return (p1 * p2);
+    public boolean bar(int x) {
+        fieldb = 30;
+        return (x > 2);
     }
 
     public int buz() {
-        return 3 * 4;
+        fielda = 20;
+        return 3;
+    }
+
+    public int getFieldA() {
+        return fielda;
+    }
+
+    public int getFieldB() {
+        return fieldb;
     }
 
 }

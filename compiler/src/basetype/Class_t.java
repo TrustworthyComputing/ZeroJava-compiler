@@ -11,6 +11,7 @@ public class Class_t extends BaseType {
     private int num_methods_;
     private int num_vars_;
     private boolean is_main;
+    private int vtable_address_;
 
     public Class_t(String name, String parent) {
         super(name);
@@ -20,6 +21,7 @@ public class Class_t extends BaseType {
         this.num_methods_ = 0;
         this.num_vars_ = 0;
         this.is_main = false;
+        this.vtable_address_ = 0;
     }
 
     public void setIsMain() {
@@ -40,6 +42,14 @@ public class Class_t extends BaseType {
 
     public int getNumVars() {
         return this.num_vars_;
+    }
+
+    public void setVTableAddress(int address) {
+        this.vtable_address_ = address;
+    }
+
+    public int getVTableAddress() {
+        return this.vtable_address_;
     }
 
     public boolean addMethod(Method_t meth) {

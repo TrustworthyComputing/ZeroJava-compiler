@@ -11,7 +11,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	private StringBuilder code_;
 	private Label labels_;
 	private Map<String, Class_t> st_;
-	private List<String> vtables_;
 	private int globals_;
 	private int obj_heap_;
 	private boolean use_arrays_heap_;
@@ -23,7 +22,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         this.globals_ = globals;
 		this.obj_heap_ = 1000;
 		this.use_arrays_heap_ = false;
-		vtables_ = new ArrayList<>();
 	}
 
 	public String getCode() {
@@ -40,21 +38,17 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			if (cl.isMain()) {
 				continue;
 			}
-			String vtable_label = labels_.newClassLabel(cl.getName());
-			vtables_.add(vtable_label);
 			String vtable_reg = newRegister();
-			String reg = newRegister();
-			this.code_.append("la " + vtable_reg + ", " + vtable_label + "\n");
-			this.code_.append("move " + reg + ", " + obj_heap_ + "\t; " + cl.getNumMethods() + "\n");
+			this.code_.append("move " + vtable_reg + ", " + obj_heap_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
+			cl.setVTableAddress(obj_heap_);
 			obj_heap_ += cl.getNumMethods();
-			this.code_.append("sw " + reg + ", 0(" + vtable_reg + ")\n");
 			int i = 0;
 			for (Map.Entry<String, Method_t> methods : cl.class_methods_map.entrySet()) {
 				String newreg = newRegister();
 				Method_t meth = methods.getValue();
 				String meth_label = new String("__" + meth.getFromClass().getName() + "_" + meth.getName() + "__");
 				this.code_.append("la " + newreg + ", " + meth_label  + "\n");
-				this.code_.append("sw " + newreg + ", " + i  + "(" + reg + ")\n");
+				this.code_.append("sw " + newreg + ", " + i  + "(" + vtable_reg + ")\n");
 				i++;
 			}
 			this.code_.append("\n");
@@ -70,16 +64,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
-		if (vtables_.size() > 0) {
-			this.code_.append("\n");
-		}
-		for (String vtable : vtables_) {
-			this.code_.append(vtable + "\n");
-		}
 		this.code_.append(labels_.getErrorCode());
-		if (vtables_.size() > 0) {
-			this.code_.append("\n");
-		}
 		if (this.use_arrays_heap_) {
 			this.code_.insert(0, "move $hp, " + arrays_heap_ + "\n\n");
 		}
@@ -114,7 +99,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         initVtables();
 		n.f14.accept(this, meth);
 		n.f15.accept(this, meth);
-		this.code_.append("\n");
+		// this.code_.append("\n");
 		return null;
 	}
 
@@ -333,7 +318,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				var = cl.classContainsVar(id);
 				// class field
 				if (var != null) {
-					this.code_.append("sw " + expr + ", " + var.getNum() + "($r0)\n");
+					this.code_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
 				}
 				return null;
 			}
@@ -346,7 +331,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 			Variable_t var = cl.classContainsVar(id);
 			// class field
 			if (var != null) {
-				this.code_.append("sw " + expr + ", " + var.getNum() + "($r0)\n");
+				this.code_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
 			}
 		}
 		return null;
@@ -524,7 +509,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "||"
 	* f2 -> Clause()
 	*/
-	// TODO
 	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -745,9 +729,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         this.code_.append("lw " + vtable_addr + ", 0(" + thisreg + ")\n"); 	// load the address of vtable
         this.code_.append("lw " + methreg + ", " + offset + "(" + vtable_addr + ")\n");	// load the right method from vtable
         // add params to method call
+		this.code_.append("move $a0, " + thisreg + "\t\t\t# this object\n");
         if (n.f4.present()) {														// if meth has params
 			Method_t params = (Method_t) n.f4.accept(this, argu);
-			this.code_.append("move $a0, " + thisreg + " ; this object\n");
 	        for (int i = 0 ; i < params.method_params.size() ; i++) {				// for every par
 				String parreg = new String("$a" + (i+1));
 				this.code_.append("move " + parreg + ", " + ((Variable_t) params.method_params.get(i)).getRegister() + "\n");
@@ -881,7 +865,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 					return new Variable_t(null, id);
 				}
 				String newreg = "$r" + ++globals_;
-				this.code_.append("lw " + newreg + ", " + var.getNum() + "($r0)\n");
+				this.code_.append("lw " + newreg + ", " + var.getNum() + "($a0)\t\t\t# read #" + var.getNum() + " field from this\n");
 				return new Variable_t(var.getType(), id, newreg);
 			}
 		}
@@ -892,7 +876,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 */
 	public BaseType visit(ThisExpression n, BaseType argu) throws Exception {
 		Class_t cl = ((Method_t) argu).getFromClass();
-		return new Variable_t(cl.getName(), "this", "$r0");
+		return new Variable_t(cl.getName(), "this", "$a0");
 	}
 
 	/**
@@ -928,20 +912,17 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	public BaseType visit(AllocationExpression n, BaseType argu) throws Exception {
 		String id = n.f1.accept(this, argu).getName();
         Class_t cl = st_.get(id);
-		String t = newRegister();
+		String new_obj = newRegister();
 		String vtable = newRegister();
-		String vtable_addr = newRegister();
-		String label = labels_.newClassLabel(cl.getName());
-		this.code_.append("move " + t + ", " + obj_heap_ + "\t; " + (cl.getNumVars() + 1) + "\n");
+		this.code_.append("move " + new_obj + ", " + obj_heap_ + "\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
 		obj_heap_ += (cl.getNumVars() + 1);
-        this.code_.append("la " + vtable_addr + ", " + label + "\n");
-        this.code_.append("lw " + vtable + ", 0(" + vtable_addr + ")\n");
-        this.code_.append("sw " + vtable + ", 0(" + t + ")\n");
+
+        this.code_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t# load vTable address\n");
+        this.code_.append("sw " + vtable + ", 0(" + new_obj + ")\n");
         for (int i = 1 ; i <= cl.getNumVars() ; i++) {
-			this.code_.append("sw $zero, " + i + "(" + t + ")\n");
+			this.code_.append("sw $zero, " + i + "(" + new_obj + ")\n");
 		}
-        this.code_.append("\n");
-		return new Variable_t(id, id, t);
+		return new Variable_t(id, id, new_obj);
 	}
 
 	/**
