@@ -12,16 +12,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	private Label labels_;
 	private Map<String, Class_t> st_;
 	private int globals_;
-	private int obj_heap_;
-	private boolean use_arrays_heap_;
-	private final int arrays_heap_ = 2000;
+	private int vtables_heap_;
+	private final int init_heap_offset_ = 1000;
 
     public ZMIPSGenVisitor(Map<String, Class_t> st, int globals) {
 		this.labels_ = new Label();
         this.st_ = st;
         this.globals_ = globals;
-		this.obj_heap_ = 1000;
-		this.use_arrays_heap_ = false;
+		this.vtables_heap_ = init_heap_offset_;
 	}
 
 	public String getCode() {
@@ -39,9 +37,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 				continue;
 			}
 			String vtable_reg = newRegister();
-			this.code_.append("move " + vtable_reg + ", " + obj_heap_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
-			cl.setVTableAddress(obj_heap_);
-			obj_heap_ += cl.getNumMethods();
+			this.code_.append("move " + vtable_reg + ", " + vtables_heap_ + "\t\t\t# " + cl.getName() + " vTable ("+ cl.getNumMethods() + " methods)\n");
+			cl.setVTableAddress(vtables_heap_);
+			vtables_heap_ += cl.getNumMethods();
 			int i = 0;
 			for (Map.Entry<String, Method_t> methods : cl.class_methods_map.entrySet()) {
 				String newreg = newRegister();
@@ -65,9 +63,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
 		this.code_.append(labels_.getErrorCode());
-		if (this.use_arrays_heap_) {
-			this.code_.insert(0, "move $hp, " + arrays_heap_ + "\n\n");
-		}
+		this.code_.insert(0, "move $hp, " + vtables_heap_ + "\t\t\t# initialize heap pointer\n\n");
 		return null;
 	}
 
@@ -347,7 +343,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f6 -> ";"
 	*/
 	public BaseType visit(ArrayAssignmentStatement n, BaseType argu) throws Exception {
-		this.use_arrays_heap_ = true;
 		String length = newRegister();
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
@@ -621,6 +616,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpe " + exp2 + ", " + exp1 + "\n");
 		this.code_.append("cnjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -638,6 +634,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpe " + exp2 + ", " + exp1 + "\n");
 		this.code_.append("cjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -655,6 +652,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpg " + exp2 + ", " + exp1 + "\n");
 		this.code_.append("cnjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -672,6 +670,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpge " + exp2 + ", " + exp1 + "\n");
 		this.code_.append("cnjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -689,6 +688,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpg " + exp1 + ", " + exp2 + "\n");
 		this.code_.append("cnjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -706,6 +706,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
 		String end_label = labels_.newLabel();
+		this.code_.append("move " + ret + ", 0\n");
 		this.code_.append("cmpge " + exp1 + ", " + exp2 + "\n");
 		this.code_.append("cnjmp " + end_label + "\n");
 		this.code_.append("move " + ret + ", 1\n");
@@ -773,7 +774,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f3 -> "]"
 	*/
 	public BaseType visit(ArrayLookup n, BaseType argu) throws Exception {
-		this.use_arrays_heap_ = true;
 		String length = newRegister();
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
@@ -800,10 +800,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> "length"
 	*/
 	public BaseType visit(ArrayLength n, BaseType argu) throws Exception {
-		this.use_arrays_heap_ = true;
 		String len = newRegister();
 		String exp = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.code_.append("lw " + len + ", 0(" + exp + ")\t ; load array length\n");
+		this.code_.append("lw " + len + ", 0(" + exp + ")\t\t# load array length\n");
 		return new Variable_t(null, null, len);
 	}
 
@@ -1035,7 +1034,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f4 -> "]"
 	 */
 	public BaseType visit(ArrayAllocationExpression n, BaseType argu) throws Exception {
-		this.use_arrays_heap_ = true;
 		String error_label = labels_.getErrorLabel();
 		String len = ((Variable_t) n.f3.accept(this, argu)).getRegister();
 		String array = newRegister();
@@ -1062,8 +1060,12 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
         Class_t cl = st_.get(id);
 		String new_obj = newRegister();
 		String vtable = newRegister();
-		this.code_.append("move " + new_obj + ", " + obj_heap_ + "\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
-		obj_heap_ += (cl.getNumVars() + 1);
+
+		// this.code_.append("move " + new_obj + ", " + vtables_heap_ + "\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
+		// vtables_heap_ += (cl.getNumVars() + 1);
+
+		this.code_.append("move " + new_obj + ", $hp\t\t\t# " + cl.getName() + " object ("+ (cl.getNumVars() + 1) + " fields)\n");
+		this.code_.append("add $hp, $hp, " + (cl.getNumVars() + 1) + "\n");
 
         this.code_.append("la " + vtable + ", " + cl.getVTableAddress() + "\t\t\t# load vTable address\n");
         this.code_.append("sw " + vtable + ", 0(" + new_obj + ")\n");

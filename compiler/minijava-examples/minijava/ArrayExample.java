@@ -8,6 +8,7 @@ class ArrayExample {
         System.out.println(b.length);
         System.out.println(b[0]);
         System.out.println(b[9]);
+        Prover.answer(0);
     }
 
 }
