@@ -135,19 +135,19 @@ public class Main {
                         System.out.println("---------------------------");
                     }
 
-                    // OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
-                    // root.accept(opt, null);
-                    // if (abs_path.endsWith(".opt")) {
-                    //     abs_path = abs_path.substring(0, abs_path.length() - 4);
-                    // }
-                    // System.out.println(abs_path + ".opt.zmips");
-                    // PrintWriter writer = new PrintWriter(abs_path + ".opt.zmips");
-                    //
-                    // if (debug_) {
-                    //     System.out.println("\n" + opt.result);
-                    // }
-                    // writer.println(opt.result);
-                    // writer.close();
+                    OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
+                    root.accept(opt, null);
+                    if (abs_path.endsWith(".opt")) {
+                        abs_path = abs_path.substring(0, abs_path.length() - 4);
+                    }
+                    System.out.println(abs_path + ".opt.zmips");
+                    PrintWriter writer = new PrintWriter(abs_path + ".opt.zmips");
+
+                    if (debug_) {
+                        System.out.println("\n" + opt.result);
+                    }
+                    writer.println(opt.result);
+                    writer.close();
                 } catch (Exception ex) {
                     System.out.println("\n"+ ex.getMessage() + "\n");
                 }
