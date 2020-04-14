@@ -1,7 +1,7 @@
 package org.twc.minijavacompiler.symboltable;
 
-import org.twc.minijavacompiler.syntaxtree.*;
-import org.twc.minijavacompiler.visitor.GJNoArguDepthFirst;
+import org.twc.minijavacompiler.minijavasyntaxtree.*;
+import org.twc.minijavacompiler.minijavavisitor.GJNoArguDepthFirst;
 import org.twc.minijavacompiler.basetype.*;
 import java.util.Map;
 import java.util.HashMap;

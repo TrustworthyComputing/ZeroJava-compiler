@@ -1,7 +1,7 @@
 package org.twc.minijavacompiler;
 
 import org.twc.minijavacompiler.basetype.*;
-import org.twc.minijavacompiler.syntaxtree.*;
+import org.twc.minijavacompiler.minijavasyntaxtree.*;
 import org.twc.minijavacompiler.symboltable.*;
 import org.twc.minijavacompiler.typecheck.*;
 import org.twc.minijavacompiler.zmipsgenerator.*;
