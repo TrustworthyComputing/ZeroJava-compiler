@@ -25,7 +25,7 @@ import org.deri.iris.storage.IRelation;
 
 public class Main {
 
-    private static boolean debug_ = false;
+    private static boolean debug_ = true;
 
     public static void main (String [] args){
         if (args.length < 1){
@@ -56,89 +56,85 @@ public class Main {
                     root.accept(dlVisitor, null);
                     writeFacts(dlVisitor, path, debug_);
 
+                    Parser parser = new Parser();
+                    Map<IPredicate, IRelation> factMap = new HashMap<>();
+                    final File factsDirectory = new File(path);
+                    if (factsDirectory.isDirectory()) {
+                        for (final File fileEntry : factsDirectory.listFiles()) {
+                            if (fileEntry.isDirectory()) {
+                                System.out.println("Omitting directory " + fileEntry.getPath());
+                            } else {
+                                Reader factsReader = new FileReader(fileEntry);
+                                parser.parse(factsReader);
+                                factMap.putAll(parser.getFacts()); // Retrieve the facts and put all of them in factMap
+                            }
+                        }
+                    } else {
+                        System.err.println("Invalid facts directory path");
+                        System.exit(-1);
+                    }
+                    File rulesFile = new File("facts_rules/Rules/rules.iris");
+                    Reader rulesReader = new FileReader(rulesFile);
+                    File queriesFile = new File("facts_rules/Rules/queries.iris");
+                    Reader queriesReader = new FileReader(queriesFile);
+                    parser.parse(rulesReader);              // Parse rules file.
+                    List<IRule> rules = parser.getRules();  // Retrieve the rules from the parsed file.
+                    parser.parse(queriesReader);            // Parse queries file.
+                    List<IQuery> queries = parser.getQueries(); // Retrieve the queries from the parsed file.
+                    Configuration configuration = new Configuration(); // Create a default configuration.
+                    configuration.programOptmimisers.add(new MagicSets()); // Enable Magic Sets together with rule filtering.
+                    IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
 
-                    System.exit(0);
+                    Map<String, Map<String, String>> optimisationMap = new HashMap<>();
+                    for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
+                        List<IVariable> variableBindings = new ArrayList<>();
+                        IRelation relation = knowledgeBase.execute(query, variableBindings);
+                        if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
+                        String queryType = null;
+                        if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
+                            queryType = "constProp";
+                        } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
+                            queryType = "copyProp";
+                        } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
+                            queryType = "deadCode";
+                        }
+                        if (queryType != null) {
+                            Map<String, String> tempOp = new HashMap<>();
+                            String str = null;
+                            for (int r = 0; r < relation.size(); r++) {
+                                str = (relation.get(r)).toString();
+                                if (debug_) System.out.println(relation.get(r));
+                                int line = getLine(str);
+                                String meth = getMeth(str);
+                                if (tempOp.get(meth + line) == null) {
+                                    tempOp.put(meth + line, str);
+                                }
+                                else {
+                                    tempOp.put(meth + "-sec-" + line, str);
+                                }
+                            }
+                            optimisationMap.put(queryType, tempOp);
+                        } else {
+                            if (debug_) {
+                                for (int r = 0; r < relation.size(); r++) {
+                                    System.out.println(relation.get(r));
+                                }
+                            }
+                        }
+                    }
+                    /* Print optimizations map */
+                    if (debug_) {
+                        System.out.println();
+                        System.out.println("------------- optimizations map --------------");
+                        for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
+                            System.out.println(entry.getKey() + ":");
+                            for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
+                                System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
+                            }
+                        }
+                        System.out.println("---------------------------");
+                    }
 
-
-                    // Parser parser = new Parser();
-                    // Map<IPredicate, IRelation> factMap = new HashMap<>();
-                    // final File factsDirectory = new File(path);
-                    // if (factsDirectory.isDirectory()) {
-                    //     for (final File fileEntry : factsDirectory.listFiles()) {
-                    //         if (fileEntry.isDirectory()) {
-                    //             System.out.println("Omitting directory " + fileEntry.getPath());
-                    //         } else {
-                    //             Reader factsReader = new FileReader(fileEntry);
-                    //             parser.parse(factsReader);
-                    //             factMap.putAll(parser.getFacts()); // Retrieve the facts and put all of them in factMap
-                    //         }
-                    //     }
-                    // } else {
-                    //     System.err.println("Invalid facts directory path");
-                    //     System.exit(-1);
-                    // }
-                    // File rulesFile = new File("facts_rules/Rules/rules.iris");
-                    // Reader rulesReader = new FileReader(rulesFile);
-                    // File queriesFile = new File("facts_rules/Rules/queries.iris");
-                    // Reader queriesReader = new FileReader(queriesFile);
-                    // parser.parse(rulesReader);              // Parse rules file.
-                    // List<IRule> rules = parser.getRules();  // Retrieve the rules from the parsed file.
-                    // parser.parse(queriesReader);            // Parse queries file.
-                    // List<IQuery> queries = parser.getQueries(); // Retrieve the queries from the parsed file.
-                    // Configuration configuration = new Configuration(); // Create a default configuration.
-                    // configuration.programOptmimisers.add(new MagicSets()); // Enable Magic Sets together with rule filtering.
-                    // IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
-                    //
-                    // Map<String, Map<String, String>> optimisationMap = new HashMap<>();
-                    // for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
-                    //     List<IVariable> variableBindings = new ArrayList<>();
-                    //     IRelation relation = knowledgeBase.execute(query, variableBindings);
-                    //     if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
-                    //     String queryType = null;
-                    //     if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
-                    //         queryType = "constProp";
-                    //     } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
-                    //         queryType = "copyProp";
-                    //     } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
-                    //         queryType = "deadCode";
-                    //     }
-                    //     if (queryType != null) {
-                    //         Map<String, String> tempOp = new HashMap<>();
-                    //         String str = null;
-                    //         for (int r = 0; r < relation.size(); r++) {
-                    //             str = (relation.get(r)).toString();
-                    //             if (debug_) System.out.println(relation.get(r));
-                    //             int line = getLine(str);
-                    //             String meth = getMeth(str);
-                    //             if (tempOp.get(meth + line) == null) {
-                    //                 tempOp.put(meth + line, str);
-                    //             }
-                    //             else {
-                    //                 tempOp.put(meth + "-sec-" + line, str);
-                    //             }
-                    //         }
-                    //         optimisationMap.put(queryType, tempOp);
-                    //     } else {
-                    //         if (debug_) {
-                    //             for (int r = 0; r < relation.size(); r++) {
-                    //                 System.out.println(relation.get(r));
-                    //             }
-                    //         }
-                    //     }
-                    // }
-                    // /* Print optimizations map */
-                    // if (debug_) {
-                    //     System.out.println();
-                    //     System.out.println("------------- optimizations map --------------");
-                    //     for (Map.Entry<String, Map<String, String>> entry : optimisationMap.entrySet()) {
-                    //         System.out.println(entry.getKey() + ":");
-                    //         for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
-                    //             System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
-                    //         }
-                    //     }
-                    //     System.out.println("---------------------------");
-                    // }
-                    //
                     // OptimizerVisitor opt = new OptimizerVisitor(optimisationMap);
                     // root.accept(opt, null);
                     // if (abs_path.endsWith(".opt")) {

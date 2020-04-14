@@ -112,9 +112,9 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
-     * f0 ->   "j"
-     *      | "beq"
-
+     * f0 ->    "j"
+     *      | "cjmp"
+     *      | "cnjmp"
      */
     public String visit(JmpOps n, String argu) throws Exception {
         return n.f0.choice.toString();
@@ -268,23 +268,27 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
 
     /**
      * f0 -> "print"
-     * f1 -> Register()
+     * f1 -> SimpleExp()
      */
     public String visit(PrintStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu);
         String op = "print " + src;
-        var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+        if (src.startsWith("$")) {
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+        }
         return op;
     }
 
     /**
      * f0 -> "answer"
-     * f1 -> Register()
+     * f1 -> SimpleExp()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu);
         String op = "answer " + src;
-        var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+        if (src.startsWith("$")) {
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+        }
         return op;
     }
 

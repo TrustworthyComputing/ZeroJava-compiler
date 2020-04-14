@@ -68,7 +68,16 @@ TOKEN : /* LITERALS */
 
 TOKEN : /* LITERALS */
 {
-  < REGISTER: ( "$r" ["1"-"9"] (["0"-"9"])* | "$r0" ) >
+    < REGISTER:
+        ( "$r" ["1"-"9"] (["0"-"9"])* | "$r0"
+        | "$zero"
+        | "$sp"
+        | "$hp"
+        | "$a" ["1"-"4"] (["0"-"4"])* | "$a0"
+        | "$v0"
+        | "$v1"
+        )
+    >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -137,7 +146,7 @@ Label()
 | TwoRegInstr()
 | ThreeRegInstr()
 | JmpStmts()
-| ComparisonOps()
+| ComparisonStmts()
 | LwStmt()
 | SwStmt()
 | PrintStmt()
@@ -225,13 +234,13 @@ void ThreeRegInstrOp() :
 void PrintStmt() :
 {}
 {
-  "print" Register()
+  "print" SimpleExp()
 }
 
 void AnswerStmt() :
 {}
 {
-  "answer" Register()
+  "answer" SimpleExp()
 }
 
 void PubReadStmt() :

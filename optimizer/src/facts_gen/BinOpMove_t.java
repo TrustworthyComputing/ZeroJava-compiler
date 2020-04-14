@@ -15,7 +15,7 @@ public class BinOpMove_t extends Var_t {
 	}
 
 	public void writerec(PrintWriter writer, boolean print) {
-		String ret = "binOpmove(" + this.meth_name + ", " + this.ic + ", " + this.var + ", " + this.src1 + ", " + this.src2 + ").";
+		String ret = "binOpMove(" + this.meth_name + ", " + this.ic + ", " + this.var + ", " + this.src1 + ", " + this.src2 + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);
 	}

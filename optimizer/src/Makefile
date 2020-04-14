@@ -10,8 +10,8 @@ compile:
 	$(JAVACC) zmips-jtb.jj
 	$(JAVAC) syntaxtree/*.java
 	$(JAVAC) facts_gen/*.java
-	# $(JAVAC) optimizer/*.java
 	$(JAVAC) -cp $(CLASSPATH) Main.java
+	# $(JAVAC) optimizer/*.java
 
 clean:
 	$(RM) -r *.class syntaxtree/* visitor/* facts_rules/Facts/* facts_gen/*.class optimizer/*.class
