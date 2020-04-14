@@ -3,5 +3,8 @@ class Add {
 		int[] arr;
 		System.out.println(12 + 21);
 		arr = new int[10];
+
+		Prover.answer(0);
+
 	}
 }

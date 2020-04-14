@@ -141,7 +141,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
           this.label_from_stmt = true;
           if (reg2 == null) { return null; }
           String instr = null;
-          if (reg2.startsWith("$r")) {
+          if (reg2.startsWith("$")) {
               String []parts = new String[2];
               parts = reg2.split("&");
               if (parts.length == 2) {
@@ -150,7 +150,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
                   reg2 = parts[0];
               }
           }
-          if (reg1.startsWith("$r")) {
+          if (reg1.startsWith("$")) {
               String []parts = new String[2];
               parts = reg1.split("&");
               reg1 = parts[0];
@@ -187,7 +187,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = false;
         String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
-        if (idx.startsWith("$r")) {
+        if (idx.startsWith("$")) {
             String []parts = new String[2];
             parts = idx.split("&");
             if (parts.length == 2) {
@@ -219,7 +219,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = false;
         String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
-        if (idx.startsWith("$r")) {
+        if (idx.startsWith("$")) {
             String []parts = new String[2];
             parts = idx.split("&");
             if (parts.length == 2) {
@@ -250,7 +250,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (src == null) { return null; }
         String instr = null;
-        if (src.startsWith("$r")) {
+        if (src.startsWith("$")) {
             String []parts = new String[2];
             parts = src.split("&");
             if (parts.length == 2) {
@@ -295,7 +295,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         this.label_from_stmt = true;
         if (reg3 == null) { return null; }
         String instr = null;
-        if (reg3.startsWith("$r")) {
+        if (reg3.startsWith("$")) {
             String []parts = new String[2];
             parts = reg3.split("&");
             if (parts.length == 2) {
