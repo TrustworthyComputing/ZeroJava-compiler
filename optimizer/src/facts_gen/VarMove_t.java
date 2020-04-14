@@ -2,14 +2,14 @@ package facts_gen;
 import java.io.*;
 
 public class VarMove_t extends Var_t {
-	
+
 	public int ic;
 	public String src;
 
 	public VarMove_t(String meth_name, int ic, String dst, String src) {
 		super(meth_name, dst);
 		this.ic = ic;
-		this.src = src;
+		this.src = "\"" + src + "\"";
 	}
 
 	public void writerec(PrintWriter writer, boolean print) {

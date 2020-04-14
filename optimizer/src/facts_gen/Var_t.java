@@ -1,13 +1,13 @@
 package facts_gen;
 import java.io.*;
 
-public class Var_t extends dl_t {
-	
+public class Var_t extends Fact_t {
+
 	public String var;
 
 	public Var_t(String meth_name, String var) {
 		super(meth_name);
-		this.var = var;
+		this.var = "\"" + var + "\"";
 	}
 
 	public void writerec(PrintWriter writer, boolean print) {

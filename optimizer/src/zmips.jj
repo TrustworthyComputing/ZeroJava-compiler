@@ -25,7 +25,7 @@ SPECIAL_TOKEN : /* COMMENTS */
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-TOKEN : 
+TOKEN :
 {
 // Special Instructions
   < print: "print" >
@@ -45,8 +45,8 @@ TOKEN :
 | < not : "not" >
 // Instructions that All three registers
 | < and : "and" >
-| < or : "or" >   
-| < xor : "xor" >   
+| < or : "or" >
+| < xor : "xor" >
 | < add: "add" >
 | < sub: "sub" >
 | < mult: "mult" >
@@ -58,7 +58,7 @@ TOKEN :
 | < cmpg: "cmpg" >
 | < cmpge: "cmpge" >
 // for registers
-| < r: "$r" >   
+| < r: "$r" >
 }
 
 TOKEN : /* LITERALS */
@@ -137,68 +137,81 @@ Label()
 | TwoRegInstr()
 | ThreeRegInstr()
 | JmpStmts()
-| swStmt()
-| lwStmt()
+| ComparisonOps()
+| LwStmt()
+| SwStmt()
 | PrintStmt()
 | AnswerStmt()
 | PubReadStmt()
 | SecReadStmt()
-| PubSeekStmt()
-| SecSeekStmt()
+// | PubSeekStmt()
+// | SecSeekStmt()
 }
 
 void JmpStmts() :
 {}
 {
-  JmpOps() Register() "," Register() "," Label()
+  JmpOps() Label()
 }
 
 void JmpOps():
 {}
 {
   "j"
-| "beq"
-| "bne"
-| "blt"
-| "ble"
-| "bgt"
-| "bge"
+| "cjmp"
+| "cnjmp"
 }
 
-void swStmt() :
+void ComparisonStmts() :
 {}
 {
-  "sw" Register() "," SimpleExp() "(" SimpleExp() ")"
+  ComparisonOps() Register() "," SimpleExp()
 }
 
-void lwStmt() :
+void ComparisonOps():
 {}
 {
-  "lw" Register() "," SimpleExp() "(" SimpleExp() ")"
+  "cmpe"
+| "cmpg"
+| "cmpge"
 }
+
+void LwStmt() :
+{}
+{
+   "lw" "," SimpleExp() "(" SimpleExp() ")"
+}
+
+void SwStmt() :
+{}
+{
+   "sw" "," SimpleExp() "(" SimpleExp() ")"
+}
+
 
 void TwoRegInstr() :
 {}
 {
-  TwoRegInstrOp() Register() "," Register() "," SimpleExp() 
+  TwoRegInstrOp() Register() "," SimpleExp()
 }
 
 void TwoRegInstrOp() :
 {}
-{ 
+{
   "move"
+| "la"
 | "not"
 }
 
 void ThreeRegInstr() :
 {}
 {
-  ThreeRegInstrOp() Register() "," Register() "," SimpleExp() 
+  ThreeRegInstrOp() Register() "," Register() "," SimpleExp()
 }
 
 void ThreeRegInstrOp() :
 {}
-{ 
+{
   "and"
 | "or"
 | "xor"
@@ -212,39 +225,38 @@ void ThreeRegInstrOp() :
 void PrintStmt() :
 {}
 {
-  "print" Register() "," Register() "," Register() 
+  "print" Register()
 }
 
 void AnswerStmt() :
 {}
 {
-  "answer" Register() "," Register() "," Register() 
+  "answer" Register()
 }
 
 void PubReadStmt() :
 {}
 {
-  "pubread" Register() "," Register() "," SimpleExp() 
+  "pubread" Register()
 }
 
-void PubSeekStmt() :
-{}
-{
-  "pubseek" Register() "," SimpleExp() "," SimpleExp() 
-}
+// void PubSeekStmt() :
+// {}
+// {
+//   "pubseek" Register() "," SimpleExp() "," SimpleExp()
+// }
 
 void SecReadStmt() :
 {}
 {
-  "secread" Register() "," Register() "," SimpleExp() 
+  "secread" Register()
 }
 
-void SecSeekStmt() :
-{}
-{
-  "secseek" Register() "," SimpleExp() "," SimpleExp() 
-}
-
+// void SecSeekStmt() :
+// {}
+// {
+//   "secseek" Register() "," SimpleExp() "," SimpleExp()
+// }
 
 void SimpleExp() :
 {}

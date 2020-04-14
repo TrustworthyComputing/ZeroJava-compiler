@@ -1,7 +1,7 @@
 package facts_gen;
 import java.io.*;
 
-public class AnswerInstruction_t extends dl_t {
+public class AnswerInstruction_t extends Fact_t {
 
 	public int ic;
 	public String instr;
@@ -9,7 +9,7 @@ public class AnswerInstruction_t extends dl_t {
 	public AnswerInstruction_t(String meth_name, int ic, String instr) {
 		super(meth_name);
 		this.ic = ic;
-		this.instr = instr;
+		this.instr = "\"" + instr + "\"";
 	}
 
 	public void writerec(PrintWriter writer, boolean print) {

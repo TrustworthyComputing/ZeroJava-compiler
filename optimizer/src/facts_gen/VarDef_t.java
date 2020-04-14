@@ -2,7 +2,7 @@ package facts_gen;
 import java.io.*;
 
 public class VarDef_t extends Var_t {
-	
+
 	public int ic;
 
 	public VarDef_t(String meth_name, int ic, String dst) {

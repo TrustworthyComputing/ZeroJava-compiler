@@ -89,8 +89,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      *       | TwoRegInstr()
      *       | ThreeRegInstr()
      *       | JmpStmts()
-     *       | swStmt()
-     *       | lwStmt()
+     *       | SwStmt()
+     *       | LwStmt()
      *       | PrintStmt()
      *       | AnswerStmt()
      *       | PubReadStmt()
@@ -173,7 +173,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     * f5 -> SimpleExp()
     * f6 -> ")"
     */
-    public String visit(swStmt n, String argu) throws Exception {
+    public String visit(SwStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu).split("&")[0];
         String idx = n.f3.accept(this, argu);
         this.label_from_stmt = false;
@@ -205,7 +205,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     * f5 -> SimpleExp()
     * f6 -> ")"
     */
-    public String visit(lwStmt n, String argu) throws Exception {
+    public String visit(LwStmt n, String argu) throws Exception {
         String dst = n.f1.accept(this, argu).split("&")[0];
         String idx = n.f3.accept(this, argu);
         this.label_from_stmt = false;

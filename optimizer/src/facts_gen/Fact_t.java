@@ -1,11 +1,11 @@
 package facts_gen;
 
-public class dl_t {
-	
+public class Fact_t {
+
 	public String meth_name;
 
-	public dl_t(String meth_name) {
-		this.meth_name = meth_name;
+	public Fact_t(String meth_name) {
+		this.meth_name = "\"" + meth_name + "\"";
 	}
 
 	public void writerec() {
