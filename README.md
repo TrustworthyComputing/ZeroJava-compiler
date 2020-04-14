@@ -263,7 +263,7 @@ the zMIPS assembly output is optimized.
 
 
 More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
-Those examples include `if-else` statements, comparisons, `while` loops, examples with `int [ ]` accesses and others that will help getting started with Zilch programming language. 
+Those examples include `if-else` statements, comparisons, `while` loops, examples with `int [ ]` accesses and others that will help getting started with Zilch programming language.
 
 
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group

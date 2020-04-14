@@ -22,7 +22,6 @@ import org.deri.iris.compiler.Parser;
 import org.deri.iris.optimisations.magicsets.MagicSets;
 import org.deri.iris.storage.IRelation;
 
-
 public class Main {
 
     private static boolean debug_ = true;
