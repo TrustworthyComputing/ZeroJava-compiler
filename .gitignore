@@ -22,23 +22,11 @@ hs_err_pid*
 *.html
 
 
-minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavavisitor/*.java
-minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavasyntaxtree/*.java
-minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavaparser/*.java
+src/main/java/org/twc/minijavacompiler/minijavavisitor/*.java
+src/main/java/org/twc/minijavacompiler/minijavasyntaxtree/*.java
+src/main/java/org/twc/minijavacompiler/minijavaparser/*.java
 
-minijava-compiler/src/main/java/org/twc/minijavacompiler/zmipsvisitor/*.java
-minijava-compiler/src/main/java/org/twc/minijavacompiler/zmipssyntaxtree/*.java
-minijava-compiler/src/main/java/org/twc/minijavacompiler/zmipsparser/*.java
-minijava-compiler/src/main/java/org/twc/minijavacompiler/facts_rules/Facts/*
-
-optimizer/src/zmips-jtb.jj
-optimizer/src/ZMIPSParser.java
-optimizer/src/ZMIPSParserConstants.java
-optimizer/src/ZMIPSParserTokenManager.java
-optimizer/src/ParseException.java
-optimizer/src/Token.java
-optimizer/src/TokenMgrError.java
-optimizer/src/JavaCharStream.java
-optimizer/src/syntaxtree/*
-optimizer/src/visitor/*
-optimizer/src/facts_rules/Facts/*
+src/main/java/org/twc/minijavacompiler/zmipsvisitor/*.java
+src/main/java/org/twc/minijavacompiler/zmipssyntaxtree/*.java
+src/main/java/org/twc/minijavacompiler/zmipsparser/*.java
+src/main/java/org/twc/minijavacompiler/facts_rules/Facts/*

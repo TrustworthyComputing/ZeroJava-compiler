@@ -102,10 +102,11 @@ public class Main {
                 }
                 writer.close();
                 System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
-                System.out.println("===================================================================================\n\n");
-
-                // optimize zMIPS code
                 System.out.println("===================================================================================");
+
+                if (!enable_opts_) continue;
+                // optimize zMIPS code
+                System.out.println("\n\n===================================================================================");
                 System.out.println("Optimizing file \"" + zmips_output_path + "\"\n");
                 String facts_output_path = "target/Facts/" + zmips_output_path.substring(0, zmips_output_path.length() - 6);
                 Path p = Paths.get(facts_output_path);

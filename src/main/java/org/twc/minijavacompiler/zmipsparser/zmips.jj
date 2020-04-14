@@ -77,6 +77,7 @@ TOKEN : /* LITERALS */
         | "$a" ["1"-"4"] (["0"-"4"])* | "$a0"
         | "$v0"
         | "$v1"
+        | "0xffffffffffffffff"
         )
     >
 }
@@ -189,13 +190,13 @@ void ComparisonOps():
 void LwStmt() :
 {}
 {
-   "lw" "," SimpleExp() "(" SimpleExp() ")"
+   "lw" Register() "," SimpleExp() "(" SimpleExp() ")"
 }
 
 void SwStmt() :
 {}
 {
-   "sw" "," SimpleExp() "(" SimpleExp() ")"
+   "sw" Register() "," SimpleExp() "(" SimpleExp() ")"
 }
 
 
