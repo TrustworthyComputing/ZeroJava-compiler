@@ -1,9 +1,0 @@
-#!/bin/bash
-
-CLASSPATH="lib/iris-0.60.jar:lib/iris-parser-0.60.jar:."
-JVM="java"
-
-for file in $@ 
-do
-	$JVM -cp $CLASSPATH Main $file
-done

@@ -4,7 +4,8 @@ options {
 }
 
 PARSER_BEGIN(ZMIPSParser)
-  public class ZMIPSParser {}
+    package org.twc.minijavacompiler.zmipsparser;
+    public class ZMIPSParser {}
 PARSER_END(ZMIPSParser)
 
 SKIP : /* WHITE SPACE */

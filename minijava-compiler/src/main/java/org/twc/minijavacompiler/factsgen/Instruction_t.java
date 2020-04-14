@@ -1,4 +1,4 @@
-package facts_gen;
+package org.twc.minijavacompiler.factsgen;
 import java.io.*;
 
 public class Instruction_t extends Fact_t {

@@ -1,4 +1,4 @@
-package facts_gen;
+package org.twc.minijavacompiler.factsgen;
 import java.io.*;
 
 public class VarUse_t extends Var_t {

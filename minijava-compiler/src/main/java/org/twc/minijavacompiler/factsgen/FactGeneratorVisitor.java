@@ -1,7 +1,7 @@
-package facts_gen;
+package org.twc.minijavacompiler.factsgen;
 
-import syntaxtree.*;
-import visitor.GJDepthFirst;
+import org.twc.minijavacompiler.zmipssyntaxtree.*;
+import org.twc.minijavacompiler.zmipsvisitor.GJDepthFirst;
 import java.util.*;
 import java.io.*;
 
@@ -350,6 +350,82 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(Label n, String argu) throws Exception {
         return n.f0.toString();
+    }
+
+    public void writeFacts(String path, boolean print_facts) {
+        try {
+            PrintWriter file = new PrintWriter(path + "/Vars.iris");
+            if (print_facts) System.out.println("\nVars:");
+            for (int k = 0 ; k < variables_.size() ; k++) {
+                variables_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/varMoves.iris");
+            if (print_facts) System.out.println("\nvarMoves:");
+            for (int k = 0 ; k < var_moves_.size() ; k++) {
+                var_moves_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/ConstMoves.iris");
+            if (print_facts) System.out.println("\nConstMoves:");
+            for (int k = 0 ; k < const_moves_.size() ; k++) {
+                const_moves_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/BinOpMoves.iris");
+            if (print_facts) System.out.println("\nBinOpMoves:");
+            for (int k = 0 ; k < bin_op_moves_.size() ; k++) {
+                bin_op_moves_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/Instructions.iris");
+            if (print_facts) System.out.println("\nInstructions:");
+            for (int k = 0 ; k < instructions_.size() ; k++) {
+                instructions_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/AnswerInstructions.iris");
+            if (print_facts) System.out.println("\nAnswerInstructions:");
+            for (int k = 0 ; k < answers_.size() ; k++) {
+                answers_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/VarUses.iris");
+            if (print_facts) System.out.println("\nVarUses:");
+            for (int k = 0 ; k < var_uses_.size() ; k++) {
+                var_uses_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/VarDefs.iris");
+            if (print_facts) System.out.println("\nVarDefs:");
+            for (int k = 0 ; k < var_defs_.size() ; k++) {
+                var_defs_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/Jumps.iris");
+            if (print_facts) System.out.println("\nJumps:");
+            for (int k = 0 ; k < jumps_.size() ; k++) {
+                jumps_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+
+            file = new PrintWriter(path + "/Cjumps.iris");
+            if (print_facts) System.out.println("\nCjumps:");
+            for (int k = 0 ; k < cjumps_.size() ; k++) {
+                cjumps_.get(k).writerec(file, print_facts);
+            }
+            file.close();
+        } catch(FileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+        }
     }
 
 }

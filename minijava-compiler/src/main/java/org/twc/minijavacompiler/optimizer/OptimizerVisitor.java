@@ -1,8 +1,8 @@
-package optimizer;
+package org.twc.minijavacompiler.optimizer;
 
-import syntaxtree.*;
-import visitor.GJDepthFirst;
-import facts_gen.*;
+import org.twc.minijavacompiler.zmipssyntaxtree.*;
+import org.twc.minijavacompiler.zmipsvisitor.GJDepthFirst;
+import org.twc.minijavacompiler.factsgen.*;
 import java.util.*;
 import java.io.*;
 
