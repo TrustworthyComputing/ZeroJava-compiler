@@ -6,7 +6,7 @@ CLASSPATH = lib/iris-0.60.jar:lib/iris-parser-0.60.jar:.
 all: compile
 
 compile:
-	$(JVM) -jar jtb132.1.jar -te zmips.jj
+	$(JVM) -jar jtb132di.jar -te zmips.jj
 	$(JAVACC) zmips-jtb.jj
 	$(JAVAC) syntaxtree/*.java
 	$(JAVAC) facts_gen/*.java

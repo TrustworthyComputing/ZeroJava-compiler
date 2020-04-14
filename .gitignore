@@ -5,7 +5,6 @@
 *.out
 *-jtb.jj
 
-*.xml
 *.iml
 target
 
@@ -19,20 +18,14 @@ target
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-
 *.tar.gz
 *.html
 
-compiler/src/MiniJava-jtb.jj
-compiler/src/MiniJavaParser.java
-compiler/src/MiniJavaParserConstants.java
-compiler/src/MiniJavaParserTokenManager.java
-compiler/src/ParseException.java
-compiler/src/Token.java
-compiler/src/TokenMgrError.java
-compiler/src/JavaCharStream.java
-compiler/src/syntaxtree/*
-compiler/src/visitor/*
+
+minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavavisitor/*.java
+minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavasyntaxtree/*.java
+minijava-compiler/src/main/java/org/twc/minijavacompiler/minijavaparser/*.java
+
 
 optimizer/src/zmips-jtb.jj
 optimizer/src/ZMIPSParser.java

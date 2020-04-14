@@ -1,5 +1,6 @@
 package org.twc.minijavacompiler;
 
+import org.twc.minijavacompiler.minijavaparser.*;
 import org.twc.minijavacompiler.basetype.*;
 import org.twc.minijavacompiler.minijavasyntaxtree.*;
 import org.twc.minijavacompiler.symboltable.*;

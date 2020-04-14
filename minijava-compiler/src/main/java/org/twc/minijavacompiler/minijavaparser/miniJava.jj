@@ -1,10 +1,9 @@
 options {
 	JAVA_UNICODE_ESCAPE = true;
-	STATIC = false;
 }
 
 PARSER_BEGIN(MiniJavaParser)
-	package org.twc.minijavacompiler;
+	package org.twc.minijavacompiler.minijavaparser;
 	public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
