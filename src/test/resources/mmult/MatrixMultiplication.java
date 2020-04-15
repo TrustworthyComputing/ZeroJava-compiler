@@ -24,18 +24,16 @@ class MatrixMultiplication {
 		while (i < (rows_1 * cols_1_rows_2)) {
 			x = PrivateTape.read();
 			a[i] = x;
-			// printf("%d, ", a[i]);
+			System.out.println(a[i]);
 			i = i + 1;
 		}
-		// printf("\n");
 		i = 0;
 		while (i < (cols_1_rows_2 * cols_2)) {
 			x = PrivateTape.read();
 			b[i] = x;
-			// printf("%d, ", b[i]);
+			System.out.println(b[i]);
 			i = i + 1;
 		}
-		// printf("\n");
 		i = 0;
 		while (i < (rows_1 * cols_2)) {
 			res[i] = 0;
@@ -59,12 +57,11 @@ class MatrixMultiplication {
 			i = i + 1;
 		}
 
-		// i = 0;
-		// while (i < rows_1 * cols_2) {
-		// 	printf("%d, ", res[i]);
-		// 	i = i + 1;
-		// }
-		// printf("\n");
+		i = 0;
+		while (i < (rows_1 * cols_2)) {
+			System.out.println(res[i]);
+			i = i + 1;
+		}
 
 		Prover.answer(res[0]);
 	}
