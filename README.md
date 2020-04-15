@@ -71,10 +71,10 @@ Zilch files use the `.zl` extension.
 | Built in Zilch Function Name       	| Description and corresponding zMIPS command 			|
 |---------------------------------------|-----------------------------------------------------------|
 | `Prover.answer(int result);`			| `answer`: returns the result 								|
-| `Out.print(int variable);`			| `print`: prints the contents of `variable` 				|
-| `PrimaryTape.read(int dst);`			| `pubread dst`: consumes next word from public tape		|
+| `System.out.println(int variable);`			| `print`: prints the contents of `variable` 				|
+| `PublicTape.read(int dst);`			| `pubread dst`: consumes next word from public tape		|
 | `PrivateTape.read(int dst);`			| `secread dst`: consumes next word from private tape 		|
-| `PrimaryTape.seek(int dst, int idx);`	| `pubseek dst, idx`: consumes `idx`th word from public tape |
+| `PublicTape.seek(int dst, int idx);`	| `pubseek dst, idx`: consumes `idx`th word from public tape |
 | `PrivateTape.seek(int dst, int idx);` | `secseek dst idx`: consumes `idx`th word from private tape |
 
 
@@ -188,7 +188,7 @@ void main(void) {
 	int res;
 	i = 0 ;
 	while (i < 5) {
-		PrimaryTape.read(from_tape);
+		PublicTape.read(from_tape);
 		res = res + from_tape;
 		i = i + 1;
 	}

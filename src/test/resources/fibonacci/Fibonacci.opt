@@ -1,0 +1,33 @@
+LOADW r18 r18 r2
+ADD r2 r2 1
+MOV r17 r18 r18
+MOV r19 r19 1
+MOV r20 r20 0
+CMPGE r19 r19 r17
+CNJMP r0 r0 __L_2__
+MOV r20 r20 1
+__L_2__
+CMPG r20 r20 0
+CNJMP r0 r0 __L_1__
+ANSWER r17 r17 r17
+__L_1__
+MOV r13 r13 1
+MOV r15 r15 1
+MOV r16 r16 2
+__L_3__
+MOV r24 r24 0
+CMPG r17 r17 r16
+CNJMP r0 r0 __L_5__
+MOV r24 r24 1
+__L_5__
+CMPG r24 r24 0
+CNJMP r0 r0 __L_4__
+MOV r14 r13 r13
+ADD r25 r13 r15
+MOV r13 r25 r25
+MOV r15 r14 r14
+ADD r26 r16 1
+MOV r16 r26 r26
+JMP r0 r0 __L_3__
+__L_4__
+ANSWER r13 r13 r13
