@@ -2,6 +2,8 @@ package org.twc.minijavacompiler;
 
 import java.nio.file.*;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.Reader;
 import java.io.FileReader;
 import java.io.FileInputStream;
@@ -11,6 +13,7 @@ import java.io.IOException;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -95,6 +98,7 @@ public class Main {
                 String path = fp.getPath();
                 path = path.substring(0, path.lastIndexOf('.'));
                 String zmips_output_path = path + ".zmips";
+                String opt_zmips_output_path = path + ".opt.zmips";
                 writer = new PrintWriter(zmips_output_path);
                 writer.print(generator.getASM());
                 if (debug_) {
@@ -104,112 +108,115 @@ public class Main {
                 System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
                 System.out.println("===================================================================================");
 
-                if (!enable_opts_) continue;
                 // optimize zMIPS code
+                if (!enable_opts_) continue;
+
                 System.out.println("\n\n===================================================================================");
                 System.out.println("Optimizing file \"" + zmips_output_path + "\"\n");
-                String facts_output_path = "target/Facts/" + zmips_output_path.substring(0, zmips_output_path.length() - 6);
-                Path p = Paths.get(facts_output_path);
-                if (! Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
-                    throw new IOException("Error creating folder " + facts_output_path);
-                }
-                fis = new FileInputStream(zmips_output_path);
-                ZMIPSParser zmips_parser = new ZMIPSParser(fis);
-                org.twc.minijavacompiler.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
-                FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
-                zmips_root.accept(factgen_visitor, null);
-                factgen_visitor.writeFacts(facts_output_path, debug_);
-                System.out.println("[ 1/3 ] zMIPS code relations inference phase completed");
 
-                Parser iris_parser = new Parser();
-                Map<IPredicate, IRelation> factMap = new HashMap<>();
-                final File factsDirectory = new File(facts_output_path);
-                if (factsDirectory.isDirectory()) {
-                    for (final File fileEntry : factsDirectory.listFiles()) {
-                        if (fileEntry.isDirectory()) {
-                            System.out.println("Omitting directory " + fileEntry.getPath());
-                        } else {
-                            Reader factsReader = new FileReader(fileEntry);
-                            iris_parser.parse(factsReader);
-                            factMap.putAll(iris_parser.getFacts()); // Retrieve the facts and put all of them in factMap
-                        }
+                boolean can_optimize = true;
+                Map<String, Map<String, String>> prev_optimizations_map = null;
+                Map<String, Map<String, String>> optimizations_map = null;
+                while (can_optimize) {
+                    prev_optimizations_map = optimizations_map;
+                    String facts_output_path = "target/Facts/" + zmips_output_path.substring(0, zmips_output_path.length() - 6);
+                    Path p = Paths.get(facts_output_path);
+                    if (! Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
+                        throw new IOException("Error creating folder " + facts_output_path);
                     }
-                } else {
-                    System.err.println("Invalid facts directory facts_output_path");
-                    System.exit(-1);
-                }
-                File rulesFile = new File("src/main/java/org/twc/minijavacompiler/staticanalysis/rules.iris");
-                Reader rulesReader = new FileReader(rulesFile);
-                File queriesFile = new File("src/main/java/org/twc/minijavacompiler/staticanalysis/queries.iris");
-                Reader queriesReader = new FileReader(queriesFile);
-                iris_parser.parse(rulesReader);                                 // Parse rules file.
-                List<IRule> rules = iris_parser.getRules();                     // Retrieve the rules from the parsed file.
-                iris_parser.parse(queriesReader);                               // Parse queries file.
-                List<IQuery> queries = iris_parser.getQueries();                // Retrieve the queries from the parsed file.
-                Configuration configuration = new Configuration();              // Create a default configuration.
-                configuration.programOptmimisers.add(new MagicSets());          // Enable Magic Sets together with rule filtering.
-                IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
-                Map<String, Map<String, String>> optimisations_map = new HashMap<>();
-                for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
-                    List<IVariable> variableBindings = new ArrayList<>();
-                    IRelation relation = knowledgeBase.execute(query, variableBindings);
-                    if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
-                    String queryType = null;
-                    if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
-                        queryType = "constProp";
-                    } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
-                        queryType = "copyProp";
-                    } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
-                        queryType = "deadCode";
-                    }
-                    if (queryType != null) {
-                        Map<String, String> tempOp = new HashMap<>();
-                        String str = null;
-                        for (int r = 0; r < relation.size(); r++) {
-                            str = (relation.get(r)).toString();
-                            if (debug_) System.out.println(relation.get(r));
-                            int line = getLine(str);
-                            String meth = getMeth(str);
-                            if (tempOp.get(meth + line) == null) {
-                                tempOp.put(meth + line, str);
+                    fis = new FileInputStream(zmips_output_path);
+                    ZMIPSParser zmips_parser = new ZMIPSParser(fis);
+                    org.twc.minijavacompiler.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
+                    FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
+                    zmips_root.accept(factgen_visitor, null);
+                    factgen_visitor.writeFacts(facts_output_path, debug_);
+                    System.out.println("[ 1/3 ] zMIPS code relations inference phase completed");
+
+                    Parser iris_parser = new Parser();
+                    Map<IPredicate, IRelation> factMap = new HashMap<>();
+                    final File factsDirectory = new File(facts_output_path);
+                    if (factsDirectory.isDirectory()) {
+                        for (final File fileEntry : factsDirectory.listFiles()) {
+                            if (fileEntry.isDirectory()) {
+                                System.out.println("Omitting directory " + fileEntry.getPath());
                             } else {
-                                tempOp.put(meth + "-sec-" + line, str);
+                                Reader factsReader = new FileReader(fileEntry);
+                                iris_parser.parse(factsReader);
+                                factMap.putAll(iris_parser.getFacts()); // Retrieve the facts and put all of them in factMap
                             }
                         }
-                        optimisations_map.put(queryType, tempOp);
-                    } else if (debug_) {
-                        for (int r = 0; r < relation.size(); r++) {
-                            System.out.println(relation.get(r));
+                    } else {
+                        System.err.println("Invalid facts directory facts_output_path");
+                        System.exit(-1);
+                    }
+                    File rulesFile = new File("src/main/java/org/twc/minijavacompiler/staticanalysis/rules.iris");
+                    Reader rulesReader = new FileReader(rulesFile);
+                    File queriesFile = new File("src/main/java/org/twc/minijavacompiler/staticanalysis/queries.iris");
+                    Reader queriesReader = new FileReader(queriesFile);
+                    iris_parser.parse(rulesReader);                                 // Parse rules file.
+                    List<IRule> rules = iris_parser.getRules();                     // Retrieve the rules from the parsed file.
+                    iris_parser.parse(queriesReader);                               // Parse queries file.
+                    List<IQuery> queries = iris_parser.getQueries();                // Retrieve the queries from the parsed file.
+                    Configuration configuration = new Configuration();              // Create a default configuration.
+                    configuration.programOptmimisers.add(new MagicSets());          // Enable Magic Sets together with rule filtering.
+                    IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
+                    optimizations_map = new HashMap<>();
+                    for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
+                        List<IVariable> variableBindings = new ArrayList<>();
+                        IRelation relation = knowledgeBase.execute(query, variableBindings);
+                        if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
+                        String queryType = null;
+                        if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
+                            queryType = "constProp";
+                        } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
+                            queryType = "copyProp";
+                        } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
+                            queryType = "deadCode";
+                        }
+                        if (queryType != null) {
+                            Map<String, String> tempOp = new HashMap<>();
+                            String str = null;
+                            for (int r = 0; r < relation.size(); r++) {
+                                str = (relation.get(r)).toString();
+                                if (debug_) System.out.println(relation.get(r));
+                                int line = getLine(str);
+                                String meth = getMeth(str);
+                                if (tempOp.get(meth + line) == null) {
+                                    tempOp.put(meth + line, str);
+                                } else {
+                                    tempOp.put(meth + "-sec-" + line, str);
+                                }
+                            }
+                            optimizations_map.put(queryType, tempOp);
+                        } else if (debug_) {
+                            for (int r = 0; r < relation.size(); r++) {
+                                System.out.println(relation.get(r));
+                            }
                         }
                     }
-                }
-                /* Print optimizations map */
-                if (debug_) {
-                    System.out.println("\n------------- Optimizations Map --------------");
-                    for (Map.Entry<String, Map<String, String>> entry : optimisations_map.entrySet()) {
-                        System.out.println(entry.getKey() + ":");
-                        for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
-                            System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
-                        }
+                    if (debug_) { // Print optimizations map
+                        printOptMap(optimizations_map);
                     }
-                    System.out.println("---------------------------");
-                }
-                System.out.println("[ 2/3 ] Static analysis phase completed");
+                    System.out.println("[ 2/3 ] Static analysis phase completed");
 
-                OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimisations_map);
-                zmips_root.accept(optimizer_visitor, null);
-                String opt_zmips_output_path = zmips_output_path.substring(0, zmips_output_path.length() - 6);
-                if (opt_zmips_output_path.endsWith(".opt")) {
-                    opt_zmips_output_path = opt_zmips_output_path.substring(0, opt_zmips_output_path.length() - 4);
+                    OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimizations_map);
+                    zmips_root.accept(optimizer_visitor, null);
+                    writer = new PrintWriter(opt_zmips_output_path);
+                    if (debug_) {
+                        System.out.println("\n" + optimizer_visitor.result);
+                    }
+                    writer.println(optimizer_visitor.result);
+                    writer.close();
+                    System.out.println("[ 3/3 ] Optimization phase completed");
+
+                    if (prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map)) {
+                        can_optimize = true;
+                    } else {
+                        can_optimize = false;
+                    }
+                    zmips_output_path = opt_zmips_output_path;
+                    System.out.println("\n");
                 }
-                opt_zmips_output_path = opt_zmips_output_path + ".opt.zmips";
-                writer = new PrintWriter(opt_zmips_output_path);
-                if (debug_) {
-                    System.out.println("\n" + optimizer_visitor.result);
-                }
-                writer.println(optimizer_visitor.result);
-                writer.close();
-                System.out.println("[ 3/3 ] Optimization phase completed");
 
                 System.out.println("[ \u2713 ] zMIPS optimized code generated to \"" + opt_zmips_output_path + "\"");
                 System.out.println("===================================================================================");
@@ -234,14 +241,52 @@ public class Main {
         }
     }
 
-    static int getLine(String fact) {
+    private static int getLine(String fact) {
         String []parts = fact.split(",");
         return Integer.parseInt(parts[1].substring(1));
     }
 
-    static String getMeth(String fact) {
+    private static String getMeth(String fact) {
         String []parts = fact.split(",");
         return parts[0].substring(2,  parts[0].length()-1);
+    }
+
+    private static boolean optMapsEquals(Map<String, Map<String, String>> opts1, Map<String, Map<String, String>> opts2) {
+        // printOptMap(opts1);
+        // printOptMap(opts2);
+        for (String key : opts1.keySet()) {
+            if (! compareMaps(opts1.get(key), opts2.get(key))) return false;
+        }
+        return true;
+    }
+
+    private static boolean compareMaps(Map<String, String> map1, Map<String, String> map2) {
+        try {
+           for (String k : map2.keySet()) {
+               if (!map1.get(k).equals(map2.get(k))) {
+                   return false;
+               }
+           }
+           for (String y : map1.keySet()) {
+               if (!map2.containsKey(y)) {
+                   return false;
+               }
+           }
+       } catch (NullPointerException np) {
+           return false;
+       }
+       return true;
+    }
+
+    private static void printOptMap(Map<String, Map<String, String>> map) {
+        System.out.println("\n------------- Optimizations Map --------------");
+        for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + ":");
+            for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
+                System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
+            }
+        }
+        System.out.println("---------------------------");
     }
 
 }

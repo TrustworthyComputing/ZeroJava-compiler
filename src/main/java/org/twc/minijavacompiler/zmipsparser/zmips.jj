@@ -72,6 +72,7 @@ TOKEN : /* LITERALS */
     < REGISTER:
         ( "$r" ["1"-"9"] (["0"-"9"])* | "$r0"
         | "$zero"
+        | "$ra"
         | "$sp"
         | "$hp"
         | "$a" ["1"-"4"] (["0"-"4"])* | "$a0"
@@ -162,13 +163,14 @@ Label()
 void JmpStmts() :
 {}
 {
-  JmpOps() Label()
+  JmpOps() SimpleExp()
 }
 
 void JmpOps():
 {}
 {
   "j"
+| "jr"
 | "cjmp"
 | "cnjmp"
 }

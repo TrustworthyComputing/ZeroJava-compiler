@@ -105,6 +105,13 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String instr = op + label;
         if (op.equals("j")) {
             jumps_.add(new Jump_t(argu, this.inst_num2_, label));
+        } else if (op.equals("jr")) {
+            jumps_.add(new Jump_t(argu, this.inst_num2_, label));
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, label));
+            if (label.equals("$ra")) {
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$sp"));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$v0"));
+            }
         } else {
             cjumps_.add(new Cjump_t(argu, this.inst_num2_, label));
         }
@@ -113,6 +120,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
 
     /**
      * f0 ->    "j"
+     *      | "jr"
      *      | "cjmp"
      *      | "cnjmp"
      */
