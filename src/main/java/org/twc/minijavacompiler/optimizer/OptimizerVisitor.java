@@ -352,7 +352,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      * f1 -> SimpleExp()
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
-        String reg = n.f1.accept(this, argu).split("&")[0];
+        String reg = n.f1.accept(this, argu);
         String []parts = new String[2];
         parts = reg.split("&");
         if (parts.length == 2) {

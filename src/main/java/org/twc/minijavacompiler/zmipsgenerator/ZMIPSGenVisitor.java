@@ -502,7 +502,6 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      */
 	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String istrue1 = labels_.newLabel();
 		String istrue2 = labels_.newLabel();
 		String ret = newRegister();
@@ -510,8 +509,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.asm_.append("cmpg " + exp1 + ", 0\n");
 		this.asm_.append("cjmp " + istrue1 + "\n");
 		this.asm_.append("move " + ret + ", 0\n");
-		this.asm_.append("jmp " + istrue2 + "\n"); 	// early termination
+		this.asm_.append("j " + istrue2 + "\n"); 	// early termination
 		this.asm_.append(istrue1 + "\n");
+
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("cmpg " + exp2 + ", 0\n");
 		this.asm_.append("cjmp " + istrue2 + "\n");
 		this.asm_.append("move " + ret + ", 0\n");
@@ -526,12 +527,12 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*/
 	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String end_label = labels_.newLabel();
 		String ret = newRegister();
 		this.asm_.append("move " + ret + ", 1\n");
 		this.asm_.append("cmpg " + exp1 + ", 0\n");
 		this.asm_.append("cjmp " + end_label + "\n"); // if (exp1) goto end
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("cmpg " + exp2 + ", 0\n");
 		this.asm_.append("cjmp " + end_label + "\n"); // if (exp2) goto end
 		this.asm_.append("move " + ret + ", 0\n"); // else set ret to 0
@@ -790,10 +791,10 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.asm_.append("lw " + length + ", 0(" + array + ")\n");
 		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		// if idx >= arr.length goto error
-		this.asm_.append("cmpg " + length + ", " + idx + "\n"); // length > idx
+		this.asm_.append("cmpg " + length + ", " + idx + "\t\t\t# check if in bounds\n"); // length > idx
 		this.asm_.append("cnjmp " + error_label + "\n");
 		// if idx < 0 goto error
-		this.asm_.append("cmpg $zero, " + idx + "\n"); // 0 >= idx
+		this.asm_.append("cmpg $zero, " + idx + "\t\t\t# check if index is positive\n"); // 0 >= idx
 		this.asm_.append("cjmp " + error_label + "\n");
 		// skip length
 		String temp_array = newRegister();
@@ -1057,8 +1058,9 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 		this.asm_.append("move " + array + ", $hp\n");
 		this.asm_.append("sw " + len + ", 0(" + array + ")\n");
 		// increase heap pointer
-		this.asm_.append("add " + len + ", " + len + ", 1\n");
-		this.asm_.append("add $hp, $hp, " + len + "\n");
+		String temp = newRegister();
+		this.asm_.append("add " + temp + ", " + len + ", 1\n");
+		this.asm_.append("add $hp, $hp, " + temp + "\n");
 		return new Variable_t(null, null, array);
 	}
 
