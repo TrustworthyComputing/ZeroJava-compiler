@@ -6,7 +6,7 @@ class DerivedCall {
 		f = new F();
 		b = new B();
 		i = f.foo(b);
-		System.out.println(i);
+		Prover.answer(i);
 	}
 }
 
@@ -20,6 +20,6 @@ class B extends A {
 
 class F {
 	public int foo(A a) {
-		return 0;
+		return 10;
 	}
 }

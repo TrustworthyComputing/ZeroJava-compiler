@@ -221,6 +221,15 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         } else if (src.matches("[0-9]+")) {
             const_moves_.add(new ConstMove_t(argu, this.inst_num2_, dst, Integer.parseInt(src) ));
         }
+        if (op.equals("la")) {
+            if (dst.equals("$ra")) {
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a0"));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a1"));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a2"));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a3"));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a4"));
+            }
+        }
         var_defs_.add(new VarDef_t(argu, this.inst_num2_, dst));
         return instr;
     }

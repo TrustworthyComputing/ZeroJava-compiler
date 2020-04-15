@@ -104,6 +104,11 @@ noConstProp(?meth, ?l, ?var, ?val1) :-
 	prop(?meth, ?k2, ?l, ?var2),
 	constMove(?meth, ?k1, ?var, ?val1),
 	binOpmove(?meth, ?k2, ?var, ?src1, ?src2).
+noConstProp(?meth, ?l, ?var, ?val1) :-
+	prop(?meth, ?k1, ?l, ?var1),
+	prop(?meth, ?k2, ?l, ?var2),
+	constMove(?meth, ?k1, ?var, ?val1),
+	varDef(?meth, ?k1, ?var).
 
 // Cannot propagate if u have 2 different values for 1 var at line k
 noBothProp(?meth, ?l, ?var, ?val1) :-

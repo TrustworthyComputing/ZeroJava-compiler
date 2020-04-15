@@ -1,6 +1,7 @@
 *.class
 *.asm
 *.zmips
+*.opt
 *.txt
 *.out
 *-jtb.jj
