@@ -12,7 +12,7 @@ public class Cjump_t extends Fact_t {
 		this.label = "\"" + label + "\"";
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "cjumpInstr(" + this.meth_name + ", " + this.ic + ", " + this.label + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

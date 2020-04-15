@@ -2,11 +2,11 @@ package org.twc.minijavacompiler.basetype;
 
 import java.util.List;
 
-public class BaseType {
+public class Base_t {
 
 	private String name;
 
-	public BaseType(String name) {
+	public Base_t(String name) {
 		this.name = name;
 	}
 
@@ -14,15 +14,11 @@ public class BaseType {
 		return this.name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public boolean containsName(final List<? extends BaseType> list, final String name) {
+	public boolean containsName(final List<? extends Base_t> list, final String name) {
 		return list.stream().anyMatch(o -> o.getName().equals(name) );
 	}
 
-	public BaseType getByName(final List<? extends BaseType> list, final String name) {
+	public Base_t getByName(final List<? extends Base_t> list, final String name) {
 		return list.stream().filter(o -> o.getName().equals(name)).findFirst().orElse(null);
 	}
 

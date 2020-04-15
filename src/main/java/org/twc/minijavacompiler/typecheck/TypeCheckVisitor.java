@@ -2,13 +2,10 @@ package org.twc.minijavacompiler.typecheck;
 
 import org.twc.minijavacompiler.minijavasyntaxtree.*;
 import org.twc.minijavacompiler.minijavavisitor.GJDepthFirst;
-import org.twc.minijavacompiler.symboltable.*;
 import org.twc.minijavacompiler.basetype.*;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.*;
 
-public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
+public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
 
     private Map<String, Class_t> st_;
 
@@ -36,12 +33,11 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> ( TypeDeclaration() )*
      * f2 -> <EOF>
      */
-    public BaseType visit(Goal n, BaseType argu) throws Exception {
-        Variable_t _ret = null;
+    public Base_t visit(Goal n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        return _ret;
+        return null;
     }
 
     /**
@@ -64,8 +60,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f16 -> "}"
      * f17 -> "}"
      */
-    public BaseType visit(MainClass n, BaseType argu) throws Exception {
-        Variable_t _ret = null;
+    public Base_t visit(MainClass n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         String id = n.f1.accept(this, argu).getName();
         Class_t mainclazz = st_.get(id);
@@ -86,14 +81,14 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         n.f15.accept(this, meth);
         n.f16.accept(this, argu);
         n.f17.accept(this, argu);
-        return _ret;
+        return null;
     }
 
     /**
     * f0 -> ClassDeclaration()
     *       | ClassExtendsDeclaration()
     */
-    public BaseType visit(TypeDeclaration n, BaseType argu) throws Exception {
+    public Base_t visit(TypeDeclaration n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -105,7 +100,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f4 -> ( MethodDeclaration() )*
     * f5 -> "}"
     */
-    public BaseType visit(ClassDeclaration n, BaseType argu) throws Exception {
+    public Base_t visit(ClassDeclaration n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         String s = n.f1.accept(this, argu).getName();
         Class_t class_id = st_.get(s);
@@ -126,7 +121,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f6 -> ( MethodDeclaration() )*
     * f7 -> "}"
     */
-    public BaseType visit(ClassExtendsDeclaration n, BaseType argu) throws Exception {
+    public Base_t visit(ClassExtendsDeclaration n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         String s = n.f1.accept(this, argu).getName();
         Class_t class_id = st_.get(s);
@@ -146,7 +141,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> Identifier()
     * f2 -> ";"
     */
-    public BaseType visit(VarDeclaration n, BaseType argu) throws Exception {
+    public Base_t visit(VarDeclaration n, Base_t argu) throws Exception {
         n.f2.accept(this, argu);
         return new Variable_t(((Variable_t)n.f0.accept(this, argu)).getType(), n.f1.accept(this, argu).getName());
     }
@@ -166,7 +161,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f11 -> ";"
     * f12 -> "}"
     */
-    public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
+    public Base_t visit(MethodDeclaration n, Base_t argu) throws Exception {
         String methName = n.f2.accept(this, argu).getName();
         Method_t meth = ((Class_t) argu).getMethod(methName);
         n.f0.accept(this, meth);
@@ -184,25 +179,24 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> FormalParameter()
     * f1 -> FormalParameterTail()
     */
-    public BaseType visit(FormalParameterList n, BaseType argu) throws Exception {
-        Variable_t _ret=null;
+    public Base_t visit(FormalParameterList n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        return _ret;
+        return null;
     }
 
     /**
     * f0 -> Type()
     * f1 -> Identifier()
     */
-    public BaseType visit(FormalParameter n, BaseType argu) throws Exception {
+    public Base_t visit(FormalParameter n, Base_t argu) throws Exception {
         return new Variable_t(((Variable_t)n.f0.accept(this, argu)).getType(), n.f1.accept(this, argu).getName());
     }
 
     /**
     * f0 -> ( FormalParameterTerm() )*
     */
-    public BaseType visit(FormalParameterTail n, BaseType argu) throws Exception {
+    public Base_t visit(FormalParameterTail n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -210,11 +204,10 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> ","
     * f1 -> FormalParameter()
     */
-    public BaseType visit(FormalParameterTerm n, BaseType argu) throws Exception {
-        Variable_t _ret=null;
+    public Base_t visit(FormalParameterTerm n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        return _ret;
+        return null;
     }
 
     /**
@@ -223,7 +216,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     *       | IntegerType()
     *       | Identifier()
     */
-    public BaseType visit(Type n, BaseType argu) throws Exception {
+    public Base_t visit(Type n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -232,7 +225,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "["
     * f2 -> "]"
     */
-    public BaseType visit(ArrayType n, BaseType argu) throws Exception {
+    public Base_t visit(ArrayType n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
@@ -242,14 +235,14 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     /**
     * f0 -> "Variable_t"
     */
-    public BaseType visit(BooleanType n, BaseType argu) throws Exception {
+    public Base_t visit(BooleanType n, Base_t argu) throws Exception {
         return new Variable_t("boolean", null);
     }
 
     /**
     * f0 -> "int"
     */
-    public BaseType visit(IntegerType n, BaseType argu) throws Exception {
+    public Base_t visit(IntegerType n, Base_t argu) throws Exception {
         return new Variable_t("int", null);
     }
 
@@ -261,7 +254,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     *       | WhileStatement()
     *       | PrintStatement()
     */
-    public BaseType visit(Statement n, BaseType argu) throws Exception {
+    public Base_t visit(Statement n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -270,7 +263,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> ( Statement() )*
     * f2 -> "}"
     */
-    public BaseType visit(Block n, BaseType argu) throws Exception {
+    public Base_t visit(Block n, Base_t argu) throws Exception {
         n.f1.accept(this, argu);
         return null;
     }
@@ -281,7 +274,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> Expression()
     * f3 -> ";"
     */
-    public BaseType visit(AssignmentStatement n, BaseType argu) throws Exception {
+    public Base_t visit(AssignmentStatement n, Base_t argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
@@ -295,7 +288,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
         Class_t parent = st_.get(t2.getType());
         if (parent != null) {
             while (!parent.getName().equals(t1.getType())) {
-                if (parent == null || parent.getParent() == null) {
+                if (parent.getParent() == null) {
                     throw new Exception("Error assignment between different types: " + t1.getType() + " " + t2.getType());
                 }
                 parent = st_.get(parent.getParent());
@@ -314,7 +307,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f5 -> Expression()
     * f6 -> ";"
     */
-    public BaseType visit(ArrayAssignmentStatement n, BaseType argu) throws Exception {
+    public Base_t visit(ArrayAssignmentStatement n, Base_t argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f2.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t t2 = (Variable_t) n.f5.accept(this, argu);
@@ -330,7 +323,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f0 -> IfthenElseStatement()
      *       | IfthenStatement()
      */
-    public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+    public Base_t visit(IfStatement n, Base_t argu) throws Exception {
        return n.f0.accept(this, argu);
     }
 
@@ -341,7 +334,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f3 -> ")"
      * f4 -> Statement()
      */
-    public BaseType visit(IfthenStatement n, BaseType argu) throws Exception {
+    public Base_t visit(IfthenStatement n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
@@ -365,7 +358,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f5 -> "else"
      * f6 -> Statement()
      */
-    public BaseType visit(IfthenElseStatement n, BaseType argu) throws Exception {
+    public Base_t visit(IfthenElseStatement n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
@@ -389,7 +382,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f3 -> ")"
     * f4 -> Statement()
     */
-    public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
+    public Base_t visit(WhileStatement n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
@@ -411,7 +404,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f3 -> ")"
     * f4 -> ";"
     */
-    public BaseType visit(PrintStatement n, BaseType argu) throws Exception { //is int
+    public Base_t visit(PrintStatement n, Base_t argu) throws Exception { //is int
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
@@ -453,7 +446,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | PrivateReadExpression()
      *       | Clause()
      */
-    public BaseType visit(Expression n, BaseType argu) throws Exception {
+    public Base_t visit(Expression n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -462,7 +455,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "&&"
     * f2 -> Clause()
     */
-    public BaseType visit(AndExpression n, BaseType argu) throws Exception {
+    public Base_t visit(AndExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -479,7 +472,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "||"
      * f2 -> Clause()
      */
-    public BaseType visit(OrExpression n, BaseType argu) throws Exception {
+    public Base_t visit(OrExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -496,7 +489,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "&"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinAndExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinAndExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -513,7 +506,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "|"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinOrExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinOrExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -530,7 +523,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "^"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinXorExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinXorExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -546,7 +539,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f0 -> "~"
      * f1 -> PrimaryExpression()
      */
-    public BaseType visit(BinNotExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinNotExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f1.accept(this, argu);
         String t1 = findType(clause_1, (Method_t) argu).getType();
         if (t1.equals("int")) {
@@ -560,7 +553,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "<<"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(ShiftLeftExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ShiftLeftExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -577,7 +570,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> ">>"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(ShiftRightExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ShiftRightExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -594,7 +587,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "=="
      * f2 -> Clause()
      */
-    public BaseType visit(EqualExpression n, BaseType argu) throws Exception {
+    public Base_t visit(EqualExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -613,7 +606,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "!="
      * f2 -> Clause()
      */
-    public BaseType visit(NotEqualExpression n, BaseType argu) throws Exception {
+    public Base_t visit(NotEqualExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -632,7 +625,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "<"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
+    public Base_t visit(LessThanExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -649,7 +642,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "<="
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(LessThanOrEqualExpression n, BaseType argu) throws Exception {
+    public Base_t visit(LessThanOrEqualExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -666,7 +659,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> ">"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
+    public Base_t visit(GreaterThanExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -683,7 +676,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> ">="
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(GreaterThanOrEqualExpression n, BaseType argu) throws Exception {
+    public Base_t visit(GreaterThanOrEqualExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -700,7 +693,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "+"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(PlusExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PlusExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -717,7 +710,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "-"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(MinusExpression n, BaseType argu) throws Exception {
+    public Base_t visit(MinusExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -734,7 +727,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "*"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(TimesExpression n, BaseType argu) throws Exception {
+    public Base_t visit(TimesExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -751,7 +744,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "/"
     * f2 -> PrimaryExpression()
     */
-    public BaseType visit(DivExpression n, BaseType argu) throws Exception {
+    public Base_t visit(DivExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -769,7 +762,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> PrimaryExpression()
     * f3 -> "]"
     */
-    public BaseType visit(ArrayLookup n, BaseType argu) throws Exception {
+    public Base_t visit(ArrayLookup n, Base_t argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
@@ -786,7 +779,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> "."
     * f2 -> "length"
     */
-    public BaseType visit(ArrayLength n, BaseType argu) throws Exception {
+    public Base_t visit(ArrayLength n, Base_t argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
         t1 = findType(t1, (Method_t) argu);
         if (t1.getType().equals("int[]")) {
@@ -803,7 +796,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f4 -> ( ExpressionList() )?
     * f5 -> ")"
     */
-    public BaseType visit(MessageSend n, BaseType argu) throws Exception {
+    public Base_t visit(MessageSend n, Base_t argu) throws Exception {
         Variable_t clazz = (Variable_t) n.f0.accept(this, argu);
         clazz = findType(clazz, (Method_t) argu);                       // now clazz.type_() is the type_ of PrimaryExp
         Variable_t id = (Variable_t) n.f2.accept(this, argu);
@@ -819,19 +812,17 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
                     "\n" + keepParams.getName() + ": " + keepParams.method_params.size());
             }
             for (int i = 0 ; i < existingmeth.method_params.size() ; i++) { // for each parameter
-                String vartype = ((Variable_t) keepParams.method_params.get(i)).getType();
+                String vartype = keepParams.method_params.get(i).getType();
                 if (vartype == null) {
                     Variable_t tmpvar = new Variable_t(null, keepParams.method_params.get(i).getName());
                     tmpvar = findType(tmpvar, (Method_t) argu);
                     vartype = tmpvar.getType();
                 }
-                if (vartype.equals(existingmeth.method_params.get(i).getType())) {
-                    continue;
-                } else {
+                if (!vartype.equals(existingmeth.method_params.get(i).getType())) {
                     Class_t parent = st_.get(vartype);
                     if (parent != null) {
                         while (!parent.getName().equals(existingmeth.method_params.get(i).getType())) {
-                            if (parent == null || parent.getParent() == null) {
+                            if (parent.getParent() == null) {
                                 throw new Exception("Error assignment between different types " + vartype);
                             }
                             parent = st_.get(parent.getParent());
@@ -854,7 +845,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f5 -> ":"
      * f6 -> Expression()
      */
-    public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
+    public Base_t visit(TernaryExpression n, Base_t argu) throws Exception {
         Variable_t expr = (Variable_t) n.f1.accept(this, argu);
         expr = findType(expr, (Method_t) argu);
         if (expr.getType() == null) {
@@ -884,7 +875,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "("
      * f2 -> ")"
      */
-    public BaseType visit(PublicReadExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PublicReadExpression n, Base_t argu) throws Exception {
         return new Variable_t("int", null);
     }
 
@@ -893,7 +884,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "("
      * f2 -> ")"
      */
-    public BaseType visit(PrivateReadExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PrivateReadExpression n, Base_t argu) throws Exception {
         return new Variable_t("int", null);
     }
 
@@ -901,7 +892,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
-    public BaseType visit(ExpressionList n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionList n, Base_t argu) throws Exception {
         Variable_t expr =  (Variable_t) n.f0.accept(this, argu);
         Method_t meth = (Method_t) n.f1.accept(this, argu);
         meth.method_params.add(expr);
@@ -911,7 +902,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     /**
     * f0 -> ( ExpressionTerm() )*
     */
-    public BaseType visit(ExpressionTail n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionTail n, Base_t argu) throws Exception {
         Method_t meth = new Method_t(null, null);
         // create a linked list of variables. (parameters list)
         if (n.f0.present()) {
@@ -926,16 +917,16 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> ","
     * f1 -> Expression()
     */
-    public BaseType visit(ExpressionTerm n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionTerm n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
-        return (Variable_t) n.f1.accept(this, argu);
+        return n.f1.accept(this, argu);
     }
 
     /**
     * f0 -> NotExpression()
     *       | PrimaryExpression()
     */
-    public BaseType visit(Clause n, BaseType argu) throws Exception {
+    public Base_t visit(Clause n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -949,45 +940,44 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     *       | AllocationExpression()
     *       | BracketExpression()
     */
-    public BaseType visit(PrimaryExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PrimaryExpression n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
     /**
     * f0 -> <INTEGER_LITERAL>
     */
-    public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
+    public Base_t visit(IntegerLiteral n, Base_t argu) throws Exception {
         return new Variable_t("int", null);
     }
 
     /**
     * f0 -> "true"
     */
-    public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
+    public Base_t visit(TrueLiteral n, Base_t argu) throws Exception {
         return new Variable_t("boolean", null);
     }
 
     /**
     * f0 -> "false"
     */
-    public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
+    public Base_t visit(FalseLiteral n, Base_t argu) throws Exception {
         return new Variable_t("boolean", null);
     }
 
     /**
     * f0 -> <IDENTIFIER>
     */
-    public BaseType visit(Identifier n, BaseType argu) throws Exception {
+    public Base_t visit(Identifier n, Base_t argu) throws Exception {
         return new Variable_t(null, n.f0.toString());
     }
 
     /**
     * f0 -> "this"
     */
-    public BaseType visit(ThisExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ThisExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
-        Variable_t var = new Variable_t(((Method_t) argu).getFromClass().getName(), null);
-        return var;
+        return new Variable_t(((Method_t) argu).getFromClass().getName(), null);
     }
 
     /**
@@ -997,7 +987,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f3 -> Expression()
     * f4 -> "]"
     */
-    public BaseType visit(ArrayAllocationExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ArrayAllocationExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
@@ -1016,7 +1006,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f2 -> "("
     * f3 -> ")"
     */
-    public BaseType visit(AllocationExpression n, BaseType argu) throws Exception {
+    public Base_t visit(AllocationExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         Variable_t classname = new Variable_t(n.f1.accept(this, argu).getName(), null);
         n.f2.accept(this, argu);
@@ -1032,7 +1022,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> "!"
     * f1 -> Clause()
     */
-    public BaseType visit(NotExpression n, BaseType argu) throws Exception {
+    public Base_t visit(NotExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         Variable_t t = (Variable_t) n.f1.accept(this, argu);
         t = findType(t, (Method_t) argu);
@@ -1047,7 +1037,7 @@ public class TypeCheckVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f1 -> Expression()
     * f2 -> ")"
     */
-    public BaseType visit(BracketExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BracketExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         n.f2.accept(this, argu);
         return n.f1.accept(this, argu);

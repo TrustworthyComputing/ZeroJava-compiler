@@ -1,35 +1,5 @@
 package org.twc.minijavacompiler;
 
-import java.nio.file.*;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.io.Reader;
-import java.io.FileReader;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-
-import org.twc.minijavacompiler.minijavaparser.*;
-import org.twc.minijavacompiler.basetype.*;
-import org.twc.minijavacompiler.minijavasyntaxtree.*;
-import org.twc.minijavacompiler.symboltable.*;
-import org.twc.minijavacompiler.typecheck.*;
-import org.twc.minijavacompiler.zmipsgenerator.*;
-
-import org.twc.minijavacompiler.zmipsparser.*;
-import org.twc.minijavacompiler.zmipssyntaxtree.*;
-import org.twc.minijavacompiler.zmipsvisitor.*;
-import org.twc.minijavacompiler.factsgen.*;
-import org.twc.minijavacompiler.optimizer.*;
-
 import org.deri.iris.Configuration;
 import org.deri.iris.KnowledgeBase;
 import org.deri.iris.api.IKnowledgeBase;
@@ -40,6 +10,22 @@ import org.deri.iris.api.terms.IVariable;
 import org.deri.iris.compiler.Parser;
 import org.deri.iris.optimisations.magicsets.MagicSets;
 import org.deri.iris.storage.IRelation;
+import org.twc.minijavacompiler.basetype.Class_t;
+import org.twc.minijavacompiler.factsgen.FactGeneratorVisitor;
+import org.twc.minijavacompiler.minijavaparser.MiniJavaParser;
+import org.twc.minijavacompiler.minijavaparser.ParseException;
+import org.twc.minijavacompiler.optimizer.OptimizerVisitor;
+import org.twc.minijavacompiler.symboltable.SymbolTableVisitor;
+import org.twc.minijavacompiler.symboltable.VisitClasses;
+import org.twc.minijavacompiler.typecheck.TypeCheckVisitor;
+import org.twc.minijavacompiler.zmipsgenerator.ZMIPSGenVisitor;
+import org.twc.minijavacompiler.zmipsparser.ZMIPSParser;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 public class Main {
@@ -115,7 +101,7 @@ public class Main {
                 System.out.println("Optimizing file \"" + zmips_output_path + "\"\n");
 
                 boolean can_optimize = true;
-                Map<String, Map<String, String>> prev_optimizations_map = null;
+                Map<String, Map<String, String>> prev_optimizations_map;
                 Map<String, Map<String, String>> optimizations_map = null;
                 while (can_optimize) {
                     prev_optimizations_map = optimizations_map;
@@ -136,7 +122,7 @@ public class Main {
                     Map<IPredicate, IRelation> factMap = new HashMap<>();
                     final File factsDirectory = new File(facts_output_path);
                     if (factsDirectory.isDirectory()) {
-                        for (final File fileEntry : factsDirectory.listFiles()) {
+                        for (final File fileEntry : Objects.requireNonNull(factsDirectory.listFiles())) {
                             if (fileEntry.isDirectory()) {
                                 System.out.println("Omitting directory " + fileEntry.getPath());
                             } else {
@@ -166,16 +152,20 @@ public class Main {
                         IRelation relation = knowledgeBase.execute(query, variableBindings);
                         if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
                         String queryType = null;
-                        if ((query.toString()).equals("?- constProp(?m, ?l, ?v, ?val).")) {
-                            queryType = "constProp";
-                        } else if ((query.toString()).equals("?- copyProp(?m, ?l, ?v1, ?v2).")) {
-                            queryType = "copyProp";
-                        } else if ((query.toString()).equals("?- deadCode(?m, ?i, ?v).")) {
-                            queryType = "deadCode";
+                        switch ((query.toString())) {
+                            case "?- constProp(?m, ?l, ?v, ?val).":
+                                queryType = "constProp";
+                                break;
+                            case "?- copyProp(?m, ?l, ?v1, ?v2).":
+                                queryType = "copyProp";
+                                break;
+                            case "?- deadCode(?m, ?i, ?v).":
+                                queryType = "deadCode";
+                                break;
                         }
                         if (queryType != null) {
                             Map<String, String> tempOp = new HashMap<>();
-                            String str = null;
+                            String str;
                             for (int r = 0; r < relation.size(); r++) {
                                 str = (relation.get(r)).toString();
                                 if (debug_) System.out.println(relation.get(r));
@@ -203,28 +193,20 @@ public class Main {
                     zmips_root.accept(optimizer_visitor, null);
                     writer = new PrintWriter(opt_zmips_output_path);
                     if (debug_) {
-                        System.out.println("\n" + optimizer_visitor.result);
+                        System.out.println("\n" + optimizer_visitor.asm_);
                     }
-                    writer.println(optimizer_visitor.result);
+                    writer.println(optimizer_visitor.asm_);
                     writer.close();
                     System.out.println("[ 3/3 ] Optimization phase completed");
 
-                    if (prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map)) {
-                        can_optimize = true;
-                    } else {
-                        can_optimize = false;
-                    }
+                    can_optimize = prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map);
                     zmips_output_path = opt_zmips_output_path;
                     System.out.println("\n");
                 }
 
                 System.out.println("[ \u2713 ] zMIPS optimized code generated to \"" + opt_zmips_output_path + "\"");
                 System.out.println("===================================================================================");
-            } catch (org.twc.minijavacompiler.minijavaparser.ParseException ex) {
-                ex.printStackTrace();
-            } catch (org.twc.minijavacompiler.zmipsparser.ParseException ex) {
-                ex.printStackTrace();
-            } catch (FileNotFoundException ex) {
+            } catch (ParseException | org.twc.minijavacompiler.zmipsparser.ParseException | FileNotFoundException ex) {
                 ex.printStackTrace();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -283,7 +265,7 @@ public class Main {
         for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
             System.out.println(entry.getKey() + ":");
             for (Map.Entry<String, String> e : entry.getValue().entrySet()) {
-                System.out.println("\t" + e.getKey() + ":" + e.getValue().toString());
+                System.out.println("\t" + e.getKey() + ":" + e.getValue());
             }
         }
         System.out.println("---------------------------");

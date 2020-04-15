@@ -10,7 +10,7 @@ public class VarDef_t extends Var_t {
 		this.ic = ic;
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "varDef(" + this.meth_name + ", " + this.ic + ", " + this.var + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

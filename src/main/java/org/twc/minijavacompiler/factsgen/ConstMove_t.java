@@ -12,7 +12,7 @@ public class ConstMove_t extends Var_t {
 		this.constsrc = constsrc;
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "constMove(" + this.meth_name + ", " + this.ic + ", " + this.var + ", " + this.constsrc + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

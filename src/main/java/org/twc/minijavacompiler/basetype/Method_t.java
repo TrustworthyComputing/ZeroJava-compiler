@@ -2,14 +2,13 @@ package org.twc.minijavacompiler.basetype;
 
 import java.util.*;
 
-public class Method_t extends BaseType {
+public class Method_t extends Base_t {
 
     public LinkedList<Variable_t> method_params;
     public LinkedList<Variable_t> method_vars;
 
     private Class_t from_class_;
     private String type_;
-    private int num_vars_;
     private int num_parameters_;
     private int meth_num_;
 
@@ -17,8 +16,8 @@ public class Method_t extends BaseType {
         super(name);
         this.type_ = type;
         this.num_parameters_ = 0;
-        this.method_params = new LinkedList<Variable_t>();
-        this.method_vars = new LinkedList<Variable_t>();
+        this.method_params = new LinkedList<>();
+        this.method_vars = new LinkedList<>();
         this.from_class_ = null;
     }
 
@@ -38,20 +37,8 @@ public class Method_t extends BaseType {
         this.type_ = type;
     }
 
-    public int getNumVars() {
-        return this.num_vars_;
-    }
-
-    public void setNumVars(int num_vars) {
-        this.num_vars_ = num_vars;
-    }
-
     public int getNumParameters() {
         return this.num_parameters_;
-    }
-
-    public void setNumParameters(int num_parameters) {
-        this.num_parameters_ = num_parameters;
     }
 
     public int getMethNum() {
@@ -67,14 +54,14 @@ public class Method_t extends BaseType {
     }
 
     public String methContains(String varName) {
-        for (int i = 0 ; i < method_vars.size() ; i++) {
-            if (method_vars.get(i).getName().equals(varName)) {
-                return method_vars.get(i).getType();
+        for (Variable_t method_var : method_vars) {
+            if (method_var.getName().equals(varName)) {
+                return method_var.getType();
             }
         }
-        for (int i = 0 ; i < method_params.size() ; i++) {
-            if (method_params.get(i).getName().equals(varName)) {
-                return method_params.get(i).getType();
+        for (Variable_t method_param : method_params) {
+            if (method_param.getName().equals(varName)) {
+                return method_param.getType();
             }
         }
         return null;
@@ -91,7 +78,7 @@ public class Method_t extends BaseType {
             return false;
         }
         param.setNum(++this.num_parameters_);
-        param.setRegister(new String("$a" + param.getNum()));
+        param.setRegister("$a" + param.getNum());
         method_params.add(param);
         return true;
     }
@@ -108,10 +95,10 @@ public class Method_t extends BaseType {
     }
 
     public void addRegToVar(String varName, String tempName) {
-        for (int i = 0 ; i < method_vars.size(); i++) {
-            if (method_vars.get(i).getName().equals(varName)) {
-                method_vars.get(i).setRegister(tempName);
-                return ;
+        for (Variable_t method_var : method_vars) {
+            if (method_var.getName().equals(varName)) {
+                method_var.setRegister(tempName);
+                return;
             }
         }
     }

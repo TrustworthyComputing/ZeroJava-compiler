@@ -10,7 +10,7 @@ public class Var_t extends Fact_t {
 		this.var = "\"" + var + "\"";
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "var(" + this.meth_name + ", " + this.var + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

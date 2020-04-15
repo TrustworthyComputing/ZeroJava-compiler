@@ -2,29 +2,24 @@ package org.twc.minijavacompiler.optimizer;
 
 import org.twc.minijavacompiler.zmipssyntaxtree.*;
 import org.twc.minijavacompiler.zmipsvisitor.GJDepthFirst;
-import org.twc.minijavacompiler.factsgen.*;
-import java.util.*;
-import java.io.*;
+
+import java.util.Enumeration;
+import java.util.Map;
 
 public class OptimizerVisitor extends GJDepthFirst<String, String> {
 
-    public String result;
+    public String asm_;
     private int instr_cnt;
     private Map<String, Map<String, String>> optimisationMap;
     private boolean label_from_stmt;
     private boolean is_dst;
 
     public OptimizerVisitor(Map<String, Map<String, String>> optimisationMap) {
-        result = new String();
+        asm_ = "";
         this.instr_cnt = 1;
         this.optimisationMap = optimisationMap;
         this.label_from_stmt = true;
         this.is_dst = false;
-    }
-
-    static int getLine(String fact) {
-        String []parts = fact.split(",");
-        return Integer.parseInt(parts[1].substring(1));
     }
 
     static String getTemp(String fact) {
@@ -47,20 +42,19 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         if (n.size() == 1) {
             return n.elementAt(0).accept(this,argu);
         }
-        String _ret = null;
-        int _count=0;
+        StringBuilder _ret = null;
         for (Enumeration<Node> e = n.elements() ; e.hasMoreElements() ; ) {
             String ret = e.nextElement().accept(this,argu);
             if (ret != null) {
                 if (_ret == null) {
-                    _ret = ret;
+                    _ret = new StringBuilder(ret);
                 } else {
-                    _ret += " " + ret;
+                    _ret.append(" ").append(ret);
                 }
             }
-            _count++;
         }
-        return _ret;
+        assert _ret != null;
+        return _ret.toString();
     }
 
     /**
@@ -78,7 +72,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String visit(ZMIPSProg n, String argu) throws Exception {
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
-                String str = n.f0.elementAt(i).accept(this, argu);
+                n.f0.elementAt(i).accept(this, argu);
                 this.instr_cnt++;
             }
         }
@@ -113,7 +107,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
          String instr = op + " " + label + "\n";
          String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
          if (opt_found == null) {
-             this.result += instr;
+             this.asm_ += instr;
          }
          return instr;
      }
@@ -140,9 +134,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
           String reg2 = n.f3.accept(this, argu);
           this.label_from_stmt = true;
           if (reg2 == null) { return null; }
-          String instr = null;
+          String instr;
           if (reg2.startsWith("$")) {
-              String []parts = new String[2];
+              String []parts;
               parts = reg2.split("&");
               if (parts.length == 2) {
                   reg2 = parts[1];
@@ -151,14 +145,14 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
               }
           }
           if (reg1.startsWith("$")) {
-              String []parts = new String[2];
+              String []parts;
               parts = reg1.split("&");
               reg1 = parts[0];
           }
           instr = op + " " + reg1 + ", " + reg2 + "\n";
           String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
           if (opt_found == null){
-              this.result += instr;
+              this.asm_ += instr;
           }
           return instr;
       }
@@ -188,7 +182,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
         if (idx.startsWith("$")) {
-            String []parts = new String[2];
+            String []parts;
             parts = idx.split("&");
             if (parts.length == 2) {
                 idx = parts[1];
@@ -199,7 +193,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String instr = "lw " + dst + ", " + idx + "(" + addr + ")\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -220,7 +214,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String addr = n.f5.accept(this, argu).split("&")[0];
         this.label_from_stmt = true;
         if (idx.startsWith("$")) {
-            String []parts = new String[2];
+            String []parts;
             parts = idx.split("&");
             if (parts.length == 2) {
                 idx = parts[1];
@@ -231,7 +225,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String intsr = "sw " + src + ", " + idx + "(" + addr + ")\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
-            this.result += intsr;
+            this.asm_ += intsr;
         }
         return intsr;
     }
@@ -249,9 +243,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String src = n.f3.accept(this, argu);
         this.label_from_stmt = true;
         if (src == null) { return null; }
-        String instr = null;
+        String instr;
         if (src.startsWith("$")) {
-            String []parts = new String[2];
+            String []parts;
             parts = src.split("&");
             if (parts.length == 2) {
                 src = parts[1];
@@ -262,7 +256,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         instr = op + " " + dst + ", " + src + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -294,9 +288,9 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String reg3 = n.f5.accept(this, argu);
         this.label_from_stmt = true;
         if (reg3 == null) { return null; }
-        String instr = null;
+        String instr;
         if (reg3.startsWith("$")) {
-            String []parts = new String[2];
+            String []parts;
             parts = reg3.split("&");
             if (parts.length == 2) {
                 reg3 = parts[1];
@@ -307,7 +301,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         instr = op + " " + dst + ", " + reg2 + ", " + reg3 + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -332,7 +326,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(PrintStmt n, String argu) throws Exception {
         String reg = n.f1.accept(this, argu);
-        String []parts = new String[2];
+        String []parts;
         parts = reg.split("&");
         if (parts.length == 2) {
             reg = parts[1];
@@ -342,7 +336,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String instr = "print " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -353,7 +347,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      */
     public String visit(AnswerStmt n, String argu) throws Exception {
         String reg = n.f1.accept(this, argu);
-        String []parts = new String[2];
+        String []parts;
         parts = reg.split("&");
         if (parts.length == 2) {
             reg = parts[1];
@@ -363,7 +357,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String instr = "answer " + reg + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null) {
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -377,7 +371,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String instr = "pubread " + dst + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -391,7 +385,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
         String instr = "secread " + dst + "\n";
         String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
         if (opt_found == null){
-            this.result += instr;
+            this.asm_ += instr;
         }
         return instr;
     }
@@ -460,7 +454,7 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     public String visit(Label n, String argu) throws Exception {
         String ret = n.f0.toString();
         if (this.label_from_stmt) {
-            this.result += ret + "\n";
+            this.asm_ += ret + "\n";
         }
         return ret;
     }

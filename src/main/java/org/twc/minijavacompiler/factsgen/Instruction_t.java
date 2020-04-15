@@ -12,7 +12,7 @@ public class Instruction_t extends Fact_t {
 		this.instr = "\"" + instr + "\"";
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "instruction(" + this.meth_name + ", " + this.ic + ", " + this.instr + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

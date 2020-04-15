@@ -12,7 +12,7 @@ public class VarMove_t extends Var_t {
 		this.src = "\"" + src + "\"";
 	}
 
-	public void writerec(PrintWriter writer, boolean print) {
+	public void writeRecord(PrintWriter writer, boolean print) {
 		String ret = "varMove(" + this.meth_name + ", " + this.ic + ", " + this.var + ", " + this.src + ").";
 		if (print) System.out.println(ret);
 		writer.println(ret);

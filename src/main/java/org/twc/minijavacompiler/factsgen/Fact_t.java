@@ -8,8 +8,4 @@ public class Fact_t {
 		this.meth_name = "\"" + meth_name + "\"";
 	}
 
-	public void writerec() {
-		// System.out.println("(" + this.meth_name + ").");
-	}
-
 }

@@ -11,16 +11,12 @@ public class Label {
 	}
 
 	public String newLabel() {
-		return new String("__L_" + (++this.labels_) + "__");
-	}
-
-	public String newClassLabel(String str) {
-		return new String("__" + str + "_vTable__");
+		return "__L_" + (++this.labels_) + "__";
 	}
 
 	public String getErrorLabel() {
 		this.may_have_error_ = true;
-		return new String("__Runtime_Error__");
+		return "__Runtime_Error__";
 	}
 
 	public String getErrorCode() {

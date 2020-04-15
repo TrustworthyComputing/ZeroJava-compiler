@@ -2,7 +2,7 @@ package org.twc.minijavacompiler.basetype;
 
 import java.util.*;
 
-public class Class_t extends BaseType {
+public class Class_t extends Base_t {
 
     public Map<String, Method_t> class_methods_map;
     public Map<String, Variable_t> class_vars_map;
@@ -63,17 +63,6 @@ public class Class_t extends BaseType {
         return true;
     }
 
-    public void copyMethod(Method_t meth) {
-        Method_t newMeth = new Method_t(meth.getType(), meth.getName());
-        newMeth.method_params = meth.method_params;
-        newMeth.method_vars = meth.method_vars;
-        newMeth.setFromClass(meth.getFromClass());
-        newMeth.setNumVars(meth.getNumVars());
-        newMeth.setNumParameters(meth.getNumParameters());
-        newMeth.setMethNum(meth.getMethNum());
-        class_methods_map.put(meth.getName(), newMeth);
-    }
-
     public void copyVar(Variable_t var) {
         this.num_vars_++;
         var.setNum(this.num_vars_);
@@ -103,7 +92,6 @@ public class Class_t extends BaseType {
     }
 
     public boolean checkMethod(Method_t meth) { // check if meth is the same as this.method
-        int i = 0;
         if (class_methods_map.containsKey(meth.getName())) {
             Method_t m_from_class = class_methods_map.get(meth.getName());
             if (m_from_class.getType().equals(meth.getType())) {

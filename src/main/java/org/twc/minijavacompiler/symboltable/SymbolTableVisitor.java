@@ -6,7 +6,7 @@ import org.twc.minijavacompiler.basetype.*;
 import java.util.Map;
 
 /* Second Visitor Pattern creates the Symbol Table */
-public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
+public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
 
     private Map<String, Class_t> st_;
     private int globals_;
@@ -52,7 +52,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
     * f16 -> "}"
     * f17 -> "}"
     */
-    public BaseType visit(MainClass n) throws Exception {
+    public Base_t visit(MainClass n) throws Exception {
         n.f0.accept(this);
         n.f1.accept(this);
         n.f2.accept(this);
@@ -102,7 +102,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
     * f4 -> ( MethodDeclaration() )*
     * f5 -> "}"
     */
-    public BaseType visit(ClassDeclaration n) throws Exception {
+    public Base_t visit(ClassDeclaration n) throws Exception {
         n.f0.accept(this);
         String classname = n.f1.accept(this).getName();
         n.f2.accept(this);
@@ -148,7 +148,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f6 -> ( MethodDeclaration() )*
      * f7 -> "}"
      */
-    public BaseType visit(ClassExtendsDeclaration n) throws Exception {
+    public Base_t visit(ClassExtendsDeclaration n) throws Exception {
         n.f0.accept(this);
         String id = n.f1.accept(this).getName();
         n.f2.accept(this);
@@ -223,7 +223,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f1 -> Identifier()
      * f2 -> ";"
      */
-    public BaseType visit(VarDeclaration n) throws Exception {
+    public Base_t visit(VarDeclaration n) throws Exception {
         String type_ = n.f0.accept(this).getName();
         String var_id = n.f1.accept(this).getName();
         n.f2.accept(this);
@@ -232,7 +232,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
 
     /**
      * f0 -> "public"
-     * f1 -> BaseType()
+     * f1 -> Base_t()
      * f2 -> Identifier()
      * f3 -> "("
      * f4 -> ( FormalParameterList() )?
@@ -245,7 +245,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f11 -> ";"
      * f12 -> "}"
      */
-    public BaseType visit(MethodDeclaration n) throws Exception {
+    public Base_t visit(MethodDeclaration n) throws Exception {
         n.f0.accept(this);
         String type_ = n.f1.accept(this).getName();
         String meth_name = n.f2.accept(this).getName();
@@ -293,7 +293,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f0 -> FormalParameter()
      * f1 -> FormalParameterTail()
      */
-    public BaseType visit(FormalParameterList n) throws Exception {
+    public Base_t visit(FormalParameterList n) throws Exception {
         Variable_t fp = (Variable_t) n.f0.accept(this);
         Method_t meth = (Method_t) n.f1.accept(this);
         if (!meth.addParam(fp)) {
@@ -306,7 +306,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f0 -> Type()
      * f1 -> Identifier()
      */
-    public BaseType visit(FormalParameter n) throws Exception {
+    public Base_t visit(FormalParameter n) throws Exception {
         String type_ = n.f0.accept(this).getName();
         String id = n.f1.accept(this).getName();
         return new Variable_t(type_, id);
@@ -315,7 +315,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
     /**
      * f0 -> ( FormalParameterTerm() )*
      */
-    public BaseType visit(FormalParameterTail n) throws Exception {
+    public Base_t visit(FormalParameterTail n) throws Exception {
         Method_t meth = new Method_t(null, null);
         // create a linked list of variables. (parameters list)
         if (n.f0.present()) {
@@ -332,9 +332,9 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f0 -> ","
      * f1 -> FormalParameter()
      */
-    public BaseType visit(FormalParameterTerm n) throws Exception {
+    public Base_t visit(FormalParameterTerm n) throws Exception {
         n.f0.accept(this);
-        return (Variable_t) n.f1.accept(this);
+        return n.f1.accept(this);
     }
 
 
@@ -344,7 +344,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      *       | IntegerType()
      *       | Identifier()
      */
-    public BaseType visit(Type n) throws Exception {
+    public Base_t visit(Type n) throws Exception {
         return n.f0.accept(this);
     }
 
@@ -353,29 +353,29 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<BaseType> {
      * f1 -> "["
      * f2 -> "]"
      */
-    public BaseType visit(ArrayType n) throws Exception {
-        return new BaseType("int[]");
+    public Base_t visit(ArrayType n) throws Exception {
+        return new Base_t("int[]");
     }
 
     /**
      * f0 -> "boolean"
      */
-    public BaseType visit(BooleanType n) throws Exception {
-        return new BaseType("boolean");
+    public Base_t visit(BooleanType n) throws Exception {
+        return new Base_t("boolean");
     }
 
     /**
      * f0 -> "int"
      */
-    public BaseType visit(IntegerType n) throws Exception {
-        return new BaseType("int");
+    public Base_t visit(IntegerType n) throws Exception {
+        return new Base_t("int");
     }
 
     /**
      * f0 -> <IDENTIFIER>
      */
-    public BaseType visit(Identifier n) throws Exception {
-        return new BaseType(n.f0.toString());
+    public Base_t visit(Identifier n) throws Exception {
+        return new Base_t(n.f0.toString());
     }
 
 }

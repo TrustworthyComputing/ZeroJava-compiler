@@ -1,6 +1,6 @@
 package org.twc.minijavacompiler.basetype;
 
-public class Variable_t extends BaseType {
+public class Variable_t extends Base_t {
 
 	private String type_;
 	private int num;

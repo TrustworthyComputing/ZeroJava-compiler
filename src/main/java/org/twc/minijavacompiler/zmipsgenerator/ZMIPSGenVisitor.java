@@ -2,11 +2,10 @@ package org.twc.minijavacompiler.zmipsgenerator;
 
 import org.twc.minijavacompiler.minijavasyntaxtree.*;
 import org.twc.minijavacompiler.minijavavisitor.GJDepthFirst;
-import org.twc.minijavacompiler.symboltable.*;
 import org.twc.minijavacompiler.basetype.*;
 import java.util.*;
 
-public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
+public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 
 	private StringBuilder asm_;
 	private Label labels_;
@@ -61,7 +60,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> ( TypeDeclaration() )*
 	* f2 -> <EOF>
 	*/
-	public BaseType visit(Goal n, BaseType argu) throws Exception {
+	public Base_t visit(Goal n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
@@ -91,7 +90,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f16 -> "}"
 	* f17 -> "}"
 	*/
-	public BaseType visit(MainClass n, BaseType argu) throws Exception {
+	public Base_t visit(MainClass n, Base_t argu) throws Exception {
 		this.asm_ = new StringBuilder();
 		String id = n.f1.accept(this, argu).getName();
         Class_t mainclazz = st_.get(id);
@@ -107,7 +106,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> ClassDeclaration()
 	*       | ClassExtendsDeclaration()
 	*/
-	public BaseType visit(TypeDeclaration n, BaseType argu) throws Exception {
+	public Base_t visit(TypeDeclaration n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -119,7 +118,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f4 -> ( MethodDeclaration() )*
 	* f5 -> "}"
 	*/
-	public BaseType visit(ClassDeclaration n, BaseType argu) throws Exception {
+	public Base_t visit(ClassDeclaration n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
         String s = n.f1.accept(this, argu).getName();
         Class_t class_id = st_.get(s);
@@ -138,7 +137,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f6 -> ( MethodDeclaration() )*
 	* f7 -> "}"
 	*/
-	public BaseType visit(ClassExtendsDeclaration n, BaseType argu) throws Exception {
+	public Base_t visit(ClassExtendsDeclaration n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         String s = n.f1.accept(this, argu).getName();
         Class_t class_id = st_.get(s);
@@ -154,7 +153,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> Identifier()
 	* f2 -> ";"
 	*/
-	public BaseType visit(VarDeclaration n, BaseType argu) throws Exception {
+	public Base_t visit(VarDeclaration n, Base_t argu) throws Exception {
 		Method_t meth = (Method_t) argu;
 		String varName = n.f1.f0.toString();
 		if (meth.getFromClass() != null) { 												// is a variable of a function
@@ -189,7 +188,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f11 -> ";"
 	* f12 -> "}"
 	*/
-	public BaseType visit(MethodDeclaration n, BaseType argu) throws Exception {
+	public Base_t visit(MethodDeclaration n, Base_t argu) throws Exception {
 		String methName = n.f2.accept(this, argu).getName();
         Method_t meth = ((Class_t) argu).getMethod(methName);
         this.asm_.append("\n__" + ((Class_t) argu).getName()+ "_" + methName + "__\n");
@@ -210,7 +209,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> FormalParameter()
 	* f1 -> FormalParameterTail()
 	*/
-	public BaseType visit(FormalParameterList n, BaseType argu) throws Exception {
+	public Base_t visit(FormalParameterList n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		return null;
@@ -220,7 +219,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> Type()
 	* f1 -> Identifier()
 	*/
-	public BaseType visit(FormalParameter n, BaseType argu) throws Exception {
+	public Base_t visit(FormalParameter n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		return null;
@@ -229,7 +228,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> ( FormalParameterTerm() )*
 	*/
-	public BaseType visit(FormalParameterTail n, BaseType argu) throws Exception {
+	public Base_t visit(FormalParameterTail n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -237,7 +236,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> ","
 	* f1 -> FormalParameter()
 	*/
-	public BaseType visit(FormalParameterTerm n, BaseType argu) throws Exception {
+	public Base_t visit(FormalParameterTerm n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		return null;
@@ -249,7 +248,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | IntegerType()
 	*       | Identifier()
 	*/
-	public BaseType visit(Type n, BaseType argu) throws Exception {
+	public Base_t visit(Type n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -258,7 +257,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "["
 	* f2 -> "]"
 	*/
-	public BaseType visit(ArrayType n, BaseType argu) throws Exception {
+	public Base_t visit(ArrayType n, Base_t argu) throws Exception {
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
@@ -268,14 +267,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "boolean"
 	*/
-	public BaseType visit(BooleanType n, BaseType argu) throws Exception {
+	public Base_t visit(BooleanType n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
 	/**
 	* f0 -> "int"
 	*/
-	public BaseType visit(IntegerType n, BaseType argu) throws Exception {
+	public Base_t visit(IntegerType n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -288,7 +287,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | PrintStatement()
 	*       | AnswerStatement()
 	*/
-	public BaseType visit(Statement n, BaseType argu) throws Exception {
+	public Base_t visit(Statement n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -297,7 +296,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> ( Statement() )*
 	* f2 -> "}"
 	*/
-	public BaseType visit(Block n, BaseType argu) throws Exception {
+	public Base_t visit(Block n, Base_t argu) throws Exception {
 		n.f1.accept(this, argu);
 		return null;
 	}
@@ -308,7 +307,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> Expression()
 	* f3 -> ";"
 	*/
-	public BaseType visit(AssignmentStatement n, BaseType argu) throws Exception {
+	public Base_t visit(AssignmentStatement n, Base_t argu) throws Exception {
 		String id = n.f0.accept(this, argu).getName();
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		// if a local var
@@ -351,7 +350,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f5 -> Expression()
 	* f6 -> ";"
 	*/
-	public BaseType visit(ArrayAssignmentStatement n, BaseType argu) throws Exception {
+	public Base_t visit(ArrayAssignmentStatement n, Base_t argu) throws Exception {
 		String length = newRegister();
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
@@ -375,7 +374,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f0 -> IfthenElseStatement()
 	 *       | IfthenStatement()
 	 */
-	public BaseType visit(IfStatement n, BaseType argu) throws Exception {
+	public Base_t visit(IfStatement n, Base_t argu) throws Exception {
 	   return n.f0.accept(this, argu);
 	}
 
@@ -388,7 +387,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f5 -> "else"
      * f6 -> Statement()
      */
-	public BaseType visit(IfthenElseStatement n, BaseType argu) throws Exception {
+	public Base_t visit(IfthenElseStatement n, Base_t argu) throws Exception {
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("cmpg " + cond + ", 0\n");
@@ -409,7 +408,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f3 -> ")"
      * f4 -> Statement()
      */
-	public BaseType visit(IfthenStatement n, BaseType argu) throws Exception {
+	public Base_t visit(IfthenStatement n, Base_t argu) throws Exception {
 		String endlabel = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("cmpg " + cond + ", 0\n");
@@ -426,7 +425,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f3 -> ")"
 	 * f4 -> Statement()
 	 */
-	public BaseType visit(WhileStatement n, BaseType argu) throws Exception {
+	public Base_t visit(WhileStatement n, Base_t argu) throws Exception {
 		String start_label = labels_.newLabel();
 		String end_label = labels_.newLabel();
 		this.asm_.append(start_label + "\n");
@@ -446,7 +445,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f3 -> ")"
      * f4 -> ";"
      */
-	public BaseType visit(PrintStatement n, BaseType argu) throws Exception {
+	public Base_t visit(PrintStatement n, Base_t argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("print " + t + "\n");
 		return null;
@@ -459,7 +458,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f3 -> ")"
      * f4 -> ";"
      */
-	public BaseType visit(AnswerStatement n, BaseType argu) throws Exception {
+	public Base_t visit(AnswerStatement n, Base_t argu) throws Exception {
 		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("answer " + t + "\n");
 		return null;
@@ -491,7 +490,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      *       | PrivateReadExpression()
      *       | Clause()
      */
-	public BaseType visit(Expression n, BaseType argu) throws Exception {
+	public Base_t visit(Expression n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -500,7 +499,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "&&"
      * f2 -> Clause()
      */
-	public BaseType visit(AndExpression n, BaseType argu) throws Exception {
+	public Base_t visit(AndExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String istrue1 = labels_.newLabel();
 		String istrue2 = labels_.newLabel();
@@ -525,7 +524,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "||"
 	* f2 -> Clause()
 	*/
-	public BaseType visit(OrExpression n, BaseType argu) throws Exception {
+	public Base_t visit(OrExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String end_label = labels_.newLabel();
 		String ret = newRegister();
@@ -545,7 +544,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "&"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinAndExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinAndExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -558,7 +557,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "|"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinOrExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinOrExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -571,7 +570,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "^"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(BinXorExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinXorExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -583,7 +582,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f0 -> "~"
      * f1 -> PrimaryExpression()
      */
-    public BaseType visit(BinNotExpression n, BaseType argu) throws Exception {
+    public Base_t visit(BinNotExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f1.accept(this, argu)).getRegister();
 		this.asm_.append("not " + ret + ", " + exp1 + "\n");
@@ -595,7 +594,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "<<"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(ShiftLeftExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ShiftLeftExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -608,7 +607,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> ">>"
      * f2 -> PrimaryExpression()
      */
-    public BaseType visit(ShiftRightExpression n, BaseType argu) throws Exception {
+    public Base_t visit(ShiftRightExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -621,7 +620,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "=="
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(EqualExpression n, BaseType argu) throws Exception {
+	public Base_t visit(EqualExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -639,7 +638,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "!="
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(NotEqualExpression n, BaseType argu) throws Exception {
+	public Base_t visit(NotEqualExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -657,7 +656,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "<"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(LessThanExpression n, BaseType argu) throws Exception {
+	public Base_t visit(LessThanExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -675,7 +674,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "<="
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(LessThanOrEqualExpression n, BaseType argu) throws Exception {
+	public Base_t visit(LessThanOrEqualExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -693,7 +692,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> ">"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(GreaterThanExpression n, BaseType argu) throws Exception {
+	public Base_t visit(GreaterThanExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -711,7 +710,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> ">="
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(GreaterThanOrEqualExpression n, BaseType argu) throws Exception {
+	public Base_t visit(GreaterThanOrEqualExpression n, Base_t argu) throws Exception {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String ret = newRegister();
@@ -729,7 +728,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "+"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(PlusExpression n, BaseType argu) throws Exception {
+	public Base_t visit(PlusExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -742,7 +741,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "-"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(MinusExpression n, BaseType argu) throws Exception {
+	public Base_t visit(MinusExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -755,7 +754,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "*"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(TimesExpression n, BaseType argu) throws Exception {
+	public Base_t visit(TimesExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -769,7 +768,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "/"
 	* f2 -> PrimaryExpression()
 	*/
-	public BaseType visit(DivExpression n, BaseType argu) throws Exception {
+	public Base_t visit(DivExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
@@ -783,7 +782,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f2 -> PrimaryExpression()
 	* f3 -> "]"
 	*/
-	public BaseType visit(ArrayLookup n, BaseType argu) throws Exception {
+	public Base_t visit(ArrayLookup n, Base_t argu) throws Exception {
 		String length = newRegister();
 		String error_label = labels_.getErrorLabel();
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
@@ -809,7 +808,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f1 -> "."
 	* f2 -> "length"
 	*/
-	public BaseType visit(ArrayLength n, BaseType argu) throws Exception {
+	public Base_t visit(ArrayLength n, Base_t argu) throws Exception {
 		String len = newRegister();
 		String exp = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		this.asm_.append("lw " + len + ", 0(" + exp + ")\t\t# load array length\n");
@@ -824,7 +823,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f4 -> ( ExpressionList() )?
 	* f5 -> ")"
 	*/
-	public BaseType visit(MessageSend n, BaseType argu) throws Exception {
+	public Base_t visit(MessageSend n, Base_t argu) throws Exception {
 		Variable_t obj = (Variable_t) n.f0.accept(this, argu);
         Variable_t func = (Variable_t) n.f2.accept(this, argu);
         String objreg = obj.getRegister();
@@ -868,7 +867,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f5 -> ":"
      * f6 -> Expression()
      */
-    public BaseType visit(TernaryExpression n, BaseType argu) throws Exception {
+    public Base_t visit(TernaryExpression n, Base_t argu) throws Exception {
 		String res = newRegister();
 		String endlabel = labels_.newLabel();
 		String elselabel = labels_.newLabel();
@@ -890,7 +889,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "("
      * f2 -> ")"
      */
-    public BaseType visit(PublicReadExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PublicReadExpression n, Base_t argu) throws Exception {
 		String t = newRegister();
 		this.asm_.append("pubread " + t + "\n");
 		return new Variable_t("int", null, t);
@@ -901,7 +900,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f1 -> "("
      * f2 -> ")"
      */
-    public BaseType visit(PrivateReadExpression n, BaseType argu) throws Exception {
+    public Base_t visit(PrivateReadExpression n, Base_t argu) throws Exception {
 		String t = newRegister();
 		this.asm_.append("secread " + t + "\n");
 		return new Variable_t("int", null, t);
@@ -911,7 +910,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
      * f0 -> Expression()
      * f1 -> ExpressionTail()
      */
-    public BaseType visit(ExpressionList n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionList n, Base_t argu) throws Exception {
         Variable_t expr =  (Variable_t) n.f0.accept(this, argu); //na tsekarw th seira
         Method_t meth = (Method_t) n.f1.accept(this, argu);
         meth.method_params.add(expr);
@@ -921,7 +920,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     /**
      * f0 -> ( ExpressionTerm() )*
      */
-    public BaseType visit(ExpressionTail n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionTail n, Base_t argu) throws Exception {
         Method_t meth = new Method_t(null, null);
 		// create a linked list of variables. (parameters list)
         if (n.f0.present()) {
@@ -936,7 +935,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
     * f0 -> ","
     * f1 -> Expression()
     */
-    public BaseType visit(ExpressionTerm n, BaseType argu) throws Exception {
+    public Base_t visit(ExpressionTerm n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
         return (Variable_t) n.f1.accept(this, argu);
     }
@@ -947,7 +946,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	* f0 -> NotExpression()
 	*       | PrimaryExpression()
 	*/
-	public BaseType visit(Clause n, BaseType argu) throws Exception {
+	public Base_t visit(Clause n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
@@ -961,14 +960,14 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	*       | AllocationExpression()
 	*       | BracketExpression()
 	*/
-	public BaseType visit(PrimaryExpression n, BaseType argu) throws Exception {
+	public Base_t visit(PrimaryExpression n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
 
 	/**
 	* f0 -> <INTEGER_LITERAL>
 	*/
-	public BaseType visit(IntegerLiteral n, BaseType argu) throws Exception {
+	public Base_t visit(IntegerLiteral n, Base_t argu) throws Exception {
 		String ret = "$r" + ++globals_;
 		this.asm_.append("move " + ret + ", " + n.f0.toString() + "\n");
 		return new Variable_t(null, null, ret);
@@ -977,7 +976,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "true"
 	*/
-	public BaseType visit(TrueLiteral n, BaseType argu) throws Exception {
+	public Base_t visit(TrueLiteral n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		this.asm_.append("move " + ret + ", 1\n");
 		return new Variable_t(null, null, ret);
@@ -986,7 +985,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> "false"
 	*/
-	public BaseType visit(FalseLiteral n, BaseType argu) throws Exception {
+	public Base_t visit(FalseLiteral n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		this.asm_.append("move " + ret + ", 0\n");
 		return new Variable_t(null, null, ret);
@@ -995,7 +994,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	* f0 -> <IDENTIFIER>
 	*/
-	public BaseType visit(Identifier n, BaseType argu) throws Exception {
+	public Base_t visit(Identifier n, Base_t argu) throws Exception {
 		String id = n.f0.toString();
 		if (argu == null) {
 			return new Variable_t(null, id);
@@ -1035,7 +1034,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	/**
 	 * f0 -> "this"
 	 */
-	public BaseType visit(ThisExpression n, BaseType argu) throws Exception {
+	public Base_t visit(ThisExpression n, Base_t argu) throws Exception {
 		Class_t cl = ((Method_t) argu).getFromClass();
 		return new Variable_t(cl.getName(), "this", "$a0");
 	}
@@ -1047,7 +1046,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f3 -> Expression()
 	 * f4 -> "]"
 	 */
-	public BaseType visit(ArrayAllocationExpression n, BaseType argu) throws Exception {
+	public Base_t visit(ArrayAllocationExpression n, Base_t argu) throws Exception {
 		String error_label = labels_.getErrorLabel();
 		String len = ((Variable_t) n.f3.accept(this, argu)).getRegister();
 		String array = newRegister();
@@ -1070,7 +1069,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f2 -> "("
 	 * f3 -> ")"
 	 */
-	public BaseType visit(AllocationExpression n, BaseType argu) throws Exception {
+	public Base_t visit(AllocationExpression n, Base_t argu) throws Exception {
 		String id = n.f1.accept(this, argu).getName();
         Class_t cl = st_.get(id);
 		String new_obj = newRegister();
@@ -1089,7 +1088,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f0 -> "!"
 	 * f1 -> Clause()
 	 */
-	public BaseType visit(NotExpression n, BaseType argu) throws Exception {
+	public Base_t visit(NotExpression n, Base_t argu) throws Exception {
 		String ret = newRegister();
 		String t = ((Variable_t) n.f1.accept(this, argu)).getRegister();
 		this.asm_.append("move " + ret + ", 1\n");
@@ -1102,7 +1101,7 @@ public class ZMIPSGenVisitor extends GJDepthFirst<BaseType, BaseType> {
 	 * f1 -> Expression()
 	 * f2 -> ")"
 	 */
-	public BaseType visit(BracketExpression n, BaseType argu) throws Exception {
+	public Base_t visit(BracketExpression n, Base_t argu) throws Exception {
 		return n.f1.accept(this, argu);
 	}
 
