@@ -235,6 +235,18 @@
                             </excludes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
+                        <fileset>
+                            <directory>${basedir}/src/test/resources</directory>
+                            <includes>
+                                <include>**/*.zmips</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*.java</exclude>
+                                <exclude>**/*.pubtape</exclude>
+                                <exclude>**/*.auxtape</exclude>
+                            </excludes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
