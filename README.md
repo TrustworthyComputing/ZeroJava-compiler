@@ -1,22 +1,43 @@
-# ![alt text][zilch] Zilch to zMIPS compiler [![License MIT][badge-license]](LICENSE)
+# ![alt text][compiler-logo] ZeroJava to zMIPS compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate Zilch, a language designed for zero-knowledge proofs creation, to zMIPS.
+A compiler to translate ZeroJava, a subset of Java designed for zero-knowledge proofs, to zMIPS.
 
-## Zilch Language
-Zilch is a custom designed language for easy translation to zMIPS and thus easy Zero-Knowledge Proofs creation.
+
+## ZeroJava Language
+ZeroJava is inspired by the MiniJava language and is a custom subset of Java tailored to zero-knowledge proofs.
+Thus, it is possible to compile ZeroJava programs to byte code with a Java compiler if the ZK-specific instructions are omitted.
+ZeroJava abstains from features of Java that complicate the run-time system, such as exceptions and multi-threading.
+
 Below we briefly describe the language.
 
-Zilch has one main method and also supports arbitrary methods.
-Methods should be defined before they are used (each definition should be before the first invocation).
-Zilch supports three types for both methods and variables; int, boolean, and int [ ] which is an array of ints.
-Variable definitions and variable assignments should be in different lines (i.e., `int x;` and in a following line `x = 4;`).
-Arrays of integers are initialized as follows: `int [ ] arr;`, `arr = new int[10];`.
-Function parameters are always passed by value.
-Zilch program source text is free-format, using the semicolon as a statement terminator and curly braces for grouping blocks of statements, such as while loops and if-else statements.
-Zilch supports comments like C99, where the delimiter `//` is used for a single line comment and delimiters `/*` and `*/` are used for a block of lines.
-Zilch files use the `.zl` extension.
 
-### Zilch Arithmetic Operators
+ZeroJava is object-oriented, like Java.
+The basic types of ZeroJava are `int` for integer, `boolean` for logical values, and `int[]` for arrays of integers.
+Classes contain attributes and methods with arguments and return type of basic or class types.
+ZeroJava supports single inheritance but not interfaces and function overloading (i.e., each method name must be unique).
+In addition, all methods are inherently polymorphic; meaning that a method can be defined in a subclass if it has the same return type and arguments as in the parent.
+Fields in the base and derived class are allowed to have the same names, and are essentially different fields.
+All ZeroJava methods are `public` and all fields `protected`, which means that a class method cannot access fields of another class, with the exception of its parent.
+A class's own methods can be called via `this`.
+Local variables are defined only at the beginning of a method and local variables shadow fields of the surrounding class with the same name.
+
+
+In ZeroJava, the `new` operator calls a default void constructor.
+In addition, there are no inner classes and there are no static methods or fields.
+A ZeroJava program begins with a special main class that does not have fields and methods and contains the `main` method (i.e., `public static void main(String[] args)`).
+After main class, other classes may be defined that can have fields and methods.
+
+
+For `int` arrays, ZeroJava supports the assignment and lookup (`[]`) operators, as well as the `array.length` expression, which returns the size of the array.
+ZeroJava supports `while`, `if` code blocks as well as ternary operators.
+The assignment `A a = new B();` when `B extends A` is correct, and the same applies when a method expects a parameter of type `A` and a `B` instance is given instead.
+Finally, ZeroJava supports comments like Java, where the delimiter `//` is used for a single line comment and delimiters `/*` and `*/` are used for a block of lines.
+
+
+Below we present the various ZeroJava operators.
+
+
+### ZeroJava Arithmetic Operators
 | Operator | Description        											|
 |----------|----------------------------------------------------------------|
 | `+`      | Adds two operands.			 									|
@@ -24,11 +45,9 @@ Zilch files use the `.zl` extension.
 | `*`      | Multiplies both operands.			 							|
 | `/`      | Divides numerator by de-numerator.			 					|
 | `%`      | Modulus Operator and remainder of after an integer division.	|
-| `++`     | Increment operator increases the integer value by one. 		|
-| `--`     | Decrement operator decreases the integer value by one. 		|
 
 
-### Zilch Comparison and Logical Operators
+### ZeroJava Comparison and Logical Operators
 | Operator | Description        	|
 |----------|------------------------|
 | `==`     | Equal 					|
@@ -39,9 +58,10 @@ Zilch files use the `.zl` extension.
 | `>=`     | Greater or Equal than	|
 | `&&`     | Logical `and`			|
 | `\|\|`   | Logical `or`			|
+| `!`      | Logical `not`			|
 
 
-### Zilch Bitwise Operators
+### ZeroJava Bitwise Operators
 | Operator | Description        			|
 |----------|--------------------------------|
 | `&`      | Binary and 					|
@@ -51,7 +71,7 @@ Zilch files use the `.zl` extension.
 | `>>`     | Binary Right shift operator. 	|
 
 
-### Zilch Assignment Operators
+<!-- ### ZeroJava Assignment Operators
 | Operator | Description        					|
 |----------|----------------------------------------|
 | `=`      | Simple assignment operator. 			|
@@ -64,212 +84,92 @@ Zilch files use the `.zl` extension.
 | `>>=`    | Right shift and assignment operator. 	|
 | `&=`     | Bitwise and assignment operator. 		|
 | `^=`     | Bitwise xor and assignment operator.	|
-| `\|=`    | Bitwise or and assignment operator. 	|
+| `\|=`    | Bitwise or and assignment operator. 	| -->
 
 
-### Built in Zilch Functions
-| Built in Zilch Function Name       	| Description and corresponding zMIPS command 			|
-|---------------------------------------|-----------------------------------------------------------|
-| `Prover.answer(int result);`			| `answer`: returns the result 								|
-| `System.out.println(int variable);`			| `print`: prints the contents of `variable` 				|
-| `PublicTape.read(int dst);`			| `pubread dst`: consumes next word from public tape		|
-| `PrivateTape.read(int dst);`			| `secread dst`: consumes next word from private tape 		|
-| `PublicTape.seek(int dst, int idx);`	| `pubseek dst, idx`: consumes `idx`th word from public tape |
-| `PrivateTape.seek(int dst, int idx);` | `secseek dst idx`: consumes `idx`th word from private tape |
+### Built in ZeroJava Functions
+| Built in ZeroJava Function Name   | zMIPS instruction | Description 		|
+|-----------------------------------|-------------------|---------------------------------------------------------------|
+| `Prover.answer(int);` 			| `answer`			| returns the result 											|
+| `System.out.println(int);`		| `print`			| prints contents of integer variable 							|
+| `int PublicTape.read();`			| `pubread dst`		| return next word from public tape								|
+| `int PrivateTape.read();`			| `secread dst`		| return next word from private tape 							|
+| `int PublicTape.seek(int);`		| `pubseek dst, idx`| return the nth word from public tape where n is the argument	|
+| `int PrivateTape.seek(int);` 		| `secseek dst idx`	| return the nth word from private tape where n is the argument	|
 
 
-Finally, Zilch supports the ternary operation (`( a ) ? b : c ;`) which evaluates to b if the value of a is true, and otherwise to c.
-
-## zMIPS ISA
-| Instruction         | Description                 |
-|---------------------|-----------------------------|
-| move $ri, $rj, A    | $ri = A                     |
-| and $ri, $rj, A     | $ri, = $rj & A              |
-| or $ri, $rj, A      | $ri, = $rj \| A             |
-| xor $ri, $rj, A     | $ri, = $rj ^ A              |
-| not $ri, $rj, A     | $ri, = !A                   |
-| add $ri, $rj, A     | $ri, = $rj + A              |
-| sub $ri, $rj, A     | $ri, = $rj - A              |
-| mult $ri, $rj, A    | $ri, = $rj * A              |
-| sll $ri, $rj, A     | $ri, = $rj << A             |
-| srl $ri, $rj, A     | $ri, = $rj >> A             |
-| beq $ri, $rj, A     | if $ri == $rj goto A        |
-| beqz $ri, $rj, A    | if $ri == 0 goto A          |
-| bnez $ri, $rj, A    | if $ri != 0 goto A          |
-| bne $ri, $rj, A     | if $ri != $rj goto A        |
-| bgt $ri, $rj, A     | if $ri > $rj goto A         |
-| bge $ri, $rj, A     | if $ri >= $rj goto A        |
-| blt $ri, $rj, A     | if $ri < $rj goto A         |
-| ble $ri, $rj, A     | if $ri <= $rj goto A        |
-| j $ri, $rj, A       | goto label A                |
-| pubread $ri, $rj, A | $ri = next from public 		|
-| secread $ri, $rj, A | $ri = next from private		|
-| pubseek $ri, $rj, A | $ri = public[A]				|
-| secseek $ri, $rj, A | $ri = private[A]	   		|
-| sw $ri, A($rj)      | [A+$rj] = $ri               |
-| lw $ri, A($rj)      | $ri = [A+$rj]               |
-| print $ri, $rj, A   | print ri	                |
-| println $ri, $rj, A | print ri + newline	        |
-| answer $ri, $rj, A  | return ri                   |
+Finally, ZeroJava supports the ternary operation (`( a ) ? b : c ;`) which evaluates to `b` if the value of `a` is true, and otherwise to `c`.
 
 
-## Compilation & Execution:
-To compile the compiler type_ `make`.
+## Build and Run Instructions
 
-In order to make the Zilch compiler (`zc`) and the Zilch interpreter (`zi`) scripts executable type_ `chmod +x ./zc` and `chmod +x ./zi`.
+To build the ZeroJava to zMIPS compiler you will need a Java Development Kit (JDK), such as [OpenJDK](https://openjdk.java.net/) >= 8 and [Apache Maven](https://maven.apache.org/).
 
-Use the `zi` script to simulate Zilch programs and the `zc` script to compile Zilch programs to zMIPS assembly code.
-
-Our compiler also supports zMIPS analysis and optimizations. In order to enable the optimizer pass the argument `-opts` to `zc` script after the zilch program.
-
-Below are some usage examples and we also demonstrate the optimizer.
-
-### Zilch Examples:
-
-A simple program that performs addition:
+Then simply type:
 ```
-./zi ./compiler/zilch-examples/simpleAdd.zl
+$ mvn package
+```
 
-40
+The above command will create a `target` directory with all the build files, as well as with the `zerojava-compiler-1.0.jar` inside the `target` directory.
+
+
+To compile a ZeroJava program type:
 ```
-To generate zMIPS code:
+$ java -jar target/zerojava-compiler-1.0.jar /path-to-zerojava-example/example.java
 ```
-./zc ./compiler/zilch-examples/simpleAdd.zl
+
+
+Our compiler supports zMIPS static analysis and optimizations.
+In order to enable the optimizer pass the argument `--opts` command line argument.
+
+
+We provide various ZeroJava examples in the [src/test/resources/](./src/test/resources/) directory.
+Those examples include `if-else` statements, comparisons, `while` loops, examples with `int[]` accesses and others that will help getting started with ZeroJava programming language.
+
+For instance, a simple program that performs addition:
 ```
+$ java -jar target/zerojava-compiler-1.0.jar src/test/resources/Add.java
 ```
-void main(void) {
-	int x;
-	int y;
-	y = 13;
-	y += 7;
-	x = 12;
-	x = x - 1;
-	x--;
-	x <<= 1;
-	Prover.answer(x + y);
+
+```
+$ cat src/test/resources/Add.java
+
+class Add {
+
+	public static void main(String[] a) {
+		int sum;
+		sum = 12 + 21;
+		System.out.println(sum);
+		Prover.answer(sum);
+	}
+
 }
 ```
 
-Which generates the following four lines of zMIPS assembly:
+Which generates the following lines of zMIPS assembly:
 ```
-move $r2, $r2, 13
-add $r2, $r2, 7
-move $r1, $r1, 12
-sub $r3, $r1, 1
-move $r1, $r1, $r3
-sub $r1, $r1, 1
-sll $r1, $r1, 1
-add $r4, $r1, $r2
-answer $r4, $r4, $r4
+move $r1, 0
+move $r3, 12
+move $r4, 21
+add $r2, $r3, $r4
+move $r1, $r2
+print $r1
+answer $r1
 ```
+
 Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
 ```
-./zc ./compiler/zilch-examples/simpleAdd.zl -opts
+move $r3, 12
+add $r2, $r3, 21
+print $r2
+answer $r2
 ```
-```
-move $r2, $r2, 13
-add $r2, $r2, 7
-move $r1, $r1, 12
-sub $r3, $r1, 1
-sub $r1, $r3, 1
-sll $r1, $r1, 1
-add $r4, $r1, $r2
-answer $r4, $r4, $r4
-```
-
-A more complex program that reads inputs from the primary tape and adds them all together:
-```
-./zc ./compiler/zilch-examples/Addloop.zl
-```
-```
-void main(void) {
-	int i;
-	int from_tape;
-	int res;
-	i = 0 ;
-	while (i < 5) {
-		PublicTape.read(from_tape);
-		res = res + from_tape;
-		i = i + 1;
-	}
-	Prover.answer(res);
-}
-```
-
-Which generates the following zMIPS code:
-```
-move $r1, $r1, 0
-__L1__
-move $r4, $r4, 5
-cmpg $r4, $r4, $r1
-cnjmp $r4, $r4, __L2__
-pubread $r2, $r2, 0
-add $r5, $r3, $r2
-move $r3, $r3, $r5
-add $r6, $r1, 1
-move $r1, $r1, $r6
-j $r0, $r0, __L1__
-__L2__
-answer $r3, $r3, $r3
-```
-
-A final example that invokes methods is presented below:
-```
-./zc ./compiler/zilch-examples/methodCalls.zl
-```
-```
-int bar() {
-	return 30;
-}
-
-int foo() {
-	int x;
-	x = bar();
-	return x + 40;
-}
-
-void main(void) {
-	int x;
-	int y;
-	x = foo();
-	y = bar();
-	Prover.answer(x + y);
-}
-```
-
-Which generates the following zMIPS code:
-```
-move $r1, $r1, 30
-move $r2, $r2, $r1
-move $r4, $r4, 40
-add $r3, $r2, $r4
-move $r5, $r5, $r3
-move $r1, $r1, 30
-move $r6, $r6, $r1
-add $r7, $r5, $r6
-answer $r7, $r7, $r7
-```
-while enabling the optimizations:
-```
-./zc ./compiler/zilch-examples/methodCalls.zl -opts
-```
-```
-move $r1, $r1, 30
-add $r3, $r1, 40
-add $r7, $r3, 30
-answer $r7, $r7, $r7
-```
-the zMIPS assembly output is optimized.
-
-
-More Zilch examples can be found in the [zilch-examples](./zilch-examples) directory.
-Those examples include `if-else` statements, comparisons, `while` loops, examples with `int [ ]` accesses and others that will help getting started with Zilch programming language.
 
 
 ### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group
 
 
-[zilch]: ./logos/zilch_sm.png
+[compiler-logo]: ./logos/compiler_logo_sm.png
 
 [twc-logo]: ./logos/twc.png
 

@@ -1,8 +1,10 @@
 class Add {
 
-	public static void main(String[] a){
-		System.out.println(12 + 21);
-		Prover.answer(12 + 21);
+	public static void main(String[] a) {
+		int sum;
+		sum = 12 + 21;
+		System.out.println(sum);
+		Prover.answer(sum);
 	}
 
 }
