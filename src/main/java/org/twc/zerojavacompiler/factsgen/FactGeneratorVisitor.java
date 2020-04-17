@@ -12,7 +12,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public LinkedList<Var_t> variables_;
     public LinkedList<VarMove_t> var_moves_;
     public LinkedList<ConstMove_t> const_moves_;
-    // public LinkedList<BinOpMove_t> bin_op_moves_;
     public LinkedList<VarUse_t> var_uses_;
     public LinkedList<VarDef_t> var_defs_;
     public LinkedList<Jump_t> jumps_;
@@ -26,7 +25,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         variables_ = new LinkedList<>();
         var_moves_ = new LinkedList<>();
         const_moves_ = new LinkedList<>();
-        // bin_op_moves_ = new LinkedList<>();
         var_uses_ = new LinkedList<>();
         var_defs_ = new LinkedList<>();
         jumps_ = new LinkedList<>();
@@ -260,9 +258,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         if (src2.startsWith("$")) { // if third argument is not immediate
             var_uses_.add(new VarUse_t(argu, this.inst_num2_, src2));
         }
-
-        // bin_op_moves_.add(new BinOpMove_t(argu, this.inst_num2_, dst, src1, src2));
-
         var_defs_.add(new VarDef_t(argu, this.inst_num2_, dst));
         return instr;
     }
@@ -389,13 +384,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
                 constMove_t.writeRecord(file, print_facts);
             }
             file.close();
-
-            // file = new PrintWriter(path + "/BinOpMoves.iris");
-            // if (print_facts) System.out.println("\nBinOpMoves:");
-            // for (BinOpMove_t binOpMove_t : bin_op_moves_) {
-            //     binOpMove_t.writeRecord(file, print_facts);
-            // }
-            // file.close();
 
             file = new PrintWriter(path + "/Instructions.iris");
             if (print_facts) System.out.println("\nInstructions:");
