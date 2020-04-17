@@ -24,11 +24,11 @@ hs_err_pid*
 *.html
 
 
-src/main/java/org/twc/minijavacompiler/minijavavisitor/*.java
-src/main/java/org/twc/minijavacompiler/minijavasyntaxtree/*.java
-src/main/java/org/twc/minijavacompiler/minijavaparser/*.java
+src/main/java/org/twc/zerojavacompiler/zerojavavisitor/*.java
+src/main/java/org/twc/zerojavacompiler/zerojavasyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/zerojavaparser/*.java
 
-src/main/java/org/twc/minijavacompiler/zmipsvisitor/*.java
-src/main/java/org/twc/minijavacompiler/zmipssyntaxtree/*.java
-src/main/java/org/twc/minijavacompiler/zmipsparser/*.java
-src/main/java/org/twc/minijavacompiler/facts_rules/Facts/*
+src/main/java/org/twc/zerojavacompiler/zmipsvisitor/*.java
+src/main/java/org/twc/zerojavacompiler/zmipssyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/zmipsparser/*.java
+src/main/java/org/twc/zerojavacompiler/facts_rules/Facts/*
