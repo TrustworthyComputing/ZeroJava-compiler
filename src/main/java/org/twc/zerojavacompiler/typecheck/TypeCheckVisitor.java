@@ -233,7 +233,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     }
 
     /**
-    * f0 -> "Variable_t"
+    * f0 -> "boolean"
     */
     public Base_t visit(BooleanType n, Base_t argu) throws Exception {
         return new Variable_t("boolean", null);
@@ -247,13 +247,24 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     }
 
     /**
-    * f0 -> Block()
-    *       | AssignmentStatement()
-    *       | ArrayAssignmentStatement()
-    *       | IfStatement()
-    *       | WhileStatement()
-    *       | PrintStatement()
-    */
+     * f0 -> Block()
+     *       | AssignmentStatement()
+     *       | CompoundPlusAssignmentStatement()
+     *       | CompoundMinusAssignmentStatement()
+     *       | CompoundTimesAssignmentStatement()
+     *       | CompoundDivAssignmentStatement()
+     *       | CompoundModAssignmentStatement()
+     *       | CompoundShiftLeftAssignmentStatement()
+     *       | CompounShiftRightAssignmentStatement()
+     *       | CompoundBinaryAndAssignmentStatement()
+     *       | CompoundBinaryOrAssignmentStatement()
+     *       | CompoundBinaryXorAssignmentStatement()
+     *       | ArrayAssignmentStatement()
+     *       | IfStatement()
+     *       | WhileStatement()
+     *       | PrintStatement()
+     *       | AnswerStatement()
+     */
     public Base_t visit(Statement n, Base_t argu) throws Exception {
         return n.f0.accept(this, argu);
     }
@@ -296,6 +307,216 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
             return null;
         }
         throw new Exception("Error assignment between different types: " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "++"
+    * f2 -> ";"
+    */
+    public Base_t visit(IncrementAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        if (! t1.getType().equals("int")) {
+            throw new Exception("Error increment assignment (++) is only allowed to int type. Found " + t1.getType());
+        }
+        return null;
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "--"
+    * f2 -> ";"
+    */
+    public Base_t visit(DecrementAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        if (! t1.getType().equals("int")) {
+            throw new Exception("Error decrement assignment (--) is only allowed to int type. Found " + t1.getType());
+        }
+        return null;
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "+="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundPlusAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (+=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "-="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundMinusAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (-=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "*="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundTimesAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (*=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "/="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundDivAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (/=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "%="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundModAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (%=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "<<="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundShiftLeftAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (<<=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> ">>="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompounShiftRightAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (>>=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "&="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundBinaryAndAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (&=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "|="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundBinaryOrAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (|=) : " + t1.getType() + " " + t2.getType());
+    }
+
+    /**
+    * f0 -> Identifier()
+    * f1 -> "^="
+    * f2 -> Expression()
+    * f3 -> ";"
+    */
+    public Base_t visit(CompoundBinaryXorAssignmentStatement n, Base_t argu) throws Exception {
+        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
+        t1 = findType(t1, (Method_t) argu);
+        t2 = findType(t2, (Method_t) argu);
+        if (t1.getType().equals("int") && t2.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Error compound assignment between different types (^=) : " + t1.getType() + " " + t2.getType());
     }
 
     /**
@@ -438,6 +659,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      *       | MinusExpression()
      *       | TimesExpression()
      *       | DivExpression()
+     *       | ModExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
@@ -754,6 +976,23 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
             return new Variable_t("int", null);
         }
         throw new Exception("Bad operand types for operator '/': " + t1 + " " + t2);
+    }
+
+    /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "%"
+    * f2 -> PrimaryExpression()
+    */
+    public Base_t visit(ModExpression n, Base_t argu) throws Exception {
+        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
+        String t1 = findType(clause_1, (Method_t) argu).getType();
+        String t2 = findType(clause_2, (Method_t) argu).getType();
+        if (t1.equals("int") && t2.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Bad operand types for operator '%': " + t1 + " " + t2);
     }
 
     /**

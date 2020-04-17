@@ -211,19 +211,30 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String src = n.f3.accept(this, argu);
         if (src == null) { return null; }
         String instr = op + " " + dst + ", " + src;
-        if (src.startsWith("$")) {
-            var_moves_.add(new VarMove_t(argu, this.inst_num2_, dst, src));
-            var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
-        } else if (src.matches("[0-9]+")) {
-            const_moves_.add(new ConstMove_t(argu, this.inst_num2_, dst, Integer.parseInt(src) ));
-        }
-        if (op.equals("la")) {
+        if (op.equals("move")) {
+            if (src.startsWith("$")) {
+                var_moves_.add(new VarMove_t(argu, this.inst_num2_, dst, src));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+            } else if (src.matches("[0-9]+")) {
+                const_moves_.add(new ConstMove_t(argu, this.inst_num2_, dst, Integer.parseInt(src) ));
+            }
+        } else if (op.equals("la")) {
+            if (src.startsWith("$")) {
+                var_moves_.add(new VarMove_t(argu, this.inst_num2_, dst, src));
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+            } else if (src.matches("[0-9]+")) {
+                const_moves_.add(new ConstMove_t(argu, this.inst_num2_, dst, Integer.parseInt(src) ));
+            }
             if (dst.equals("$ra")) {
                 var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a0"));
                 var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a1"));
                 var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a2"));
                 var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a3"));
                 var_uses_.add(new VarUse_t(argu, this.inst_num2_, "$a4"));
+            }
+        } else if (op.equals("not")) {
+            if (src.startsWith("$")) {
+                var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
             }
         }
         var_defs_.add(new VarDef_t(argu, this.inst_num2_, dst));
@@ -283,6 +294,19 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(PrintStmt n, String argu) throws Exception {
         String src = n.f1.accept(this, argu);
         String op = "print " + src;
+        if (src.startsWith("$")) {
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
+        }
+        return op;
+    }
+
+    /**
+     * f0 -> "print"
+     * f1 -> SimpleExp()
+     */
+    public String visit(PrintLineStmt n, String argu) throws Exception {
+        String src = n.f1.accept(this, argu);
+        String op = "println " + src;
         if (src.startsWith("$")) {
             var_uses_.add(new VarUse_t(argu, this.inst_num2_, src));
         }

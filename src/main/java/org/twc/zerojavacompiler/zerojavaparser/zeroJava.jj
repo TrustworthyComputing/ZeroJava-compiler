@@ -150,8 +150,7 @@ void TypeDeclaration() :
 {
 	LOOKAHEAD(3)
 	ClassDeclaration()
-|
-	ClassExtendsDeclaration()
+| 	ClassExtendsDeclaration()
 }
 
 void ClassDeclaration() :
@@ -217,12 +216,9 @@ void Type() :
 {
 	LOOKAHEAD(3)
 	ArrayType()
-|
-	BooleanType()
-|
-	IntegerType()
-|
-	Identifier()
+| 	BooleanType()
+| 	IntegerType()
+| 	Identifier()
 }
 
 void ArrayType() :
@@ -247,20 +243,41 @@ void Statement() :
 {}
 {
 	Block()
-|
-	LOOKAHEAD(2)
+| 	LOOKAHEAD(2)
 	AssignmentStatement()
-|
-	LOOKAHEAD(2)
+| 	LOOKAHEAD(2)
+	IncrementAssignmentStatement()
+| 	LOOKAHEAD(2)
+	DecrementAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundPlusAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundMinusAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundTimesAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundDivAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundModAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundShiftLeftAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompounShiftRightAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundBinaryAndAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundBinaryOrAssignmentStatement()
+| 	LOOKAHEAD(2)
+	CompoundBinaryXorAssignmentStatement()
+| 	LOOKAHEAD(2)
 	ArrayAssignmentStatement()
-|
-	IfStatement()
-|
-	WhileStatement()
-|
+| 	IfStatement()
+| 	WhileStatement()
+| 	LOOKAHEAD(3)
 	PrintStatement()
-|
-	AnswerStatement()
+| 	LOOKAHEAD(3)
+	PrintLineStatement()
+| 	AnswerStatement()
 }
 
 void Block() :
@@ -275,6 +292,78 @@ void AssignmentStatement() :
 	Identifier() "=" Expression() ";"
 }
 
+void IncrementAssignmentStatement() :
+{}
+{
+  Identifier() "++" ";"
+}
+
+void DecrementAssignmentStatement() :
+{}
+{
+  Identifier() "--" ";"
+}
+
+void CompoundPlusAssignmentStatement() :
+{}
+{
+  Identifier() "+=" Expression() ";"
+}
+
+void CompoundMinusAssignmentStatement() :
+{}
+{
+  Identifier() "-=" Expression() ";"
+}
+
+void CompoundTimesAssignmentStatement() :
+{}
+{
+  Identifier() "*=" Expression() ";"
+}
+
+void CompoundDivAssignmentStatement() :
+{}
+{
+  Identifier() "/=" Expression() ";"
+}
+
+void CompoundModAssignmentStatement() :
+{}
+{
+  Identifier() "%=" Expression() ";"
+}
+
+void CompoundShiftLeftAssignmentStatement() :
+{}
+{
+  Identifier() "<<=" Expression() ";"
+}
+
+void CompounShiftRightAssignmentStatement() :
+{}
+{
+  Identifier() ">>=" Expression() ";"
+}
+
+void CompoundBinaryAndAssignmentStatement() :
+{}
+{
+  Identifier() "&=" Expression() ";"
+}
+
+void CompoundBinaryOrAssignmentStatement() :
+{}
+{
+  Identifier() "|=" Expression() ";"
+}
+
+void CompoundBinaryXorAssignmentStatement() :
+{}
+{
+  Identifier() "^=" Expression() ";"
+}
+
 void ArrayAssignmentStatement() :
 {}
 {
@@ -286,8 +375,7 @@ void IfStatement() :
 {
 	LOOKAHEAD(IfthenElseStatement())
 	IfthenElseStatement()
-|
-	IfthenStatement()
+| 	IfthenStatement()
 }
 
 void IfthenStatement() :
@@ -311,6 +399,12 @@ void PrintStatement() :
 {}
 {
 	<PRINT> "(" Expression() ")" ";"
+}
+
+void PrintLineStatement() :
+{}
+{
+	<PRINT> "(" ")" ";"
 }
 
 void AnswerStatement() :
@@ -358,6 +452,8 @@ void Expression() :
 	TimesExpression()
 | 	LOOKAHEAD( PrimaryExpression() "/" )
 	DivExpression()
+| 	LOOKAHEAD( PrimaryExpression() "%" )
+	ModExpression()
 |	LOOKAHEAD( PrimaryExpression() "[" )
 	ArrayLookup()
 | 	LOOKAHEAD( PrimaryExpression() "." "length" )
@@ -481,6 +577,12 @@ void DivExpression() :
 	PrimaryExpression() "/" PrimaryExpression()
 }
 
+void ModExpression() :
+{}
+{
+	PrimaryExpression() "%" PrimaryExpression()
+}
+
 void ArrayLookup() :
 {}
 {
@@ -539,29 +641,21 @@ void Clause() :
 {}
 {
 	NotExpression()
-|
-	PrimaryExpression()
+| 	PrimaryExpression()
 }
 
 void PrimaryExpression() :
 {}
 {
 	IntegerLiteral()
-|
-	TrueLiteral()
-|
-	FalseLiteral()
-|
-	Identifier()
-|
-	ThisExpression()
-|
-	LOOKAHEAD(3)
+| 	TrueLiteral()
+| 	FalseLiteral()
+| 	Identifier()
+| 	ThisExpression()
+| 	LOOKAHEAD(3)
 	ArrayAllocationExpression()
-|
-	AllocationExpression()
-|
-	BracketExpression()
+| 	AllocationExpression()
+| 	BracketExpression()
 }
 
 void IntegerLiteral() :

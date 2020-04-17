@@ -313,6 +313,8 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
      *       | "add"
      *       | "sub"
      *       | "mult"
+     *       | "div"
+     *       | "mod"
      *       | "sll"
      *       | "srl"
      */
@@ -334,10 +336,28 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
             reg = parts[0];
         }
         String instr = "print " + reg + "\n";
-        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
-        if (opt_found == null) {
-            this.asm_ += instr;
+        // String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
+        // if (opt_found == null) {
+        this.asm_ += instr;
+        // }
+        return instr;
+    }
+
+    /**
+     * f0 -> "println"
+     * f1 -> SimpleExp()
+     */
+    public String visit(PrintLineStmt n, String argu) throws Exception {
+        String reg = n.f1.accept(this, argu);
+        String []parts;
+        parts = reg.split("&");
+        if (parts.length == 2) {
+            reg = parts[1];
+        } else {
+            reg = parts[0];
         }
+        String instr = "println " + reg + "\n";
+        this.asm_ += instr;
         return instr;
     }
 

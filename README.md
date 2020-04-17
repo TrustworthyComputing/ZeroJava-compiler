@@ -45,6 +45,8 @@ Below we present the various ZeroJava operators.
 | `*`      | Multiplies both operands.			 							|
 | `/`      | Divides numerator by de-numerator.			 					|
 | `%`      | Modulus Operator and remainder of after an integer division.	|
+| `++`     | Increment operator increases the integer value by one.			|
+| `--`     | Decrement operator decreases the integer value by one.			|
 
 
 ### ZeroJava Comparison and Logical Operators
@@ -71,7 +73,7 @@ Below we present the various ZeroJava operators.
 | `>>`     | Binary Right shift operator. 	|
 
 
-<!-- ### ZeroJava Assignment Operators
+### ZeroJava Assignment Operators
 | Operator | Description        					|
 |----------|----------------------------------------|
 | `=`      | Simple assignment operator. 			|
@@ -84,7 +86,7 @@ Below we present the various ZeroJava operators.
 | `>>=`    | Right shift and assignment operator. 	|
 | `&=`     | Bitwise and assignment operator. 		|
 | `^=`     | Bitwise xor and assignment operator.	|
-| `\|=`    | Bitwise or and assignment operator. 	| -->
+| `\|=`    | Bitwise or and assignment operator. 	|
 
 
 ### Built in ZeroJava Functions

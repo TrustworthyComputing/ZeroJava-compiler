@@ -279,14 +279,24 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 	}
 
 	/**
-	* f0 -> Block()
-	*       | AssignmentStatement()
-	*       | ArrayAssignmentStatement()
-	*       | IfStatement()
-	*       | WhileStatement()
-	*       | PrintStatement()
-	*       | AnswerStatement()
-	*/
+     * f0 -> Block()
+     *       | AssignmentStatement()
+     *       | CompoundPlusAssignmentStatement()
+     *       | CompoundMinusAssignmentStatement()
+     *       | CompoundTimesAssignmentStatement()
+     *       | CompoundDivAssignmentStatement()
+     *       | CompoundModAssignmentStatement()
+     *       | CompoundShiftLeftAssignmentStatement()
+     *       | CompounShiftRightAssignmentStatement()
+     *       | CompoundBinaryAndAssignmentStatement()
+     *       | CompoundBinaryOrAssignmentStatement()
+     *       | CompoundBinaryXorAssignmentStatement()
+     *       | ArrayAssignmentStatement()
+     *       | IfStatement()
+     *       | WhileStatement()
+     *       | PrintStatement()
+     *       | AnswerStatement()
+     */
 	public Base_t visit(Statement n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
@@ -336,6 +346,554 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 			// class field
 			if (var != null) {
 				this.asm_.append("sw " + expr + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "++"
+	* f2 -> ";"
+	*/
+	public Base_t visit(IncrementAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("add " + temp + ", " + temp + ", 1\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("add " + var.getRegister() + ", " + var.getRegister() + ", 1\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at IncrementAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("add " + temp + ", " + temp + ", 1\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "--"
+	* f2 -> ";"
+	*/
+	public Base_t visit(DecrementAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at DecrementAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("sub " + temp + ", " + temp + ", 1\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("sub " + var.getRegister() + ", " + var.getRegister() + ", 1\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at DecrementAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("sub " + temp + ", " + temp + ", 1\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "+="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundPlusAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundPlusAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("add " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("add " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundPlusAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("add " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "-="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundMinusAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundMinusAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("sub " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("sub " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundMinusAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("sub " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "*="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundTimesAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundTimesAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("mult " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("mult " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundTimesAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("mult " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "/="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundDivAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundDivAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("div " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("div " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundDivAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("div " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "%="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundModAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundModAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("mod " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("mod " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundModAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("mod " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> "<<="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundShiftLeftAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundShiftLeftAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("sll " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("sll " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundShiftLeftAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("sll " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> ">>="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompounShiftRightAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompounShiftRightAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("srl " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("srl " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompounShiftRightAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("srl " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> &="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundBinaryAndAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundBinaryAndAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("and " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("and " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundBinaryAndAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("and " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> |="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundBinaryOrAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundBinaryOrAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("or " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("or " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundBinaryOrAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("or " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+			}
+		}
+		return null;
+	}
+
+	/**
+	* f0 -> Identifier()
+	* f1 -> ^="
+	* f2 -> Expression()
+	* f3 -> ";"
+	*/
+	public Base_t visit(CompoundBinaryXorAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didnt find the var in method, so its a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at CompoundBinaryXorAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newRegister();
+					this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+					this.asm_.append("xor " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+					this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
+				}
+				return null;
+			}
+			this.asm_.append("xor " + var.getRegister() + ", " + var.getRegister() + ", " + expr +"\n");
+		} else { // if a field of a class
+			Class_t cl = st_.get(meth.getFromClass().getName());
+			if (cl == null) {
+				throw new Exception("something went wrong at CompoundBinaryXorAssignmentStatement 2");
+			}
+			Variable_t var = cl.classContainsVar(id);
+			// class field
+			if (var != null) {
+				String temp = newRegister();
+				this.asm_.append("lw " + temp + ", " + var.getNum() + "($a0)\t\t\t# load #" + var.getNum() + " field of this\n");
+				this.asm_.append("xor " + temp + ", " + temp + ", " + expr +"\t\t\t# increment field\n");
+				this.asm_.append("sw " + temp + ", " + var.getNum() + "($a0)\t\t\t# write on #" + var.getNum() + " field of this\n");
 			}
 		}
 		return null;
@@ -452,6 +1010,17 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 	}
 
 	/**
+	 * f0 -> <PRINT>
+	 * f1 -> "("
+	 * f2 -> ")"
+	 * f3 -> ";"
+	 */
+	public Base_t visit(PrintLineStatement n, Base_t argu) throws Exception {
+		this.asm_.append("println $r0\n");
+		return null;
+	}
+
+	/**
      * f0 -> <ANSWER>
      * f1 -> "("
      * f2 -> Expression()
@@ -483,9 +1052,11 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
      *       | MinusExpression()
      *       | TimesExpression()
      *       | DivExpression()
+     *       | ModExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
+     *       | TernaryExpression()
      *       | PublicReadExpression()
      *       | PrivateReadExpression()
      *       | Clause()
@@ -773,6 +1344,19 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
 		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		this.asm_.append("div " + ret + ", " + exp1 + ", " + exp2 + "\n");
+		return new Variable_t(null, null, ret);
+	}
+
+	/**
+	* f0 -> PrimaryExpression()
+	* f1 -> "%"
+	* f2 -> PrimaryExpression()
+	*/
+	public Base_t visit(ModExpression n, Base_t argu) throws Exception {
+		String ret = newRegister();
+		String exp1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String exp2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.asm_.append("mod " + ret + ", " + exp1 + ", " + exp2 + "\n");
 		return new Variable_t(null, null, ret);
 	}
 

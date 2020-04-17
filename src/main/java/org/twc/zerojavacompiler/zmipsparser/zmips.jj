@@ -153,6 +153,7 @@ Label()
 | LwStmt()
 | SwStmt()
 | PrintStmt()
+| PrintLineStmt()
 | AnswerStmt()
 | PubReadStmt()
 | SecReadStmt()
@@ -231,6 +232,8 @@ void ThreeRegInstrOp() :
 | "add"
 | "sub"
 | "mult"
+| "div"
+| "mod"
 | "sll"
 | "srl"
 }
@@ -239,6 +242,12 @@ void PrintStmt() :
 {}
 {
   "print" SimpleExp()
+}
+
+void PrintLineStmt() :
+{}
+{
+  "println" SimpleExp()
 }
 
 void AnswerStmt() :
