@@ -125,31 +125,25 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
       * f0 -> ComparisonOps()
       * f1 -> Register()
       * f2 -> ","
-      * f3 -> SimpleExp()
+      * f3 -> Register()
+      * f4 -> ","
+      * f5 -> SimpleExp()
       */
       public String visit(ComparisonStmts n, String argu) throws Exception {
           String op = n.f0.accept(this, argu);
           String reg1 = n.f1.accept(this, argu);
-          this.label_from_stmt = false;
           String reg2 = n.f3.accept(this, argu);
+          this.label_from_stmt = false;
+          String label = n.f5.accept(this, argu);
           this.label_from_stmt = true;
           if (reg2 == null) { return null; }
-          String instr;
           if (reg2.startsWith("$")) {
-              String []parts;
-              parts = reg2.split("&");
-              if (parts.length == 2) {
-                  reg2 = parts[1];
-              } else {
-                  reg2 = parts[0];
-              }
+              reg2 = reg2.split("&")[0];
           }
           if (reg1.startsWith("$")) {
-              String []parts;
-              parts = reg1.split("&");
-              reg1 = parts[0];
+              reg1 = reg1.split("&")[0];
           }
-          instr = op + " " + reg1 + ", " + reg2 + "\n";
+          String instr = op + " " + reg1 + ", " + reg2 + ", " + label + "\n";
           String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
           if (opt_found == null){
               this.asm_ += instr;
@@ -158,9 +152,10 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
       }
 
       /**
-       * f0 -> "cmpe"
-       *       | "cmpg"
-       *       | "cmpge"
+       * f0 -> "beq"
+       *       | "bne"
+       *       | "blt"
+       *       | "ble"
        */
       public String visit(ComparisonOps n, String argu) throws Exception {
           return n.f0.choice.toString();

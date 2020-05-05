@@ -128,24 +128,27 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * f0 -> ComparisonOps()
      * f1 -> Register()
      * f2 -> ","
-     * f3 -> SimpleExp()
+     * f3 -> Register()
+     * f4 -> ","
+     * f5 -> SimpleExp()
      */
     public String visit(ComparisonStmts n, String argu) throws Exception {
         String op = n.f0.accept(this, argu);
         String src1 = n.f1.accept(this, argu);
         String src2 = n.f3.accept(this, argu);
-        String instr = op + " " + src1 + ", " + src2;
+        String label = n.f5.accept(this, argu);
+        String instr = op + " " + src1 + ", " + src2 + ", " + label;
         var_uses_.add(new VarUse_t(argu, this.inst_num2_, src1));
-        if (src2.startsWith("$")) {
-            var_uses_.add(new VarUse_t(argu, this.inst_num2_, src2));
-        }
+        var_uses_.add(new VarUse_t(argu, this.inst_num2_, src2));
+        cjumps_.add(new Cjump_t(argu, this.inst_num2_, label));
         return instr;
     }
 
     /**
-     * f0 -> "cmpe"
-     *       | "cmpg"
-     *       | "cmpge"
+     * f0 -> "beq"
+     *       | "bne"
+     *       | "blt"
+     *       | "ble"
      */
     public String visit(ComparisonOps n, String argu) throws Exception {
         return n.f0.choice.toString();

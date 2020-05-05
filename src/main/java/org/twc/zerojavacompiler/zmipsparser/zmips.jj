@@ -54,10 +54,10 @@ TOKEN :
 | < sll: "sll" >
 | < srl: "srl" >
 // Comparisons
-| < cmpe: "cmpe" >
-| < cmpne: "cmpne" >
-| < cmpg: "cmpg" >
-| < cmpge: "cmpge" >
+| < beq: "beq" >
+| < bne: "bne" >
+| < blt: "blt" >
+| < ble: "ble" >
 // for registers
 | < r: "$r" >
 }
@@ -179,15 +179,16 @@ void JmpOps():
 void ComparisonStmts() :
 {}
 {
-  ComparisonOps() Register() "," SimpleExp()
+  ComparisonOps() Register() "," Register() "," SimpleExp()
 }
 
 void ComparisonOps():
 {}
 {
-  "cmpe"
-| "cmpg"
-| "cmpge"
+  "beq"
+| "bne"
+| "blt"
+| "ble"
 }
 
 void LwStmt() :
