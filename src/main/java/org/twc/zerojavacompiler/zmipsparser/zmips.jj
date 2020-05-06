@@ -157,8 +157,8 @@ Label()
 | AnswerStmt()
 | PubReadStmt()
 | SecReadStmt()
-// | PubSeekStmt()
-// | SecSeekStmt()
+| PubSeekStmt()
+| SecSeekStmt()
 }
 
 void JmpStmts() :
@@ -263,11 +263,11 @@ void PubReadStmt() :
   "pubread" Register()
 }
 
-// void PubSeekStmt() :
-// {}
-// {
-//   "pubseek" Register() "," SimpleExp() "," SimpleExp()
-// }
+void PubSeekStmt() :
+{}
+{
+  "pubseek" Register() "," SimpleExp()
+}
 
 void SecReadStmt() :
 {}
@@ -275,11 +275,11 @@ void SecReadStmt() :
   "secread" Register()
 }
 
-// void SecSeekStmt() :
-// {}
-// {
-//   "secseek" Register() "," SimpleExp() "," SimpleExp()
-// }
+void SecSeekStmt() :
+{}
+{
+  "secseek" Register() "," SimpleExp()
+}
 
 void SimpleExp() :
 {}

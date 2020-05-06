@@ -352,6 +352,40 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
+     * f0 -> "pubseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     */
+    public String visit(PubSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu);
+        String idx = n.f3.accept(this, argu);
+        String op = "pubseek " + dst + ", " + idx;
+        var_defs_.add(new VarDef_t(argu, this.inst_num2_, dst));
+        if (idx.startsWith("$")) {
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, idx));
+        }
+        return op;
+    }
+
+    /**
+     * f0 -> "secseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     */
+    public String visit(SecSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu);
+        String idx = n.f3.accept(this, argu);
+        String op = "secseek " + dst + ", " + idx;
+        var_defs_.add(new VarDef_t(argu, this.inst_num2_, dst));
+        if (idx.startsWith("$")) {
+            var_uses_.add(new VarUse_t(argu, this.inst_num2_, idx));
+        }
+        return op;
+    }
+
+    /**
      * f0 -> Register()
      *       | IntegerLiteral()
      *       | Label()

@@ -1473,6 +1473,32 @@ public class ZMIPSGenVisitor extends GJDepthFirst<Base_t, Base_t> {
 		return new Variable_t("int", null, t);
     }
 
+	/**
+	 * f0 -> <PUBLIC_SEEK>
+	 * f1 -> "("
+	 * f2 -> PrimaryExpression()
+	 * f3 -> ")"
+	 */
+	public Base_t visit(PublicSeekExpression n, Base_t argu) throws Exception {
+		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		String t = newRegister();
+		this.asm_.append("pubseek " + t + ", " + idx + "\n");
+		return new Variable_t("int", null, t);
+	}
+
+	/**
+	 * f0 -> <PRIVATE_SEEK>
+	 * f1 -> "("
+	 * f2 -> PrimaryExpression()
+	 * f3 -> ")"
+	 */
+	public Base_t visit(PrivateSeekExpression n, Base_t argu) throws Exception {
+		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		String t = newRegister();
+		this.asm_.append("secseek " + t + ", " + idx + "\n");
+		return new Variable_t("int", null, t);
+	}
+
   	/**
      * f0 -> Expression()
      * f1 -> ExpressionTail()

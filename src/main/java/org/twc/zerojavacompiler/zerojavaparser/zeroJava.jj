@@ -71,6 +71,8 @@ TOKEN :
 	| < ANSWER: "Prover.answer" >
 	| < PUBLIC_READ: "PublicTape.read" >
 	| < PRIVATE_READ: "PrivateTape.read" >
+	| < PUBLIC_SEEK: "PublicTape.seek" >
+	| < PRIVATE_SEEK: "PrivateTape.seek" >
 	| < VOID: "void" >
 }
 
@@ -466,6 +468,10 @@ void Expression() :
 	PublicReadExpression()
 | 	LOOKAHEAD( <PRIVATE_READ> )
 	PrivateReadExpression()
+|	LOOKAHEAD( <PUBLIC_SEEK> )
+	PublicSeekExpression()
+| 	LOOKAHEAD( <PRIVATE_SEEK> )
+	PrivateSeekExpression()
 | 	Clause()
 }
 
@@ -617,6 +623,18 @@ void PrivateReadExpression() :
 {}
 {
 	<PRIVATE_READ> "(" ")"
+}
+
+void PublicSeekExpression() :
+{}
+{
+	<PUBLIC_SEEK> "(" PrimaryExpression() ")"
+}
+
+void PrivateSeekExpression() :
+{}
+{
+	<PRIVATE_SEEK> "(" PrimaryExpression() ")"
 }
 
 void ExpressionList() :

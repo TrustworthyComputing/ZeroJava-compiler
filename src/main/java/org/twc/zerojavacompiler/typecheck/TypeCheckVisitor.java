@@ -1128,6 +1128,34 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     }
 
     /**
+     * f0 -> <PUBLIC_SEEK>
+     * f1 -> "("
+     * f2 -> PrimaryExpression()
+     * f3 -> ")"
+     */
+    public Base_t visit(PublicSeekExpression n, Base_t argu) throws Exception {
+        String type = findType((Variable_t) n.f2.accept(this, argu), (Method_t) argu).getType();
+        if (type.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Seek statement index should be integer");
+    }
+
+    /**
+     * f0 -> <PRIVATE_SEEK>
+     * f1 -> "("
+     * f2 -> PrimaryExpression()
+     * f3 -> ")"
+     */
+    public Base_t visit(PrivateSeekExpression n, Base_t argu) throws Exception {
+        String type = findType((Variable_t) n.f2.accept(this, argu), (Method_t) argu).getType();
+        if (type.equals("int")) {
+            return new Variable_t("int", null);
+        }
+        throw new Exception("Seek statement index should be integer");
+    }
+
+    /**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */

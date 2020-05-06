@@ -406,6 +406,65 @@ public class OptimizerVisitor extends GJDepthFirst<String, String> {
     }
 
     /**
+     * f0 -> "pubseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     */
+    public String visit(PubSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu).split("&")[0];
+// TODO
+        this.label_from_stmt = false;
+        String idx = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        if (idx == null) { return null; }
+        if (idx.startsWith("$")) {
+            String []parts;
+            parts = idx.split("&");
+            if (parts.length == 2) {
+                idx = parts[1];
+            } else {
+                idx = parts[0];
+            }
+        }
+        String instr = "pubseek " + dst + ", " + idx + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
+        if (opt_found == null){
+            this.asm_ += instr;
+        }
+        return instr;
+    }
+
+    /**
+     * f0 -> "secseek"
+     * f1 -> Register()
+     * f2 -> ","
+     * f3 -> SimpleExp()
+     */
+    public String visit(SecSeekStmt n, String argu) throws Exception {
+        String dst = n.f1.accept(this, argu).split("&")[0];
+        this.label_from_stmt = false;
+        String idx = n.f3.accept(this, argu);
+        this.label_from_stmt = true;
+        if (idx == null) { return null; }
+        if (idx.startsWith("$")) {
+            String []parts;
+            parts = idx.split("&");
+            if (parts.length == 2) {
+                idx = parts[1];
+            } else {
+                idx = parts[0];
+            }
+        }
+        String instr = "secseek " + dst + ", " + idx + "\n";
+        String opt_found = optimisationMap.get("deadCode").get(argu + instr_cnt);
+        if (opt_found == null){
+            this.asm_ += instr;
+        }
+        return instr;
+    }
+
+    /**
      * f0 -> Register()
      *       | IntegerLiteral()
      *       | Label()
