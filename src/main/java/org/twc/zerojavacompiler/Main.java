@@ -7,14 +7,14 @@ import org.twc.zerojavacompiler.spiglet2kanga.Method;
 import org.twc.zerojavacompiler.spiglet2kanga.Spiglet2Kanga;
 import org.twc.zerojavacompiler.spiglet2kanga.Temp2Reg;
 import org.twc.zerojavacompiler.zerojava2spiglet.ZeroJava2Spiglet;
-import org.twc.zerojavacompiler.zerojavaparser.ZeroJavaParser;
-import org.twc.zerojavacompiler.zerojavaparser.ParseException;
+import org.twc.zerojavacompiler.zerojava2spiglet.zerojavaparser.ZeroJavaParser;
+import org.twc.zerojavacompiler.zerojava2spiglet.zerojavaparser.ParseException;
 import org.twc.zerojavacompiler.zerojava2spiglet.SymbolTableVisitor;
 import org.twc.zerojavacompiler.zerojava2spiglet.VisitClasses;
 import org.twc.zerojavacompiler.zerojava2spiglet.TypeCheckVisitor;
-import org.twc.zerojavacompiler.spigletparser.SpigletParser;
-import org.twc.zerojavacompiler.kangaparser.KangaParser;
-import org.twc.zerojavacompiler.kanga2zMIPS.Kanga2zMIPS;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletparser.SpigletParser;
+import org.twc.zerojavacompiler.kanga2zmips.kangaparser.KangaParser;
+import org.twc.zerojavacompiler.kanga2zmips.Kanga2zMIPS;
 
 import java.io.*;
 import java.util.*;
@@ -49,7 +49,7 @@ public class Main {
                 System.out.println("Checking file \"" + arg + "\"\n");
                 fis = new FileInputStream(arg);
                 ZeroJavaParser zerojava_parser = new ZeroJavaParser(fis);
-                org.twc.zerojavacompiler.zerojavasyntaxtree.Goal zerojava_root = zerojava_parser.Goal();
+                org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.Goal zerojava_root = zerojava_parser.Goal();
                 VisitClasses firstvisit = new VisitClasses();
                 zerojava_root.accept(firstvisit);
                 System.out.println("[ 1/3 ] Class name collection phase completed");
@@ -92,7 +92,7 @@ public class Main {
                 System.out.println("Generating Kanga code from \""+ spiglet_output_path + "\"\n");
                 fis = new FileInputStream(spiglet_output_path);
                 SpigletParser spiglet_parser = new SpigletParser(fis);
-                org.twc.zerojavacompiler.spigletsyntaxtree.Node spiglet_ast = spiglet_parser.Goal();
+                org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.Node spiglet_ast = spiglet_parser.Goal();
                 HashMap<String, Method> method_map_ = new HashMap<>();
                 HashMap<String, Integer> mLabel = new HashMap<>();
                 // visit 1: Get Flow Graph Vertex
@@ -122,7 +122,7 @@ public class Main {
                 System.out.println("Generating zMIPS code from \""+ kanga_output_path + "\"\n");
                 fis = new FileInputStream(kanga_output_path);
                 KangaParser kanga_parser = new KangaParser(fis);
-                org.twc.zerojavacompiler.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
+                org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
                 // Kanga to MIPS
                 Kanga2zMIPS kanga2zmips = new Kanga2zMIPS();
                 kanga_ast.accept(kanga2zmips);
@@ -160,7 +160,7 @@ public class Main {
 //                     }
 //                     fis = new FileInputStream(zmips_output_path);
 //                     ZMIPSParser zmips_parser = new ZMIPSParser(fis);
-//                     org.twc.zerojavacompiler.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
+//                     org.twc.zerojavacompiler.zmipsoptimizer.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
 //                     FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
 //                     zmips_root.accept(factgen_visitor, null);
 //                     factgen_visitor.writeFacts(facts_output_path, debug_);
@@ -254,7 +254,7 @@ public class Main {
 //
 //                 System.out.println("[ \u2713 ] zMIPS optimized code generated to \"" + opt_zmips_output_path + "\"");
 //                 System.out.println("===================================================================================");
-            } catch (ParseException | org.twc.zerojavacompiler.spigletparser.ParseException | org.twc.zerojavacompiler.kangaparser.ParseException | org.twc.zerojavacompiler.zmipsparser.ParseException | FileNotFoundException ex) {
+            } catch (ParseException | org.twc.zerojavacompiler.spiglet2kanga.spigletparser.ParseException | org.twc.zerojavacompiler.kanga2zmips.kangaparser.ParseException | org.twc.zerojavacompiler.zmipsoptimizer.zmipsparser.ParseException | FileNotFoundException ex) {
                 ex.printStackTrace();
             } catch (Exception ex) {
                 ex.printStackTrace();

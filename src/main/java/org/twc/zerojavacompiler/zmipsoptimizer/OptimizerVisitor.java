@@ -1,7 +1,7 @@
-package org.twc.zerojavacompiler.optimizer;
+package org.twc.zerojavacompiler.zmipsoptimizer;
 
-import org.twc.zerojavacompiler.zmipssyntaxtree.*;
-import org.twc.zerojavacompiler.zmipsvisitor.GJDepthFirst;
+import org.twc.zerojavacompiler.zmipsoptimizer.zmipssyntaxtree.*;
+import org.twc.zerojavacompiler.zmipsoptimizer.zmipsvisitor.GJDepthFirst;
 
 import java.util.Enumeration;
 import java.util.Map;

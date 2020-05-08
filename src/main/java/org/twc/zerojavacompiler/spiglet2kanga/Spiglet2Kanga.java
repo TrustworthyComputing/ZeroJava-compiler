@@ -1,7 +1,7 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
-import org.twc.zerojavacompiler.spigletsyntaxtree.*;
-import org.twc.zerojavacompiler.spigletvisitor.*;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.*;
 import java.util.*;
 
 public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {

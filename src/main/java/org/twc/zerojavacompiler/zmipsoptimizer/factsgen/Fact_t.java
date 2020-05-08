@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.factsgen;
+package org.twc.zerojavacompiler.zmipsoptimizer.factsgen;
 
 public class Fact_t {
 

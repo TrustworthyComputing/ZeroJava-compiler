@@ -3,10 +3,10 @@ options {
   STATIC = false;
 }
 
-PARSER_BEGIN(SpigletParser)
-  package org.twc.zerojavacompiler.spigletparser;
-  public class SpigletParser {}
-PARSER_END(SpigletParser)
+PARSER_BEGIN(KangaParser)
+  package org.twc.zerojavacompiler.kanga2zmips.kangaparser;
+  public class KangaParser {}
+PARSER_END(KangaParser)
 
 SKIP : /* WHITE SPACE */
 {
@@ -23,7 +23,6 @@ SPECIAL_TOKEN : /* COMMENTS */
 | <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
-
 
 TOKEN :
 {
@@ -49,6 +48,7 @@ TOKEN :
 | < MAIN: "MAIN" >
 | < CODE: "CODE" >
 | < HALLOCATE: "HALLOCATE" >
+| < SPILLEDARG: "SPILLEDARG" >
 | < END: "END" >
 | < NOOP: "NOOP" >
 | < MOVE : "MOVE" >
@@ -62,9 +62,44 @@ TOKEN :
 | < CJUMP : "CJUMP" >
 | < HSTORE: "HSTORE" >
 | < HLOAD : "HLOAD" >
+| < ALOAD : "ALOAD" >
+| < ASTORE : "ASTORE" >
+| < PASSARG : "PASSARG" >
 | < MEM: "MEM" >
 | < TEMP: "TEMP" >
 | < ARG: "ARG" >
+| < ZERO: "zero" >
+| < at: "at" >
+| < v0: "v0" >
+| < v1: "v1" >
+| < a0: "a0" >
+| < a1: "a1" >
+| < a2: "a2" >
+| < a3: "a3" >
+| < t0: "t0" >
+| < t1: "t1" >
+| < t2: "t2" >
+| < t3: "t3" >
+| < t4: "t4" >
+| < t5: "t5" >
+| < t6: "t6" >
+| < t7: "t7" >
+| < s0: "s0" >
+| < s1: "s1" >
+| < s2: "s2" >
+| < s3: "s3" >
+| < s4: "s4" >
+| < s5: "s5" >
+| < s6: "s6" >
+| < s7: "s7" >
+| < t8: "t8" >
+| < t9: "t9" >
+| < k0: "k0" >
+| < k1: "k1" >
+| < gp: "gp" >
+| < sp: "sp" >
+| < fp: "fp" >
+| < ra: "ra" >
 }
 
 TOKEN : /* LITERALS */
@@ -115,15 +150,15 @@ TOKEN : /* IDENTIFIERS */
   >
 }
 
-/***********************************
- * The Spiglet Grammar Starts Here *
- ***********************************/
+/*********************************
+ * The Kanga Grammar Starts Here *
+ *********************************/
 
 
 void Goal() :
 {}
 {
-  "MAIN" StmtList() "END" ( Procedure() )* <EOF>
+  "MAIN" "[" IntegerLiteral() "]" "[" IntegerLiteral() "]" "[" IntegerLiteral() "]" StmtList() "END" ( Procedure() )* <EOF>
 }
 
 void StmtList() :
@@ -135,7 +170,7 @@ void StmtList() :
 void Procedure() :
 {}
 {
-  Label() "[" IntegerLiteral() "]" StmtExp()
+  Label() "[" IntegerLiteral() "]" "[" IntegerLiteral() "]" "[" IntegerLiteral() "]" StmtList() "END"
 }
 
 void Stmt() :
@@ -158,6 +193,14 @@ void Stmt() :
   PrintStmt()
 |
   AnswerStmt()
+|
+  ALoadStmt()
+|
+  AStoreStmt()
+|
+  PassArgStmt()
+|
+  CallStmt()
 }
 
 void NoOpStmt() :
@@ -175,7 +218,7 @@ void ErrorStmt() :
 void CJumpStmt() :
 {}
 {
-  "CJUMP" Temp() Label()
+  "CJUMP" Reg() Label()
 }
 
 void JumpStmt() :
@@ -187,19 +230,19 @@ void JumpStmt() :
 void HStoreStmt() :
 {}
 {
-  "HSTORE" Temp() IntegerLiteral() Temp()
+  "HSTORE" Reg() IntegerLiteral() Reg()
 }
 
 void HLoadStmt() :
 {}
 {
-  "HLOAD" Temp() Temp() IntegerLiteral()
+  "HLOAD" Reg() Reg() IntegerLiteral()
 }
 
 void MoveStmt() :
 {}
 {
-  "MOVE" Temp() Exp()
+  "MOVE" Reg() Exp()
 }
 
 void PrintStmt() :
@@ -214,11 +257,34 @@ void AnswerStmt() :
   "ANSWER" SimpleExp()
 }
 
+void ALoadStmt() :
+{}
+{
+  "ALOAD" Reg() SpilledArg()
+}
+
+void AStoreStmt() :
+{}
+{
+  "ASTORE" SpilledArg() Reg()
+}
+
+void PassArgStmt() :
+{}
+{
+  "PASSARG" IntegerLiteral() Reg()
+}
+
+void CallStmt() :
+{}
+{
+  "CALL" SimpleExp()
+}
+
+
 void Exp():
 {}
 {
-  Call()
-|
   HAllocate()
 |
   BinOp()
@@ -226,17 +292,6 @@ void Exp():
   SimpleExp()
 }
 
-void StmtExp() :
-{}
-{
-  "BEGIN" StmtList() "RETURN" SimpleExp() "END"
-}
-
-void Call() :
-{}
-{
-  "CALL" SimpleExp() "(" ( Temp() )* ")"
-}
 
 void HAllocate() :
 {}
@@ -247,7 +302,7 @@ void HAllocate() :
 void BinOp() :
 {}
 {
-  Operator() Temp() SimpleExp()
+  Operator() Reg() SimpleExp()
 }
 
 void Operator() :
@@ -262,20 +317,72 @@ void Operator() :
   "TIMES"
 }
 
+void SpilledArg() :
+{}
+{
+  "SPILLEDARG" IntegerLiteral()
+}
+
 void SimpleExp() :
 {}
 {
-  Temp()
+  Reg()
 |
   IntegerLiteral()
 |
   Label()
 }
 
-void Temp() :
+void Reg() :
 {}
 {
-  "TEMP" IntegerLiteral()
+  "a0"
+|
+  "a1"
+|
+  "a2"
+|
+  "a3"
+|
+  "t0"
+|
+  "t1"
+|
+  "t2"
+|
+  "t3"
+|
+  "t4"
+|
+  "t5"
+|
+  "t6"
+|
+  "t7"
+|
+  "s0"
+|
+  "s1"
+|
+  "s2"
+|
+  "s3"
+|
+  "s4"
+|
+  "s5"
+|
+  "s6"
+|
+  "s7"
+|
+  "t8"
+|
+  "t9"
+|
+  "v0"
+|
+  "v1"
 }
 
 void IntegerLiteral() :
@@ -289,4 +396,3 @@ void Label() :
 {
   <IDENTIFIER>
 }
-

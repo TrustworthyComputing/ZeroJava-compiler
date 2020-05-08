@@ -1,7 +1,7 @@
-package org.twc.zerojavacompiler.kanga2zMIPS;
+package org.twc.zerojavacompiler.kanga2zmips;
 
-import org.twc.zerojavacompiler.kangasyntaxtree.*;
-import org.twc.zerojavacompiler.kangavisitor.*;
+import org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.*;
+import org.twc.zerojavacompiler.kanga2zmips.kangavisitor.*;
 
 public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
 

@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.kanga2zMIPS;
+package org.twc.zerojavacompiler.kanga2zmips;
 
 public class ZMIPSPrinter {
 

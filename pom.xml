@@ -41,16 +41,16 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojava2spiglet</workingDirectory>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${basedir}/lib/jtb132di.jar</argument>
                                 <argument>-te</argument>
                                 <argument>./zerojavaparser/zeroJava.jj</argument>
                                 <argument>-np</argument>
-                                <argument>org.twc.zerojavacompiler.zerojavasyntaxtree</argument>
+                                <argument>org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree</argument>
                                 <argument>-vp</argument>
-                                <argument>org.twc.zerojavacompiler.zerojavavisitor</argument>
+                                <argument>org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -62,7 +62,7 @@
                         </goals>
                         <configuration>
                             <executable>javacc</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojavaparser</workingDirectory>
+                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavaparser</workingDirectory>
                             <arguments>
                                 <argument>zeroJava-jtb.jj</argument>
                             </arguments>
@@ -77,16 +77,16 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/spiglet2kanga</workingDirectory>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${basedir}/lib/jtb132di.jar</argument>
                                 <argument>-te</argument>
                                 <argument>./spigletparser/spiglet.jj</argument>
                                 <argument>-np</argument>
-                                <argument>org.twc.zerojavacompiler.spigletsyntaxtree</argument>
+                                <argument>org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree</argument>
                                 <argument>-vp</argument>
-                                <argument>org.twc.zerojavacompiler.spigletvisitor</argument>
+                                <argument>org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -98,7 +98,7 @@
                         </goals>
                         <configuration>
                             <executable>javacc</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/spigletparser</workingDirectory>
+                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletparser</workingDirectory>
                             <arguments>
                                 <argument>spiglet-jtb.jj</argument>
                             </arguments>
@@ -113,16 +113,16 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/kanga2zmips</workingDirectory>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${basedir}/lib/jtb132di.jar</argument>
                                 <argument>-te</argument>
                                 <argument>./kangaparser/kanga.jj</argument>
                                 <argument>-np</argument>
-                                <argument>org.twc.zerojavacompiler.kangasyntaxtree</argument>
+                                <argument>org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree</argument>
                                 <argument>-vp</argument>
-                                <argument>org.twc.zerojavacompiler.kangavisitor</argument>
+                                <argument>org.twc.zerojavacompiler.kanga2zmips.kangavisitor</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -134,7 +134,7 @@
                         </goals>
                         <configuration>
                             <executable>javacc</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/kangaparser</workingDirectory>
+                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangaparser</workingDirectory>
                             <arguments>
                                 <argument>kanga-jtb.jj</argument>
                             </arguments>
@@ -149,16 +149,16 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer</workingDirectory>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${basedir}/lib/jtb132di.jar</argument>
                                 <argument>-te</argument>
                                 <argument>./zmipsparser/zmips.jj</argument>
                                 <argument>-np</argument>
-                                <argument>org.twc.zerojavacompiler.zmipssyntaxtree</argument>
+                                <argument>org.twc.zerojavacompiler.zmipsoptimizer.zmipssyntaxtree</argument>
                                 <argument>-vp</argument>
-                                <argument>org.twc.zerojavacompiler.zmipsvisitor</argument>
+                                <argument>org.twc.zerojavacompiler.zmipsoptimizer.zmipsvisitor</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -170,7 +170,7 @@
                         </goals>
                         <configuration>
                             <executable>javacc</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsparser</workingDirectory>
+                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser</workingDirectory>
                             <arguments>
                                 <argument>zmips-jtb.jj</argument>
                             </arguments>
@@ -259,21 +259,21 @@
                     <filesets>
                         <!-- zerojava -->
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojavasyntaxtree</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavasyntaxtree</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojavavisitor</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavavisitor</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojavaparser</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavaparser</directory>
                             <includes>
                                 <include>**/*.java</include>
                             </includes>
@@ -284,21 +284,21 @@
                         </fileset>
                         <!-- spiglet -->
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletsyntaxtree</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletsyntaxtree</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletvisitor</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletvisitor</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletparser</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletparser</directory>
                             <includes>
                                 <include>**/*.java</include>
                             </includes>
@@ -309,21 +309,21 @@
                         </fileset>
                         <!-- kanga -->
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangasyntaxtree</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangasyntaxtree</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangavisitor</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangavisitor</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangaparser</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangaparser</directory>
                             <includes>
                                 <include>**/*.java</include>
                             </includes>
@@ -334,21 +334,21 @@
                         </fileset>
                         <!-- zMIPS -->
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipssyntaxtree</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipssyntaxtree</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsvisitor</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsvisitor</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsparser</directory>
+                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser</directory>
                             <includes>
                                 <include>**/*.java</include>
                             </includes>

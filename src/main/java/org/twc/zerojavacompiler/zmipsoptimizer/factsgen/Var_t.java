@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.factsgen;
+package org.twc.zerojavacompiler.zmipsoptimizer.factsgen;
 import java.io.*;
 
 public class Var_t extends Fact_t {

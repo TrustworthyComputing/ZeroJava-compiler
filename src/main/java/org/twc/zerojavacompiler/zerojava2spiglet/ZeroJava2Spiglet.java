@@ -1,7 +1,7 @@
 package org.twc.zerojavacompiler.zerojava2spiglet;
 
-import org.twc.zerojavacompiler.zerojavasyntaxtree.*;
-import org.twc.zerojavacompiler.zerojavavisitor.GJDepthFirst;
+import org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.*;
+import org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor.GJDepthFirst;
 import org.twc.zerojavacompiler.basetype.*;
 import org.twc.zerojavacompiler.zmipsgenerator.Label;
 import java.util.*;

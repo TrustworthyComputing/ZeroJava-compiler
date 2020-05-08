@@ -26,19 +26,19 @@ hs_err_pid*
 *.html
 
 
-src/main/java/org/twc/zerojavacompiler/zerojavavisitor/*.java
-src/main/java/org/twc/zerojavacompiler/zerojavasyntaxtree/*.java
-src/main/java/org/twc/zerojavacompiler/zerojavaparser/*.java
+src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavavisitor/*.java
+src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavasyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavaparser/*.java
 
-src/main/java/org/twc/zerojavacompiler/spigletvisitor/*.java
-src/main/java/org/twc/zerojavacompiler/spigletsyntaxtree/*.java
-src/main/java/org/twc/zerojavacompiler/spigletparser/*.java
+src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletvisitor/*.java
+src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletsyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletparser/*.java
 
-src/main/java/org/twc/zerojavacompiler/kangavisitor/*.java
-src/main/java/org/twc/zerojavacompiler/kangasyntaxtree/*.java
-src/main/java/org/twc/zerojavacompiler/kangaparser/*.java
+src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangavisitor/*.java
+src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangasyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangaparser/*.java
 
-src/main/java/org/twc/zerojavacompiler/zmipsvisitor/*.java
-src/main/java/org/twc/zerojavacompiler/zmipssyntaxtree/*.java
-src/main/java/org/twc/zerojavacompiler/zmipsparser/*.java
+src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsvisitor/*.java
+src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipssyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser/*.java
 src/main/java/org/twc/zerojavacompiler/facts_rules/Facts/*

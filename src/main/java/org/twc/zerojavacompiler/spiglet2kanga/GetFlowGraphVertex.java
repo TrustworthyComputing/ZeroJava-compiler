@@ -1,8 +1,8 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
 import java.util.*;
-import org.twc.zerojavacompiler.spigletsyntaxtree.*;
-import org.twc.zerojavacompiler.spigletvisitor.*;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.*;
 
 public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 

@@ -1,7 +1,8 @@
-package org.twc.zerojavacompiler.factsgen;
+package org.twc.zerojavacompiler.zmipsoptimizer;
 
-import org.twc.zerojavacompiler.zmipssyntaxtree.*;
-import org.twc.zerojavacompiler.zmipsvisitor.GJDepthFirst;
+import org.twc.zerojavacompiler.zmipsoptimizer.factsgen.*;
+import org.twc.zerojavacompiler.zmipsoptimizer.zmipssyntaxtree.*;
+import org.twc.zerojavacompiler.zmipsoptimizer.zmipsvisitor.GJDepthFirst;
 import java.util.*;
 import java.io.*;
 

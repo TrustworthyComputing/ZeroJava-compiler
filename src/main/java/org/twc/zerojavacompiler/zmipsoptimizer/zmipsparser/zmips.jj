@@ -4,7 +4,7 @@ options {
 }
 
 PARSER_BEGIN(ZMIPSParser)
-    package org.twc.zerojavacompiler.zmipsparser;
+    package org.twc.zerojavacompiler.zmipsoptimizer.zmipsparser;
     public class ZMIPSParser {}
 PARSER_END(ZMIPSParser)
 

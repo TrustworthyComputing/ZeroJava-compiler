@@ -3,7 +3,7 @@ options {
 }
 
 PARSER_BEGIN(ZeroJavaParser)
-	package org.twc.zerojavacompiler.zerojavaparser;
+	package org.twc.zerojavacompiler.zerojava2spiglet.zerojavaparser;
 	public class ZeroJavaParser {}
 PARSER_END(ZeroJavaParser)
 
