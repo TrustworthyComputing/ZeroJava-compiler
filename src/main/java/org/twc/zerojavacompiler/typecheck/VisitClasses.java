@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.symboltable;
+package org.twc.zerojavacompiler.typecheck;
 
 import org.twc.zerojavacompiler.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojavavisitor.GJNoArguDepthFirst;

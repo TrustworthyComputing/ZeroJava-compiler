@@ -1,5 +1,7 @@
 *.class
 *.asm
+*.spg
+*.kg
 *.zmips
 *.opt
 *.txt
@@ -27,6 +29,14 @@ hs_err_pid*
 src/main/java/org/twc/zerojavacompiler/zerojavavisitor/*.java
 src/main/java/org/twc/zerojavacompiler/zerojavasyntaxtree/*.java
 src/main/java/org/twc/zerojavacompiler/zerojavaparser/*.java
+
+src/main/java/org/twc/zerojavacompiler/spigletvisitor/*.java
+src/main/java/org/twc/zerojavacompiler/spigletsyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/spigletparser/*.java
+
+src/main/java/org/twc/zerojavacompiler/kangavisitor/*.java
+src/main/java/org/twc/zerojavacompiler/kangasyntaxtree/*.java
+src/main/java/org/twc/zerojavacompiler/kangaparser/*.java
 
 src/main/java/org/twc/zerojavacompiler/zmipsvisitor/*.java
 src/main/java/org/twc/zerojavacompiler/zmipssyntaxtree/*.java

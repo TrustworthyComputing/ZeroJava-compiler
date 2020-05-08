@@ -68,6 +68,78 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <!-- spiglet -->
+                    <execution>
+                        <id>generate-spiglet-visitors</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${basedir}/lib/jtb132di.jar</argument>
+                                <argument>-te</argument>
+                                <argument>./spigletparser/spiglet.jj</argument>
+                                <argument>-np</argument>
+                                <argument>org.twc.zerojavacompiler.spigletsyntaxtree</argument>
+                                <argument>-vp</argument>
+                                <argument>org.twc.zerojavacompiler.spigletvisitor</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-spiglet-parser</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>javacc</executable>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/spigletparser</workingDirectory>
+                            <arguments>
+                                <argument>spiglet-jtb.jj</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- kanga -->
+                    <execution>
+                        <id>generate-kanga-visitors</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler</workingDirectory>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${basedir}/lib/jtb132di.jar</argument>
+                                <argument>-te</argument>
+                                <argument>./kangaparser/kanga.jj</argument>
+                                <argument>-np</argument>
+                                <argument>org.twc.zerojavacompiler.kangasyntaxtree</argument>
+                                <argument>-vp</argument>
+                                <argument>org.twc.zerojavacompiler.kangavisitor</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-kanga-parser</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>javacc</executable>
+                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/kangaparser</workingDirectory>
+                            <arguments>
+                                <argument>kanga-jtb.jj</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                     <!-- zMIPS -->
                     <execution>
                         <id>generate-zmips-visitors</id>
@@ -210,6 +282,56 @@
                             </excludes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
+                        <!-- spiglet -->
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletsyntaxtree</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletvisitor</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/spigletcompiler/spigletparser</directory>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/spiglet.jj</exclude>
+                            </excludes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <!-- kanga -->
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangasyntaxtree</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangavisitor</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>${basedir}/src/main/java/org/twc/kangacompiler/kangaparser</directory>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/kanga.jj</exclude>
+                            </excludes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                         <!-- zMIPS -->
                         <fileset>
                             <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipssyntaxtree</directory>
@@ -238,6 +360,8 @@
                         <fileset>
                             <directory>${basedir}/src/test/resources</directory>
                             <includes>
+                                <include>**/*.spg</include>
+                                <include>**/*.kg</include>
                                 <include>**/*.zmips</include>
                             </includes>
                             <excludes>

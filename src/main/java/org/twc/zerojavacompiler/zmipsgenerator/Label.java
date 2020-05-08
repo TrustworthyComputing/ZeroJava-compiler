@@ -14,6 +14,10 @@ public class Label {
 		return "__L_" + (++this.labels_) + "__";
 	}
 
+	public String newVTableLabel(String str) {
+		return new String(str + "_vTable");
+	}
+
 	public String getErrorLabel() {
 		this.may_have_error_ = true;
 		return "__Runtime_Error__";

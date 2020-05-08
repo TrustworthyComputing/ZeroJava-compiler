@@ -1,30 +1,21 @@
 package org.twc.zerojavacompiler;
 
-import org.deri.iris.Configuration;
-import org.deri.iris.KnowledgeBase;
-import org.deri.iris.api.IKnowledgeBase;
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.IQuery;
-import org.deri.iris.api.basics.IRule;
-import org.deri.iris.api.terms.IVariable;
-import org.deri.iris.compiler.Parser;
-import org.deri.iris.optimisations.magicsets.MagicSets;
-import org.deri.iris.storage.IRelation;
 import org.twc.zerojavacompiler.basetype.Class_t;
-import org.twc.zerojavacompiler.factsgen.FactGeneratorVisitor;
+import org.twc.zerojavacompiler.spiglet2kanga.GetFlowGraph;
+import org.twc.zerojavacompiler.spiglet2kanga.GetFlowGraphVertex;
+import org.twc.zerojavacompiler.spiglet2kanga.Method;
+import org.twc.zerojavacompiler.spiglet2kanga.Spiglet2Kanga;
+import org.twc.zerojavacompiler.spiglet2kanga.Temp2Reg;
 import org.twc.zerojavacompiler.zerojavaparser.ZeroJavaParser;
 import org.twc.zerojavacompiler.zerojavaparser.ParseException;
-import org.twc.zerojavacompiler.optimizer.OptimizerVisitor;
-import org.twc.zerojavacompiler.symboltable.SymbolTableVisitor;
-import org.twc.zerojavacompiler.symboltable.VisitClasses;
+import org.twc.zerojavacompiler.typecheck.SymbolTableVisitor;
+import org.twc.zerojavacompiler.typecheck.VisitClasses;
 import org.twc.zerojavacompiler.typecheck.TypeCheckVisitor;
-import org.twc.zerojavacompiler.zmipsgenerator.ZMIPSGenVisitor;
-import org.twc.zerojavacompiler.zmipsparser.ZMIPSParser;
+import org.twc.zerojavacompiler.spigletparser.SpigletParser;
+import org.twc.zerojavacompiler.kangaparser.KangaParser;
+import org.twc.zerojavacompiler.kanga2zMIPS.Kanga2zMIPS;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -75,138 +66,194 @@ public class Main {
                 System.out.println("[ \u2713 ] All checks passed");
                 System.out.println("===================================================================================\n\n");
 
-                // generate zMIPS code
+
+                // generate Spiglet code
                 System.out.println("===================================================================================");
-                System.out.println("Generating zMIPS code for \""+ arg + "\"\n");
-                ZMIPSGenVisitor generator = new ZMIPSGenVisitor(symbol_table, symtable_visit.getGlobalsNumber());
-                zerojava_root.accept(generator, null);
+                System.out.println("Generating Spiglet code for \""+ arg + "\"\n");
+                ZeroJava2Spiglet zerojava2spiglet = new ZeroJava2Spiglet(symbol_table, symtable_visit.getGlobalsNumber());
+                zerojava_root.accept(zerojava2spiglet, null);
                 File fp = new File(arg);
                 String path = fp.getPath();
                 path = path.substring(0, path.lastIndexOf('.'));
-                String zmips_output_path = path + ".zmips";
-                String opt_zmips_output_path = path + ".opt.zmips";
-                writer = new PrintWriter(zmips_output_path);
-                writer.print(generator.getASM());
+                String spiglet_output_path = path + ".spg";
+                writer = new PrintWriter(spiglet_output_path);
+                writer.print(zerojava2spiglet.getASM());
                 if (debug_) {
-                    System.out.println(generator.getASM());
+                    System.out.println(zerojava2spiglet.getASM());
                 }
                 writer.close();
-                System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
+                System.out.println("[ \u2713 ] Spiglet code generated to \"" + spiglet_output_path + "\"");
+                System.out.println("===================================================================================\n\n");
+
+
+                // generate Kanga code
                 System.out.println("===================================================================================");
-
-                // optimize zMIPS code
-                if (!enable_opts_) continue;
-
-                System.out.println("\n\n===================================================================================");
-                System.out.println("Optimizing file \"" + zmips_output_path + "\"\n");
-
-                boolean can_optimize = true;
-                Map<String, Map<String, String>> prev_optimizations_map;
-                Map<String, Map<String, String>> optimizations_map = null;
-                while (can_optimize) {
-                    prev_optimizations_map = optimizations_map;
-                    String facts_output_path = "target/Facts/" + zmips_output_path.substring(0, zmips_output_path.length() - 6);
-                    Path p = Paths.get(facts_output_path);
-                    if (! Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
-                        throw new IOException("Error creating folder " + facts_output_path);
-                    }
-                    fis = new FileInputStream(zmips_output_path);
-                    ZMIPSParser zmips_parser = new ZMIPSParser(fis);
-                    org.twc.zerojavacompiler.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
-                    FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
-                    zmips_root.accept(factgen_visitor, null);
-                    factgen_visitor.writeFacts(facts_output_path, debug_);
-                    System.out.println("[ 1/3 ] zMIPS code relations inference phase completed");
-
-                    Parser iris_parser = new Parser();
-                    Map<IPredicate, IRelation> factMap = new HashMap<>();
-                    final File factsDirectory = new File(facts_output_path);
-                    if (factsDirectory.isDirectory()) {
-                        for (final File fileEntry : Objects.requireNonNull(factsDirectory.listFiles())) {
-                            if (fileEntry.isDirectory()) {
-                                System.out.println("Omitting directory " + fileEntry.getPath());
-                            } else {
-                                Reader factsReader = new FileReader(fileEntry);
-                                iris_parser.parse(factsReader);
-                                factMap.putAll(iris_parser.getFacts()); // Retrieve the facts and put all of them in factMap
-                            }
-                        }
-                    } else {
-                        System.err.println("Invalid facts directory facts_output_path");
-                        System.exit(-1);
-                    }
-                    File rulesFile = new File("src/main/java/org/twc/zerojavacompiler/staticanalysis/rules.iris");
-                    Reader rulesReader = new FileReader(rulesFile);
-                    File queriesFile = new File("src/main/java/org/twc/zerojavacompiler/staticanalysis/queries.iris");
-                    Reader queriesReader = new FileReader(queriesFile);
-                    iris_parser.parse(rulesReader);                                 // Parse rules file.
-                    List<IRule> rules = iris_parser.getRules();                     // Retrieve the rules from the parsed file.
-                    iris_parser.parse(queriesReader);                               // Parse queries file.
-                    List<IQuery> queries = iris_parser.getQueries();                // Retrieve the queries from the parsed file.
-                    Configuration configuration = new Configuration();              // Create a default configuration.
-                    configuration.programOptmimisers.add(new MagicSets());          // Enable Magic Sets together with rule filtering.
-                    IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
-                    optimizations_map = new HashMap<>();
-                    for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
-                        List<IVariable> variableBindings = new ArrayList<>();
-                        IRelation relation = knowledgeBase.execute(query, variableBindings);
-                        if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
-                        String queryType = null;
-                        switch ((query.toString())) {
-                            case "?- constProp(?m, ?l, ?v, ?val).":
-                                queryType = "constProp";
-                                break;
-                            case "?- copyProp(?m, ?l, ?v1, ?v2).":
-                                queryType = "copyProp";
-                                break;
-                            case "?- deadCode(?m, ?i, ?v).":
-                                queryType = "deadCode";
-                                break;
-                        }
-                        if (queryType != null) {
-                            Map<String, String> tempOp = new HashMap<>();
-                            String str;
-                            for (int r = 0; r < relation.size(); r++) {
-                                str = (relation.get(r)).toString();
-                                if (debug_) System.out.println(relation.get(r));
-                                int line = getLine(str);
-                                String meth = getMeth(str);
-                                if (tempOp.get(meth + line) == null) {
-                                    tempOp.put(meth + line, str);
-                                } else {
-                                    tempOp.put(meth + "-sec-" + line, str);
-                                }
-                            }
-                            optimizations_map.put(queryType, tempOp);
-                        } else if (debug_) {
-                            for (int r = 0; r < relation.size(); r++) {
-                                System.out.println(relation.get(r));
-                            }
-                        }
-                    }
-                    if (debug_) { // Print optimizations map
-                        printOptMap(optimizations_map);
-                    }
-                    System.out.println("[ 2/3 ] Static analysis phase completed");
-
-                    OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimizations_map);
-                    zmips_root.accept(optimizer_visitor, null);
-                    writer = new PrintWriter(opt_zmips_output_path);
-                    if (debug_) {
-                        System.out.println("\n" + optimizer_visitor.asm_);
-                    }
-                    writer.println(optimizer_visitor.asm_);
-                    writer.close();
-                    System.out.println("[ 3/3 ] Optimization phase completed");
-
-                    can_optimize = prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map);
-                    zmips_output_path = opt_zmips_output_path;
-                    System.out.println("\n");
+                System.out.println("Generating Kanga code from \""+ spiglet_output_path + "\"\n");
+                fis = new FileInputStream(spiglet_output_path);
+                SpigletParser spiglet_parser = new SpigletParser(fis);
+                org.twc.zerojavacompiler.spigletsyntaxtree.Node spiglet_ast = spiglet_parser.Goal();
+                HashMap<String, Method> method_map_ = new HashMap<>();
+                HashMap<String, Integer> mLabel = new HashMap<>();
+                // visit 1: Get Flow Graph Vertex
+                spiglet_ast.accept(new GetFlowGraphVertex(method_map_, mLabel));
+                // visit 2: Get Flow Graph
+                spiglet_ast.accept(new GetFlowGraph(method_map_, mLabel));
+                // Linear Scan Algorithm on Flow Graph
+                new Temp2Reg(method_map_).LinearScan();
+                // visit 3: Spiglet->Kanga
+                Spiglet2Kanga spiglet2kanga = new Spiglet2Kanga(method_map_);
+                spiglet_ast.accept(spiglet2kanga);
+                path = fp.getPath();
+                path = path.substring(0, path.lastIndexOf('.'));
+                String kanga_output_path = path + ".kg";
+                writer = new PrintWriter(kanga_output_path);
+                writer.print(spiglet2kanga.getASM());
+                if (debug_) {
+                    System.out.println(spiglet2kanga.getASM());
                 }
+                writer.close();
+                System.out.println("[ \u2713 ] Kanga code generated to \"" + kanga_output_path + "\"");
+                System.out.println("===================================================================================\n\n");
 
-                System.out.println("[ \u2713 ] zMIPS optimized code generated to \"" + opt_zmips_output_path + "\"");
+
+                 // generate zMIPS code
                 System.out.println("===================================================================================");
-            } catch (ParseException | org.twc.zerojavacompiler.zmipsparser.ParseException | FileNotFoundException ex) {
+                System.out.println("Generating zMIPS code from \""+ kanga_output_path + "\"\n");
+                fis = new FileInputStream(kanga_output_path);
+                KangaParser kanga_parser = new KangaParser(fis);
+                org.twc.zerojavacompiler.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
+                // Kanga to MIPS
+                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS();
+                kanga_ast.accept(kanga2zmips);
+
+                 path = fp.getPath();
+                 path = path.substring(0, path.lastIndexOf('.'));
+                 String zmips_output_path = path + ".zmips";
+                 String opt_zmips_output_path = path + ".opt.zmips";
+                 writer = new PrintWriter(zmips_output_path);
+                 writer.print(kanga2zmips.getASM());
+                 if (debug_) {
+                     System.out.println(kanga2zmips.getASM());
+                 }
+                 writer.close();
+                 System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
+                System.out.println("===================================================================================");
+                System.exit(0);
+
+
+//                 // optimize zMIPS code
+//                 if (!enable_opts_) continue;
+//
+//                 System.out.println("\n\n===================================================================================");
+//                 System.out.println("Optimizing file \"" + zmips_output_path + "\"\n");
+//
+//                 boolean can_optimize = true;
+//                 Map<String, Map<String, String>> prev_optimizations_map;
+//                 Map<String, Map<String, String>> optimizations_map = null;
+//                 while (can_optimize) {
+//                     prev_optimizations_map = optimizations_map;
+//                     String facts_output_path = "target/Facts/" + zmips_output_path.substring(0, zmips_output_path.length() - 6);
+//                     Path p = Paths.get(facts_output_path);
+//                     if (! Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
+//                         throw new IOException("Error creating folder " + facts_output_path);
+//                     }
+//                     fis = new FileInputStream(zmips_output_path);
+//                     ZMIPSParser zmips_parser = new ZMIPSParser(fis);
+//                     org.twc.zerojavacompiler.zmipssyntaxtree.Goal zmips_root = zmips_parser.Goal();
+//                     FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
+//                     zmips_root.accept(factgen_visitor, null);
+//                     factgen_visitor.writeFacts(facts_output_path, debug_);
+//                     System.out.println("[ 1/3 ] zMIPS code relations inference phase completed");
+//
+//                     Parser iris_parser = new Parser();
+//                     Map<IPredicate, IRelation> factMap = new HashMap<>();
+//                     final File factsDirectory = new File(facts_output_path);
+//                     if (factsDirectory.isDirectory()) {
+//                         for (final File fileEntry : Objects.requireNonNull(factsDirectory.listFiles())) {
+//                             if (fileEntry.isDirectory()) {
+//                                 System.out.println("Omitting directory " + fileEntry.getPath());
+//                             } else {
+//                                 Reader factsReader = new FileReader(fileEntry);
+//                                 iris_parser.parse(factsReader);
+//                                 factMap.putAll(iris_parser.getFacts()); // Retrieve the facts and put all of them in factMap
+//                             }
+//                         }
+//                     } else {
+//                         System.err.println("Invalid facts directory facts_output_path");
+//                         System.exit(-1);
+//                     }
+//                     File rulesFile = new File("src/main/java/org/twc/zerojavacompiler/staticanalysis/rules.iris");
+//                     Reader rulesReader = new FileReader(rulesFile);
+//                     File queriesFile = new File("src/main/java/org/twc/zerojavacompiler/staticanalysis/queries.iris");
+//                     Reader queriesReader = new FileReader(queriesFile);
+//                     iris_parser.parse(rulesReader);                                 // Parse rules file.
+//                     List<IRule> rules = iris_parser.getRules();                     // Retrieve the rules from the parsed file.
+//                     iris_parser.parse(queriesReader);                               // Parse queries file.
+//                     List<IQuery> queries = iris_parser.getQueries();                // Retrieve the queries from the parsed file.
+//                     Configuration configuration = new Configuration();              // Create a default configuration.
+//                     configuration.programOptmimisers.add(new MagicSets());          // Enable Magic Sets together with rule filtering.
+//                     IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
+//                     optimizations_map = new HashMap<>();
+//                     for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
+//                         List<IVariable> variableBindings = new ArrayList<>();
+//                         IRelation relation = knowledgeBase.execute(query, variableBindings);
+//                         if (debug_) System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
+//                         String queryType = null;
+//                         switch ((query.toString())) {
+//                             case "?- constProp(?m, ?l, ?v, ?val).":
+//                                 queryType = "constProp";
+//                                 break;
+//                             case "?- copyProp(?m, ?l, ?v1, ?v2).":
+//                                 queryType = "copyProp";
+//                                 break;
+//                             case "?- deadCode(?m, ?i, ?v).":
+//                                 queryType = "deadCode";
+//                                 break;
+//                         }
+//                         if (queryType != null) {
+//                             Map<String, String> tempOp = new HashMap<>();
+//                             String str;
+//                             for (int r = 0; r < relation.size(); r++) {
+//                                 str = (relation.get(r)).toString();
+//                                 if (debug_) System.out.println(relation.get(r));
+//                                 int line = getLine(str);
+//                                 String meth = getMeth(str);
+//                                 if (tempOp.get(meth + line) == null) {
+//                                     tempOp.put(meth + line, str);
+//                                 } else {
+//                                     tempOp.put(meth + "-sec-" + line, str);
+//                                 }
+//                             }
+//                             optimizations_map.put(queryType, tempOp);
+//                         } else if (debug_) {
+//                             for (int r = 0; r < relation.size(); r++) {
+//                                 System.out.println(relation.get(r));
+//                             }
+//                         }
+//                     }
+//                     if (debug_) { // Print optimizations map
+//                         printOptMap(optimizations_map);
+//                     }
+//                     System.out.println("[ 2/3 ] Static analysis phase completed");
+//
+//                     OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimizations_map);
+//                     zmips_root.accept(optimizer_visitor, null);
+//                     writer = new PrintWriter(opt_zmips_output_path);
+//                     if (debug_) {
+//                         System.out.println("\n" + optimizer_visitor.asm_);
+//                     }
+//                     writer.println(optimizer_visitor.asm_);
+//                     writer.close();
+//                     System.out.println("[ 3/3 ] Optimization phase completed");
+//
+//                     can_optimize = prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map);
+//                     zmips_output_path = opt_zmips_output_path;
+//                     System.out.println("\n");
+//                 }
+//
+//                 System.out.println("[ \u2713 ] zMIPS optimized code generated to \"" + opt_zmips_output_path + "\"");
+//                 System.out.println("===================================================================================");
+            } catch (ParseException | org.twc.zerojavacompiler.spigletparser.ParseException | org.twc.zerojavacompiler.kangaparser.ParseException | org.twc.zerojavacompiler.zmipsparser.ParseException | FileNotFoundException ex) {
                 ex.printStackTrace();
             } catch (Exception ex) {
                 ex.printStackTrace();
