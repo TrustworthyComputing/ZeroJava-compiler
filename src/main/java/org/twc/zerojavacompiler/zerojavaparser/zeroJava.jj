@@ -252,25 +252,7 @@ void Statement() :
 | 	LOOKAHEAD(2)
 	DecrementAssignmentStatement()
 | 	LOOKAHEAD(2)
-	CompoundPlusAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundMinusAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundTimesAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundDivAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundModAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundShiftLeftAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompounShiftRightAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundBinaryAndAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundBinaryOrAssignmentStatement()
-| 	LOOKAHEAD(2)
-	CompoundBinaryXorAssignmentStatement()
+	CompoundAssignmentStatement()
 | 	LOOKAHEAD(2)
 	ArrayAssignmentStatement()
 | 	IfStatement()
@@ -306,64 +288,26 @@ void DecrementAssignmentStatement() :
   Identifier() "--" ";"
 }
 
-void CompoundPlusAssignmentStatement() :
+
+void CompoundAssignmentStatement() :
 {}
 {
-  Identifier() "+=" Expression() ";"
+  Identifier() CompoundOperator() Expression() ";"
 }
 
-void CompoundMinusAssignmentStatement() :
+void CompoundOperator() :
 {}
 {
-  Identifier() "-=" Expression() ";"
-}
-
-void CompoundTimesAssignmentStatement() :
-{}
-{
-  Identifier() "*=" Expression() ";"
-}
-
-void CompoundDivAssignmentStatement() :
-{}
-{
-  Identifier() "/=" Expression() ";"
-}
-
-void CompoundModAssignmentStatement() :
-{}
-{
-  Identifier() "%=" Expression() ";"
-}
-
-void CompoundShiftLeftAssignmentStatement() :
-{}
-{
-  Identifier() "<<=" Expression() ";"
-}
-
-void CompounShiftRightAssignmentStatement() :
-{}
-{
-  Identifier() ">>=" Expression() ";"
-}
-
-void CompoundBinaryAndAssignmentStatement() :
-{}
-{
-  Identifier() "&=" Expression() ";"
-}
-
-void CompoundBinaryOrAssignmentStatement() :
-{}
-{
-  Identifier() "|=" Expression() ";"
-}
-
-void CompoundBinaryXorAssignmentStatement() :
-{}
-{
-  Identifier() "^=" Expression() ";"
+	"+="
+| 	"-="
+| 	"*="
+| 	"/="
+| 	"%="
+| 	"<<="
+| 	">>="
+| 	"&="
+| 	"|="
+| 	"^="
 }
 
 void ArrayAssignmentStatement() :
@@ -419,43 +363,13 @@ void Expression() :
 {}
 {
 	LOOKAHEAD( Clause() "&&" )
-	AndExpression()
+	LogicalAndExpression()
 | 	LOOKAHEAD( Clause() "||" )
-	OrExpression()
-| 	LOOKAHEAD( PrimaryExpression() "&" )
-	BinAndExpression()
-| 	LOOKAHEAD( PrimaryExpression() "|" )
-	BinOrExpression()
-| 	LOOKAHEAD( PrimaryExpression() "^" )
-	BinXorExpression()
+	LogicalOrExpression()
+| 	LOOKAHEAD( PrimaryExpression() BinOperator() )
+	BinaryExpression()
 | 	LOOKAHEAD( "~" PrimaryExpression() )
 	BinNotExpression()
-| 	LOOKAHEAD( PrimaryExpression() "<<" )
-	ShiftLeftExpression()
-| 	LOOKAHEAD( PrimaryExpression() ">>" )
-	ShiftRightExpression()
-| 	LOOKAHEAD( PrimaryExpression() "==" )
-	EqualExpression()
-| 	LOOKAHEAD( PrimaryExpression() "!=" )
-	NotEqualExpression()
-| 	LOOKAHEAD( PrimaryExpression() "<" )
-	LessThanExpression()
-| 	LOOKAHEAD( PrimaryExpression() "<=" )
-	LessThanOrEqualExpression()
-| 	LOOKAHEAD( PrimaryExpression() ">" )
-	GreaterThanExpression()
-| 	LOOKAHEAD( PrimaryExpression() ">=" )
-	GreaterThanOrEqualExpression()
-| 	LOOKAHEAD( PrimaryExpression() "+" )
-	PlusExpression()
-| 	LOOKAHEAD( PrimaryExpression() "-" )
-	MinusExpression()
-| 	LOOKAHEAD( PrimaryExpression() "*" )
-	TimesExpression()
-| 	LOOKAHEAD( PrimaryExpression() "/" )
-	DivExpression()
-| 	LOOKAHEAD( PrimaryExpression() "%" )
-	ModExpression()
 |	LOOKAHEAD( PrimaryExpression() "[" )
 	ArrayLookup()
 | 	LOOKAHEAD( PrimaryExpression() "." "length" )
@@ -475,118 +389,49 @@ void Expression() :
 | 	Clause()
 }
 
-void AndExpression() :
+void LogicalAndExpression() :
 {}
 {
 	Clause() "&&" Clause()
 }
 
-void OrExpression() :
+void LogicalOrExpression() :
 {}
 {
 	Clause() "||" Clause()
 }
 
-void BinAndExpression() :
+void BinaryExpression() :
 {}
 {
-	PrimaryExpression() "&" PrimaryExpression()
+	PrimaryExpression() BinOperator() PrimaryExpression()
 }
 
-void BinOrExpression() :
+void BinOperator() :
 {}
 {
-	PrimaryExpression() "|" PrimaryExpression()
-}
-
-void BinXorExpression() :
-{}
-{
-	PrimaryExpression() "^" PrimaryExpression()
+	"&"
+|	"|"
+|	"^"
+|	"<<"
+|	">>"
+|	"+"
+|	"-"
+|	"*"
+|	"/"
+|	"%"
+|	"=="
+|	"!="
+|	"<"
+|	"<="
+|	">"
+|	">="
 }
 
 void BinNotExpression() :
 {}
 {
 	"~" PrimaryExpression()
-}
-
-void ShiftLeftExpression() :
-{}
-{
-	PrimaryExpression() "<<" PrimaryExpression()
-}
-
-void ShiftRightExpression() :
-{}
-{
-	PrimaryExpression() ">>" PrimaryExpression()
-}
-
-void EqualExpression() :
-{}
-{
-	PrimaryExpression() "==" PrimaryExpression()
-}
-
-void NotEqualExpression() :
-{}
-{
-	PrimaryExpression() "!=" PrimaryExpression()
-}
-
-void LessThanExpression() :
-{}
-{
-	PrimaryExpression() "<" PrimaryExpression()
-}
-
-void LessThanOrEqualExpression() :
-{}
-{
-	PrimaryExpression() "<=" PrimaryExpression()
-}
-
-void GreaterThanExpression() :
-{}
-{
-	PrimaryExpression() ">" PrimaryExpression()
-}
-
-void GreaterThanOrEqualExpression() :
-{}
-{
-	PrimaryExpression() ">=" PrimaryExpression()
-}
-
-void PlusExpression() :
-{}
-{
-	PrimaryExpression() "+" PrimaryExpression()
-}
-
-void MinusExpression() :
-{}
-{
-	PrimaryExpression() "-" PrimaryExpression()
-}
-
-void TimesExpression() :
-{}
-{
-	PrimaryExpression() "*" PrimaryExpression()
-}
-
-void DivExpression() :
-{}
-{
-	PrimaryExpression() "/" PrimaryExpression()
-}
-
-void ModExpression() :
-{}
-{
-	PrimaryExpression() "%" PrimaryExpression()
 }
 
 void ArrayLookup() :

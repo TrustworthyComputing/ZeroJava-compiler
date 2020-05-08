@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.typecheck;
+package org.twc.zerojavacompiler.zerojava2spiglet;
 
 import org.twc.zerojavacompiler.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojavavisitor.GJNoArguDepthFirst;

@@ -4,7 +4,7 @@ public class ZMIPSPrinter {
 
     private int indent_;
     private final StringBuilder asm_;
-    static boolean newline_;
+    private boolean newline_;
 
     public ZMIPSPrinter() {
         indent_ = 0;

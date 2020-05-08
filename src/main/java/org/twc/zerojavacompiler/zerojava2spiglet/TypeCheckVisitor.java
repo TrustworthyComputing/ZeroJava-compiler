@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.typecheck;
+package org.twc.zerojavacompiler.zerojava2spiglet;
 
 import org.twc.zerojavacompiler.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojavavisitor.GJDepthFirst;
@@ -249,20 +249,14 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     /**
      * f0 -> Block()
      *       | AssignmentStatement()
-     *       | CompoundPlusAssignmentStatement()
-     *       | CompoundMinusAssignmentStatement()
-     *       | CompoundTimesAssignmentStatement()
-     *       | CompoundDivAssignmentStatement()
-     *       | CompoundModAssignmentStatement()
-     *       | CompoundShiftLeftAssignmentStatement()
-     *       | CompounShiftRightAssignmentStatement()
-     *       | CompoundBinaryAndAssignmentStatement()
-     *       | CompoundBinaryOrAssignmentStatement()
-     *       | CompoundBinaryXorAssignmentStatement()
+     *       | IncrementAssignmentStatement()
+     *       | DecrementAssignmentStatement()
+     *       | CompoundAssignmentStatement()
      *       | ArrayAssignmentStatement()
      *       | IfStatement()
      *       | WhileStatement()
      *       | PrintStatement()
+     *       | PrintLineStatement()
      *       | AnswerStatement()
      */
     public Base_t visit(Statement n, Base_t argu) throws Exception {
@@ -341,182 +335,37 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
 
     /**
     * f0 -> Identifier()
-    * f1 -> "+="
+    * f1 -> CompoundOperator()
     * f2 -> Expression()
     * f3 -> ";"
     */
-    public Base_t visit(CompoundPlusAssignmentStatement n, Base_t argu) throws Exception {
+    public Base_t visit(CompoundAssignmentStatement n, Base_t argu) throws Exception {
         Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
+        String operator = n.f1.accept(this, argu).getName();
         Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
         t1 = findType(t1, (Method_t) argu);
         t2 = findType(t2, (Method_t) argu);
         if (t1.getType().equals("int") && t2.getType().equals("int")) {
             return null;
         }
-        throw new Exception("Error compound assignment between different types (+=) : " + t1.getType() + " " + t2.getType());
+        throw new Exception("Error compound assignment between different types (" + operator + ") : " + t1.getType() + " " + t2.getType());
     }
 
     /**
-    * f0 -> Identifier()
-    * f1 -> "-="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundMinusAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (-=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "*="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundTimesAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (*=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "/="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundDivAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (/=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "%="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundModAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (%=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "<<="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundShiftLeftAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (<<=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> ">>="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompounShiftRightAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (>>=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "&="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundBinaryAndAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (&=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "|="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundBinaryOrAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (|=) : " + t1.getType() + " " + t2.getType());
-    }
-
-    /**
-    * f0 -> Identifier()
-    * f1 -> "^="
-    * f2 -> Expression()
-    * f3 -> ";"
-    */
-    public Base_t visit(CompoundBinaryXorAssignmentStatement n, Base_t argu) throws Exception {
-        Variable_t t1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t t2 = (Variable_t) n.f2.accept(this, argu);
-        t1 = findType(t1, (Method_t) argu);
-        t2 = findType(t2, (Method_t) argu);
-        if (t1.getType().equals("int") && t2.getType().equals("int")) {
-            return null;
-        }
-        throw new Exception("Error compound assignment between different types (^=) : " + t1.getType() + " " + t2.getType());
+     * f0 -> "+="
+     * | 	"-="
+     * | 	"*="
+     * | 	"/="
+     * | 	"%="
+     * | 	"<<="
+     * | 	">>="
+     * | 	"&="
+     * | 	"|="
+     * | 	"^="
+     */
+    public Base_t visit(CompoundOperator n, Base_t argu) throws Exception {
+        String[] _ret = { "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="};
+        return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
     }
 
     /**
@@ -641,8 +490,8 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     }
 
     /**
-     * f0 -> AndExpression()
-     *       | OrExpression()
+     * f0 -> LogicalAndExpression()
+     *       | LogicalOrExpression()
      *       | BinAndExpression()
      *       | BinOrExpression()
      *       | BinXorExpression()
@@ -677,7 +526,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     * f1 -> "&&"
     * f2 -> Clause()
     */
-    public Base_t visit(AndExpression n, Base_t argu) throws Exception {
+    public Base_t visit(LogicalAndExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -694,7 +543,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      * f1 -> "||"
      * f2 -> Clause()
      */
-    public Base_t visit(OrExpression n, Base_t argu) throws Exception {
+    public Base_t visit(LogicalOrExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
@@ -708,53 +557,53 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
 
     /**
      * f0 -> PrimaryExpression()
-     * f1 -> "&"
+     * f1 -> BinOperator()
      * f2 -> PrimaryExpression()
      */
-    public Base_t visit(BinAndExpression n, Base_t argu) throws Exception {
+    public Base_t visit(BinaryExpression n, Base_t argu) throws Exception {
         Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
+        String operator = n.f1.accept(this, argu).getName();
         Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
         String t1 = findType(clause_1, (Method_t) argu).getType();
         String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
+        if ("&".equals(operator) || "|".equals(operator) || "^".equals(operator) || "<<".equals(operator) || ">>".equals(operator)
+                || "+".equals(operator) || "-".equals(operator) || "*".equals(operator) || "/".equals(operator) || "%".equals(operator)
+                || "<".equals(operator) || "<=".equals(operator) || ">".equals(operator) || ">=".equals(operator)
+        ) {
+            if (t1.equals("int") && t2.equals("int")) {
+                return new Variable_t("int", null);
+            }
+        } else if ("==".equals(operator) || "!=".equals(operator) ) {
+            if (t1.equals("boolean") && t2.equals("boolean")) {
+                return new Variable_t("boolean", null);
+            } else if (t1.equals("int") && t2.equals("int")) {
+                return new Variable_t("boolean", null);
+            }
         }
-        throw new Exception("Bad operand types for operator '&': " + t1 + " " + t2);
+        throw new Exception("Bad operand types for operator '" + operator + "': " + t1 + " " + t2);
     }
 
     /**
-     * f0 -> PrimaryExpression()
-     * f1 -> "|"
-     * f2 -> PrimaryExpression()
+     * f0 -> "&"
+     * |	"|"
+     * |	"^"
+     * |	"<<"
+     * |	">>"
+     * |	"+"
+     * |	"-"
+     * |	"*"
+     * |	"/"
+     * |	"%"
+     * |	"=="
+     * |	"!="
+     * |	"<"
+     * |	"<="
+     * |	">"
+     * |	">="
      */
-    public Base_t visit(BinOrExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '|': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> PrimaryExpression()
-     * f1 -> "^"
-     * f2 -> PrimaryExpression()
-     */
-    public Base_t visit(BinXorExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '^': " + t1 + " " + t2);
+    public Base_t visit(BinOperator n, Base_t argu) throws Exception {
+        String[] _ret = { "&", "|", "^", "<<", ">>", "+", "-", "*", "/", "%", "==", "!=", "<", "<=", ">", ">=" };
+        return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
     }
 
     /**
@@ -768,231 +617,6 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
             return new Variable_t("int", null);
         }
         throw new Exception("Bad operand type for operator '~': " + t1);
-    }
-
-    /**
-     * f0 -> PrimaryExpression()
-     * f1 -> "<<"
-     * f2 -> PrimaryExpression()
-     */
-    public Base_t visit(ShiftLeftExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '<<': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> PrimaryExpression()
-     * f1 -> ">>"
-     * f2 -> PrimaryExpression()
-     */
-    public Base_t visit(ShiftRightExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '>>': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> Clause()
-     * f1 -> "=="
-     * f2 -> Clause()
-     */
-    public Base_t visit(EqualExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("boolean") && t2.equals("boolean")) {
-            return new Variable_t("boolean", null);
-        } else if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '==': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> Clause()
-     * f1 -> "!="
-     * f2 -> Clause()
-     */
-    public Base_t visit(NotEqualExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("boolean") && t2.equals("boolean")) {
-            return new Variable_t("boolean", null);
-        } else if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '!=': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "<"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(LessThanExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '<': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> PrimaryExpression()
-     * f1 -> "<="
-     * f2 -> PrimaryExpression()
-     */
-    public Base_t visit(LessThanOrEqualExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '<=': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> ">"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(GreaterThanExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '>': " + t1 + " " + t2);
-    }
-
-    /**
-     * f0 -> PrimaryExpression()
-     * f1 -> ">="
-     * f2 -> PrimaryExpression()
-     */
-    public Base_t visit(GreaterThanOrEqualExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("boolean", null);
-        }
-        throw new Exception("Bad operand types for operator '>=': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "+"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(PlusExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '+': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "-"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(MinusExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '-': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "*"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(TimesExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '*': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "/"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(DivExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '/': " + t1 + " " + t2);
-    }
-
-    /**
-    * f0 -> PrimaryExpression()
-    * f1 -> "%"
-    * f2 -> PrimaryExpression()
-    */
-    public Base_t visit(ModExpression n, Base_t argu) throws Exception {
-        Variable_t clause_1 = (Variable_t) n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        Variable_t clause_2 = (Variable_t) n.f2.accept(this, argu);
-        String t1 = findType(clause_1, (Method_t) argu).getType();
-        String t2 = findType(clause_2, (Method_t) argu).getType();
-        if (t1.equals("int") && t2.equals("int")) {
-            return new Variable_t("int", null);
-        }
-        throw new Exception("Bad operand types for operator '%': " + t1 + " " + t2);
     }
 
     /**

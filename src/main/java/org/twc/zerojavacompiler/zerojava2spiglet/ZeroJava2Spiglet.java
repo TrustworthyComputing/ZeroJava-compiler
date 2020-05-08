@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler;
+package org.twc.zerojavacompiler.zerojava2spiglet;
 
 import org.twc.zerojavacompiler.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojavavisitor.GJDepthFirst;
@@ -153,13 +153,16 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 			String newTemp = newTemp();
 			if ((meth = meth.getFromClass().getMethod(meth.getName())) != null) {		// if you found method
 				meth.addRegToVar(varName, newTemp);
-			} else
+			} else {
 				throw new Exception("VarDeclaration Error 1");
+			}
 			this.asm_.append("MOVE ").append(newTemp).append(" 0\n");
 		} else {																	// is a var (field) of a class
 			Class_t cl = st_.get(meth.getName());
 			if (cl == null)															// do nothing for now
+			{
 				throw new Exception("VarDeclaration Error 2");
+			}
 		}
 		return null;
 	}
@@ -264,13 +267,18 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	}
 
 	/**
-	* f0 -> Block()
-	*       | AssignmentStatement()
-	*       | ArrayAssignmentStatement()
-	*       | IfStatement()
-	*       | WhileStatement()
-	*       | PrintStatement()
-	*/
+	 * f0 -> Block()
+	 *       | AssignmentStatement()
+	 *       | IncrementAssignmentStatement()
+	 *       | DecrementAssignmentStatement()
+	 *       | CompoundAssignmentStatement()
+	 *       | ArrayAssignmentStatement()
+	 *       | IfStatement()
+	 *       | WhileStatement()
+	 *       | PrintStatement()
+	 *       | PrintLineStatement()
+	 *       | AnswerStatement()
+	 */
 	public Base_t visit(Statement n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
@@ -324,6 +332,143 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
             }
 		}
 		return null;
+	}
+
+	/**
+	 * f0 -> Identifier()
+	 * f1 -> "++"
+	 * f2 -> ";"
+	 */
+	public Base_t visit(IncrementAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didn't find the var in method, so it's a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newTemp();
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("MOVE ").append(temp).append(" PLUS ").append(temp).append(" 1\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+				}
+				return null;
+			}
+			this.asm_.append("MOVE ").append(var.getRegister()).append(" PLUS ").append(var.getRegister()).append(" 1\n");
+		}
+		return null;
+	}
+
+	/**
+	 * f0 -> Identifier()
+	 * f1 -> "--"
+	 * f2 -> ";"
+	 */
+	public Base_t visit(DecrementAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didn't find the var in method, so it's a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newTemp();
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("MOVE ").append(temp).append(" MINUS ").append(temp).append(" 1\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+				}
+				return null;
+			}
+			this.asm_.append("MOVE ").append(var.getRegister()).append(" MINUS ").append(var.getRegister()).append(" 1\n");
+		}
+		return null;
+	}
+
+	/**
+	 * f0 -> Identifier()
+	 * f1 -> CompoundOperator()
+	 * f2 -> Expression()
+	 * f3 -> ";"
+	 */
+	public Base_t visit(CompoundAssignmentStatement n, Base_t argu) throws Exception {
+		String id = n.f0.accept(this, argu).getName();
+		String operator = n.f1.accept(this, argu).getName();
+		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		String opcode;
+		if ("+=".equals(operator)) {
+			opcode = "PLUS";
+		} else if ("-=".equals(operator)) {
+			opcode = "MINUS";
+		} else if ("*=".equals(operator)) {
+			opcode = "TIMES";
+		} else if ("/=".equals(operator)) {
+			opcode = "DIV";
+		} else if ("%=".equals(operator)) {
+			opcode = "MOD";
+		} else if ("<<=".equals(operator)) {
+			opcode = "SLL";
+		} else if (">>=".equals(operator)) {
+			opcode = "SRL";
+		} else if ("&=".equals(operator)) {
+			opcode = "AND";
+		} else if ("|=".equals(operator)) {
+			opcode = "OR";
+		} else if ("^=".equals(operator)) {
+			opcode = "XOR";
+		} else {
+			throw new IllegalStateException("CompoundAssignmentStatement: Unexpected value: " + operator);
+		}
+		// if a local var
+		Method_t meth = (Method_t) argu;
+		if (meth != null) {
+			Variable_t var = meth.methContainsVar(id);
+			if (var == null) { // didn't find the var in method, so it's a field of the class
+				Class_t cl = st_.get(meth.getFromClass().getName());
+				if (cl == null) {
+					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
+				}
+				var = cl.classContainsVar(id);
+				// class field
+				if (var != null) {
+					String temp = newTemp();
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("MOVE ").append(temp).append(" ").append(opcode).append(" ").append(temp).append(" 1\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+				}
+				return null;
+			}
+			this.asm_.append("MOVE ").append(var.getRegister()).append(" ").append(opcode).append(" ").append(var.getRegister()).append(" ").append(expr).append("\n");
+		}
+		return null;
+	}
+
+	/**
+	 * f0 -> "+="
+	 * | 	"-="
+	 * | 	"*="
+	 * | 	"/="
+	 * | 	"%="
+	 * | 	"<<="
+	 * | 	">>="
+	 * | 	"&="
+	 * | 	"|="
+	 * | 	"^="
+	 */
+	public Base_t visit(CompoundOperator n, Base_t argu) throws Exception {
+		String[] _ret = { "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="};
+		return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
 	}
 
 	/**
@@ -440,7 +585,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     }
 
 	/**
-	* f0 -> AndExpression()
+	* f0 -> LogicalAndExpression()
 	*       | CompareExpression()
 	*       | PlusExpression()
 	*       | MinusExpression()
@@ -459,7 +604,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f1 -> "&&"
 	* f2 -> Clause()
 	*/
-	public Base_t visit(AndExpression n, Base_t argu) throws Exception {
+	public Base_t visit(LogicalAndExpression n, Base_t argu) throws Exception {
 		String label = labels_.newLabel();
 		String ret = newTemp();
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
@@ -471,55 +616,90 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 
 	/**
 	* f0 -> PrimaryExpression()
-	* f1 -> "<"
+	* f1 -> BinOperator()
 	* f2 -> PrimaryExpression()
 	*/
-	public Base_t visit(LessThanExpression n, Base_t argu) throws Exception {
+	public Base_t visit(BinaryExpression n, Base_t argu) throws Exception {
 		String ret = newTemp();
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		String operator = n.f1.accept(this, argu).getName();
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" LT ").append(t1).append(" ").append(t2).append("\n");
+		String opcode;
+		if ("&".equals(operator)) {
+			opcode = "AND";
+		} else if ("|".equals(operator)) {
+			opcode = "OR";
+		} else if ("^".equals(operator)) {
+			opcode = "XOR";
+		} else if ("<<".equals(operator)) {
+			opcode = "SLL";
+		} else if (">>".equals(operator)) {
+			opcode = "SRL";
+		} else if ("<<=".equals(operator)) {
+			opcode = "SLL";
+		} else if (">>=".equals(operator)) {
+			opcode = "SRL";
+		} else if ("+".equals(operator)) {
+			opcode = "PLUS";
+		} else if ("-".equals(operator)) {
+			opcode = "MINUS";
+		} else if ("*".equals(operator)) {
+			opcode = "TIMES";
+		} else if ("/".equals(operator)) {
+			opcode = "DIV";
+		} else if ("%".equals(operator)) {
+			opcode = "MOD";
+		} else if ("==".equals(operator)) {
+			opcode = "EQ";
+		} else if ("!=".equals(operator)) {
+			opcode = "NEQ";
+		} else if ("<".equals(operator)) {
+			opcode = "LT";
+		} else if ("<=".equals(operator)) {
+			opcode = "LTE";
+		} else if (">".equals(operator)) {
+			opcode = "GT";
+		} else if (">=".equals(operator)) {
+			opcode = "GTE";
+		} else {
+			throw new IllegalStateException("CompoundAssignmentStatement: Unexpected value: " + operator);
+		}
+		this.asm_.append("MOVE ").append(ret).append(" ").append(opcode).append(" ").append(t1).append(" ").append(t2).append("\n");
         return new Variable_t(null, null, ret);
 	}
 
 	/**
-	* f0 -> PrimaryExpression()
-	* f1 -> "+"
-	* f2 -> PrimaryExpression()
-	*/
-	public Base_t visit(PlusExpression n, Base_t argu) throws Exception {
-		String ret = newTemp();
-		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" PLUS ").append(t1).append(" ").append(t2).append("\n");
-        return new Variable_t(null, null, ret);
+	 * f0 -> "&"
+	 * |	"|"
+	 * |	"^"
+	 * |	"<<"
+	 * |	">>"
+	 * |	"+"
+	 * |	"-"
+	 * |	"*"
+	 * |	"/"
+	 * |	"%"
+	 * |	"=="
+	 * |	"!="
+	 * |	"<"
+	 * |	"<="
+	 * |	">"
+	 * |	">="
+	 */
+	public Base_t visit(BinOperator n, Base_t argu) throws Exception {
+		String[] _ret = { "&", "|", "^", "<<", ">>", "+", "-", "*", "/", "%", "==", "!=", "<", "<=", ">", ">=" };
+		return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
 	}
 
 	/**
-	* f0 -> PrimaryExpression()
-	* f1 -> "-"
-	* f2 -> PrimaryExpression()
-	*/
-	public Base_t visit(MinusExpression n, Base_t argu) throws Exception {
+	 * f0 -> "~"
+	 * f1 -> PrimaryExpression()
+	 */
+	public Base_t visit(BinNotExpression n, Base_t argu) throws Exception {
 		String ret = newTemp();
-		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" MINUS ").append(t1).append(" ").append(t2).append("\n");
-        return new Variable_t(null, null, ret);
-	}
-
-	/**
-	* f0 -> PrimaryExpression()
-	* f1 -> "*"
-	* f2 -> PrimaryExpression()
-	*/
-	public Base_t visit(TimesExpression n, Base_t argu) throws Exception {
-		String ret = newTemp();
-		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" TIMES ").append(t1).append(" ").append(t2).append("\n");
-        return new Variable_t(null, null, ret);
-
+		String t1 = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+		this.asm_.append("MOVE ").append(ret).append(" NOT ").append(t1).append("\n");
+		return new Variable_t(null, null, ret);
 	}
 
 	/**
@@ -665,7 +845,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f0 -> <INTEGER_LITERAL>
 	*/
 	public Base_t visit(IntegerLiteral n, Base_t argu) throws Exception {
-		String ret = "TEMP " + ++globals_;
+		String ret = newTemp();
 		this.asm_.append("MOVE ").append(ret).append(" ").append(n.f0.toString()).append("\n");
         return new Variable_t(null, null, ret);
 	}
@@ -719,7 +899,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 				if (var == null) {
                     return new Variable_t(null, id);
                 }
-				String newTemp = "TEMP " + ++globals_;
+				String newTemp = newTemp();
 				this.asm_.append("HLOAD ").append(newTemp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
                 return new Variable_t(var.getType(), id, newTemp);
 			}

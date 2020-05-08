@@ -6,11 +6,12 @@ import org.twc.zerojavacompiler.spiglet2kanga.GetFlowGraphVertex;
 import org.twc.zerojavacompiler.spiglet2kanga.Method;
 import org.twc.zerojavacompiler.spiglet2kanga.Spiglet2Kanga;
 import org.twc.zerojavacompiler.spiglet2kanga.Temp2Reg;
+import org.twc.zerojavacompiler.zerojava2spiglet.ZeroJava2Spiglet;
 import org.twc.zerojavacompiler.zerojavaparser.ZeroJavaParser;
 import org.twc.zerojavacompiler.zerojavaparser.ParseException;
-import org.twc.zerojavacompiler.typecheck.SymbolTableVisitor;
-import org.twc.zerojavacompiler.typecheck.VisitClasses;
-import org.twc.zerojavacompiler.typecheck.TypeCheckVisitor;
+import org.twc.zerojavacompiler.zerojava2spiglet.SymbolTableVisitor;
+import org.twc.zerojavacompiler.zerojava2spiglet.VisitClasses;
+import org.twc.zerojavacompiler.zerojava2spiglet.TypeCheckVisitor;
 import org.twc.zerojavacompiler.spigletparser.SpigletParser;
 import org.twc.zerojavacompiler.kangaparser.KangaParser;
 import org.twc.zerojavacompiler.kanga2zMIPS.Kanga2zMIPS;
@@ -43,7 +44,7 @@ public class Main {
             FileInputStream fis = null;
             PrintWriter writer = null;
             try {
-                // zerojava typecheck
+                // zerojava zerojava2spiglet
                 System.out.println("===================================================================================");
                 System.out.println("Checking file \"" + arg + "\"\n");
                 fis = new FileInputStream(arg);
