@@ -1,19 +1,20 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
+import org.twc.zerojavacompiler.basetype.Method_t;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.*;
 import java.util.*;
 
 public class GetFlowGraph extends GJNoArguDepthFirst<String> {
 
-	HashMap<String, Method> method_map_;
+	HashMap<String, Method_t> method_map_;
 	HashMap<String, Integer> mLabel;
-	Method currMethod;
+	Method_t currMethod;
 	FlowGraphVertex currVertex;
 	int vid = 0;
 	boolean duringCall = false;
 
-	public GetFlowGraph(HashMap<String, Method> method_map_, HashMap<String, Integer> mLabel) {
+	public GetFlowGraph(HashMap<String, Method_t> method_map_, HashMap<String, Integer> mLabel) {
 		this.method_map_ = method_map_;
 		this.mLabel = mLabel;
 	}

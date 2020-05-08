@@ -40,16 +40,16 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f12 -> ( Procedure() )*
      * f13 -> <EOF>
      */
-    int paramNum, stackNum, callParamNum; // about the 3 numbers in method[][][]
+    int num_parameters_, stackNum, callParamNum; // about the 3 numbers in method[][][]
 
     public String visit(Goal n) throws Exception {
-        paramNum = Integer.parseInt(n.f2.accept(this));
-        paramNum = paramNum > 4 ? paramNum - 4 : 0;
+        num_parameters_ = Integer.parseInt(n.f2.accept(this));
+        num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
         // 4 params using registers
         callParamNum = Integer.parseInt(n.f8.accept(this));
         callParamNum = callParamNum > 4 ? callParamNum - 4 : 0;
         stackNum = Integer.parseInt(n.f5.accept(this));
-        stackNum = stackNum - paramNum + callParamNum + 2;
+        stackNum = stackNum - num_parameters_ + callParamNum + 2;
         // parameters of this method is stored above this stack frame
         // additional 2: $ra $fp
         String[] beginLines = { "sw $fp, -8($sp)", "sw $ra, -4($sp)", "move $fp, $sp",
@@ -92,13 +92,13 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      */
     public String visit(Procedure n) throws Exception {
         String method = n.f0.accept(this);
-        paramNum = Integer.parseInt(n.f2.accept(this));
-        paramNum = paramNum > 4 ? paramNum - 4 : 0;
+        num_parameters_ = Integer.parseInt(n.f2.accept(this));
+        num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
         // 4 params using registers
         callParamNum = Integer.parseInt(n.f8.accept(this));
         callParamNum = callParamNum > 4 ? callParamNum - 4 : 0;
         stackNum = Integer.parseInt(n.f5.accept(this));
-        stackNum = stackNum - paramNum + callParamNum + 2;
+        stackNum = stackNum - num_parameters_ + callParamNum + 2;
         // parameters of this method is stored above this stack frame
         // additional 2: $ra $fp
         String[] beginLines = { "sw $fp, -8($sp)", "sw $ra, -4($sp)", "move $fp, $sp",
@@ -308,10 +308,10 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         int idx = Integer.parseInt(n.f1.accept(this));
         // SpilledArg starts from 0
 
-        if (idx >= paramNum) {
+        if (idx >= num_parameters_) {
             // is not parameter
             // is spilled register/saved register
-            idx = paramNum - idx - 3;// below $fp [$ra] [$fp]
+            idx = num_parameters_ - idx - 3;// below $fp [$ra] [$fp]
         }
 
         return 4 * idx + "($fp)";

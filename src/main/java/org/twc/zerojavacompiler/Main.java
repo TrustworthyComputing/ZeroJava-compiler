@@ -1,9 +1,9 @@
 package org.twc.zerojavacompiler;
 
 import org.twc.zerojavacompiler.basetype.Class_t;
+import org.twc.zerojavacompiler.basetype.Method_t;
 import org.twc.zerojavacompiler.spiglet2kanga.GetFlowGraph;
 import org.twc.zerojavacompiler.spiglet2kanga.GetFlowGraphVertex;
-import org.twc.zerojavacompiler.spiglet2kanga.Method;
 import org.twc.zerojavacompiler.spiglet2kanga.Spiglet2Kanga;
 import org.twc.zerojavacompiler.spiglet2kanga.Temp2Reg;
 import org.twc.zerojavacompiler.zerojava2spiglet.ZeroJava2Spiglet;
@@ -18,7 +18,6 @@ import org.twc.zerojavacompiler.kanga2zmips.Kanga2zMIPS;
 
 import java.io.*;
 import java.util.*;
-
 
 public class Main {
 
@@ -44,9 +43,9 @@ public class Main {
             FileInputStream fis = null;
             PrintWriter writer = null;
             try {
-                // zerojava zerojava2spiglet
+                // zerojava2spiglet
                 System.out.println("===================================================================================");
-                System.out.println("Checking file \"" + arg + "\"\n");
+                System.out.println("Compiling file \"" + arg + "\"");
                 fis = new FileInputStream(arg);
                 ZeroJavaParser zerojava_parser = new ZeroJavaParser(fis);
                 org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.Goal zerojava_root = zerojava_parser.Goal();
@@ -65,12 +64,8 @@ public class Main {
                 zerojava_root.accept(type_checker, null);
                 System.out.println("[ 3/3 ] Type checking phase completed");
                 System.out.println("[ \u2713 ] All checks passed");
-                System.out.println("===================================================================================\n\n");
-
 
                 // generate Spiglet code
-                System.out.println("===================================================================================");
-                System.out.println("Generating Spiglet code for \""+ arg + "\"\n");
                 ZeroJava2Spiglet zerojava2spiglet = new ZeroJava2Spiglet(symbol_table, symtable_visit.getGlobalsNumber());
                 zerojava_root.accept(zerojava2spiglet, null);
                 File fp = new File(arg);
@@ -84,26 +79,22 @@ public class Main {
                 }
                 writer.close();
                 System.out.println("[ \u2713 ] Spiglet code generated to \"" + spiglet_output_path + "\"");
-                System.out.println("===================================================================================\n\n");
 
 
                 // generate Kanga code
-                System.out.println("===================================================================================");
-                System.out.println("Generating Kanga code from \""+ spiglet_output_path + "\"\n");
                 fis = new FileInputStream(spiglet_output_path);
                 SpigletParser spiglet_parser = new SpigletParser(fis);
                 org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.Node spiglet_ast = spiglet_parser.Goal();
-                HashMap<String, Method> method_map_ = new HashMap<>();
+                HashMap<String, Method_t> method_map_ = new HashMap<>();
                 HashMap<String, Integer> mLabel = new HashMap<>();
-                // visit 1: Get Flow Graph Vertex
                 spiglet_ast.accept(new GetFlowGraphVertex(method_map_, mLabel));
-                // visit 2: Get Flow Graph
                 spiglet_ast.accept(new GetFlowGraph(method_map_, mLabel));
-                // Linear Scan Algorithm on Flow Graph
+                System.out.println("[ 1/3 ] Flow graph creation phase completed");
                 new Temp2Reg(method_map_).LinearScan();
-                // visit 3: Spiglet->Kanga
+                System.out.println("[ 2/3 ] Linear scan on flow graph phase completed");
                 Spiglet2Kanga spiglet2kanga = new Spiglet2Kanga(method_map_);
                 spiglet_ast.accept(spiglet2kanga);
+                System.out.println("[ 3/3 ] Register allocation phase completed");
                 path = fp.getPath();
                 path = path.substring(0, path.lastIndexOf('.'));
                 String kanga_output_path = path + ".kg";
@@ -114,12 +105,9 @@ public class Main {
                 }
                 writer.close();
                 System.out.println("[ \u2713 ] Kanga code generated to \"" + kanga_output_path + "\"");
-                System.out.println("===================================================================================\n\n");
 
 
                  // generate zMIPS code
-                System.out.println("===================================================================================");
-                System.out.println("Generating zMIPS code from \""+ kanga_output_path + "\"\n");
                 fis = new FileInputStream(kanga_output_path);
                 KangaParser kanga_parser = new KangaParser(fis);
                 org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
@@ -127,17 +115,17 @@ public class Main {
                 Kanga2zMIPS kanga2zmips = new Kanga2zMIPS();
                 kanga_ast.accept(kanga2zmips);
 
-                 path = fp.getPath();
-                 path = path.substring(0, path.lastIndexOf('.'));
-                 String zmips_output_path = path + ".zmips";
-                 String opt_zmips_output_path = path + ".opt.zmips";
-                 writer = new PrintWriter(zmips_output_path);
-                 writer.print(kanga2zmips.getASM());
-                 if (debug_) {
-                     System.out.println(kanga2zmips.getASM());
-                 }
-                 writer.close();
-                 System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
+                path = fp.getPath();
+                path = path.substring(0, path.lastIndexOf('.'));
+                String zmips_output_path = path + ".zmips";
+                String opt_zmips_output_path = path + ".opt.zmips";
+                writer = new PrintWriter(zmips_output_path);
+                writer.print(kanga2zmips.getASM());
+                if (debug_) {
+                    System.out.println(kanga2zmips.getASM());
+                }
+                writer.close();
+                System.out.println("[ \u2713 ] zMIPS code generated to \"" + zmips_output_path + "\"");
                 System.out.println("===================================================================================");
                 System.exit(0);
 

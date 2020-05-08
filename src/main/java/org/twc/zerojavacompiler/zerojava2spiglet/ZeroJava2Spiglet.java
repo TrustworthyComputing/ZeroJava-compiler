@@ -32,12 +32,11 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 			int offset = cl.getNumMethods();
 			this.asm_.append("MOVE ").append(temp).append(" HALLOCATE ").append(offset * 4).append("\n");
 			this.asm_.append("HSTORE ").append(vtable).append(" 0 ").append(temp).append("\n");
-
             for (Map.Entry<String, Method_t> methods : cl.class_methods_map.entrySet()) {
                 String newTemp = newTemp();
                 Method_t meth = methods.getValue();
-                this.asm_.append("MOVE ").append(newTemp).append(" ").append(meth.getFromClass().getName()).append("_").append(meth.getName()).append("\n");
-                this.asm_.append("HSTORE ").append(temp).append(" ").append(meth.getMethNum() * 4).append(" ").append(newTemp).append("\n");
+                this.asm_.append("MOVE ").append(newTemp).append(" ").append(meth.getFrom_class_().getName()).append("_").append(meth.getName()).append("\n");
+                this.asm_.append("HSTORE ").append(temp).append(" ").append(meth.getMeth_num_() * 4).append(" ").append(newTemp).append("\n");
 			}
 			this.asm_.append("\n");
     	}
@@ -149,9 +148,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(VarDeclaration n, Base_t argu) throws Exception {
 		Method_t meth = (Method_t) argu;
 		String varName = n.f1.f0.toString();
-		if (meth.getFromClass() != null) { 												// is a variable of a function
+		if (meth.getFrom_class_() != null) { 												// is a variable of a function
 			String newTemp = newTemp();
-			if ((meth = meth.getFromClass().getMethod(meth.getName())) != null) {		// if you found method
+			if ((meth = meth.getFrom_class_().getMethod(meth.getName())) != null) {		// if you found method
 				meth.addRegToVar(varName, newTemp);
 			} else {
 				throw new Exception("VarDeclaration Error 1");
@@ -185,7 +184,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(MethodDeclaration n, Base_t argu) throws Exception {
 		String methName = n.f2.accept(this, argu).getName();
         Method_t meth = ((Class_t) argu).getMethod(methName);
-        this.asm_.append("\n").append(argu.getName()).append("_").append(methName).append("[").append(meth.getNumParameters() + 1).append("]\nBEGIN\n");
+        this.asm_.append("\n").append(argu.getName()).append("_").append(methName).append("[").append(meth.getNum_parameters_() + 1).append("]\nBEGIN\n");
         n.f7.accept(this, meth);
         n.f8.accept(this, meth);
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
@@ -302,34 +301,22 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(AssignmentStatement n, Base_t argu) throws Exception {
 		String id = n.f0.accept(this, argu).getName();
 		String expr = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		// if a local var
 		Method_t meth = (Method_t) argu;
 		if (meth != null) {
 			Variable_t var = meth.methContainsVar(id);
 			if (var == null) { // didnt find the var in method, so its a field of the class
-				Class_t cl = st_.get(meth.getFromClass().getName());
+				Class_t cl = st_.get(meth.getFrom_class_().getName());
 				if (cl == null) {
                     throw new Exception("something went wrong at AssignmentStatement 2");
                 }
 				var = cl.classContainsVar(id);
-                // class field
-				if (var != null) {
+				if (var != null) { // class field
                     this.asm_.append("HSTORE " + " TEMP 0 ").append(var.getNum() * 4).append(" ").append(expr).append("\n");
                 }
 				return null;
+			} else { // if a local var
+				this.asm_.append("MOVE ").append(var.getRegister()).append(" ").append(expr).append("\n");
 			}
-			this.asm_.append("MOVE ").append(var.getRegister()).append(" ").append(expr).append("\n");
-		} else { // if a field of a class
-			assert(meth != null);
-			Class_t cl = st_.get(meth.getFromClass().getName());
-			if (cl == null) {
-                throw new Exception("something went wrong at AssignmentStatement 2");
-            }
-			Variable_t var = cl.classContainsVar(id);
-            // class field
-			if (var != null) {
-                this.asm_.append("HSTORE " + " TEMP 0 ").append(var.getNum() * 4).append(" ").append(expr).append("\n");
-            }
 		}
 		return null;
 	}
@@ -341,26 +328,25 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	 */
 	public Base_t visit(IncrementAssignmentStatement n, Base_t argu) throws Exception {
 		String id = n.f0.accept(this, argu).getName();
-		// if a local var
 		Method_t meth = (Method_t) argu;
 		if (meth != null) {
 			Variable_t var = meth.methContainsVar(id);
 			if (var == null) { // didn't find the var in method, so it's a field of the class
-				Class_t cl = st_.get(meth.getFromClass().getName());
+				Class_t cl = st_.get(meth.getFrom_class_().getName());
 				if (cl == null) {
 					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
 				}
 				var = cl.classContainsVar(id);
-				// class field
-				if (var != null) {
+				if (var != null) { // class field
 					String temp = newTemp();
 					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" PLUS ").append(temp).append(" 1\n");
 					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
 				}
 				return null;
+			} else { // if a local var
+				this.asm_.append("MOVE ").append(var.getRegister()).append(" PLUS ").append(var.getRegister()).append(" 1\n");
 			}
-			this.asm_.append("MOVE ").append(var.getRegister()).append(" PLUS ").append(var.getRegister()).append(" 1\n");
 		}
 		return null;
 	}
@@ -372,26 +358,25 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	 */
 	public Base_t visit(DecrementAssignmentStatement n, Base_t argu) throws Exception {
 		String id = n.f0.accept(this, argu).getName();
-		// if a local var
 		Method_t meth = (Method_t) argu;
-		if (meth != null) {
+		if (meth != null) { // if a local var
 			Variable_t var = meth.methContainsVar(id);
 			if (var == null) { // didn't find the var in method, so it's a field of the class
-				Class_t cl = st_.get(meth.getFromClass().getName());
+				Class_t cl = st_.get(meth.getFrom_class_().getName());
 				if (cl == null) {
 					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
 				}
 				var = cl.classContainsVar(id);
-				// class field
-				if (var != null) {
+				if (var != null) { // class field
 					String temp = newTemp();
 					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" MINUS ").append(temp).append(" 1\n");
 					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
 				}
 				return null;
+			} else {
+				this.asm_.append("MOVE ").append(var.getRegister()).append(" MINUS ").append(var.getRegister()).append(" 1\n");
 			}
-			this.asm_.append("MOVE ").append(var.getRegister()).append(" MINUS ").append(var.getRegister()).append(" 1\n");
 		}
 		return null;
 	}
@@ -430,26 +415,25 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		} else {
 			throw new IllegalStateException("CompoundAssignmentStatement: Unexpected value: " + operator);
 		}
-		// if a local var
 		Method_t meth = (Method_t) argu;
 		if (meth != null) {
 			Variable_t var = meth.methContainsVar(id);
 			if (var == null) { // didn't find the var in method, so it's a field of the class
-				Class_t cl = st_.get(meth.getFromClass().getName());
+				Class_t cl = st_.get(meth.getFrom_class_().getName());
 				if (cl == null) {
 					throw new Exception("something went wrong at IncrementAssignmentStatement 1");
 				}
 				var = cl.classContainsVar(id);
-				// class field
-				if (var != null) {
+				if (var != null) { // class field
 					String temp = newTemp();
 					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" ").append(opcode).append(" ").append(temp).append(" 1\n");
 					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
 				}
 				return null;
+			} else { // if a local var
+				this.asm_.append("MOVE ").append(var.getRegister()).append(" ").append(opcode).append(" ").append(var.getRegister()).append(" ").append(expr).append("\n");
 			}
-			this.asm_.append("MOVE ").append(var.getRegister()).append(" ").append(opcode).append(" ").append(var.getRegister()).append(" ").append(expr).append("\n");
 		}
 		return null;
 	}
@@ -518,6 +502,22 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     }
 
 	/**
+	 * f0 -> "if"
+	 * f1 -> "("
+	 * f2 -> Expression()
+	 * f3 -> ")"
+	 * f4 -> Statement()
+	 */
+	public Base_t visit(IfthenStatement n, Base_t argu) throws Exception {
+		String end_label = labels_.newLabel();
+		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(end_label).append("\n");
+		n.f4.accept(this, argu);
+		this.asm_.append(end_label).append(" NOOP\n");
+		return null;
+	}
+
+	/**
 	* f0 -> "if"
 	* f1 -> "("
 	* f2 -> Expression()
@@ -527,14 +527,14 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f6 -> Statement()
 	*/
 	public Base_t visit(IfthenElseStatement n, Base_t argu) throws Exception {
-		String elselabel = labels_.newLabel();
-		String endlabel = labels_.newLabel();
+		String else_label = labels_.newLabel();
+		String end_label = labels_.newLabel();
 		String cond = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(elselabel).append("\n"); //if cond not true go to elselabel
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(else_label).append("\n"); //if cond not true go to else_label
 		n.f4.accept(this, argu);
-		this.asm_.append("JUMP ").append(endlabel).append("\n").append(elselabel).append(" NOOP\n");
+		this.asm_.append("JUMP ").append(end_label).append("\n").append(else_label).append(" NOOP\n");
 		n.f6.accept(this, argu);
-		this.asm_.append(endlabel).append(" NOOP\n");
+		this.asm_.append(end_label).append(" NOOP\n");
 		return null;
 	}
 
@@ -571,6 +571,17 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		return null;
 	}
 
+	/**
+	 * f0 -> "System.out.println"
+	 * f1 -> "("
+	 * f2 -> ")"
+	 * f3 -> ";"
+	 */
+	public Base_t visit(PrintLineStatement n, Base_t argu) throws Exception {
+		this.asm_.append("PRINT TEMP 0\n");
+		return null;
+	}
+
     /**
      * f0 -> <ANSWER>
      * f1 -> "("
@@ -585,16 +596,20 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     }
 
 	/**
-	* f0 -> LogicalAndExpression()
-	*       | CompareExpression()
-	*       | PlusExpression()
-	*       | MinusExpression()
-	*       | TimesExpression()
-	*       | ArrayLookup()
-	*       | ArrayLength()
-	*       | MessageSend()
-	*       | Clause()
-	*/
+	 * f0 -> LogicalAndExpression()
+	 *       | LogicalOrExpression()
+	 *       | BinaryExpression()
+	 *       | BinNotExpression()
+	 *       | ArrayLookup()
+	 *       | ArrayLength()
+	 *       | MessageSend()
+	 *       | TernaryExpression()
+	 *       | PublicReadExpression()
+	 *       | PrivateReadExpression()
+	 *       | PublicSeekExpression()
+	 *       | PrivateSeekExpression()
+	 *       | Clause()
+	 */
 	public Base_t visit(Expression n, Base_t argu) throws Exception {
 		return n.f0.accept(this, argu);
 	}
@@ -605,13 +620,34 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f2 -> Clause()
 	*/
 	public Base_t visit(LogicalAndExpression n, Base_t argu) throws Exception {
-		String label = labels_.newLabel();
+		String end_label = labels_.newLabel();
 		String ret = newTemp();
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" ").append(t1).append("\n").append("CJUMP ").append(t1).append(" ").append(label).append("\n");
+		this.asm_.append("MOVE ").append(ret).append(" ").append(t1).append("\n");
+		this.asm_.append("CJUMP ").append(t1).append(" ").append(end_label).append("\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(ret).append(" ").append(t2).append("\n").append(label).append(" NOOP\n");
+		this.asm_.append("MOVE ").append(ret).append(" ").append(t2).append("\n");
+		this.asm_.append(end_label).append(" NOOP\n");
         return new Variable_t(null, null, ret);
+	}
+
+	/**
+	 * f0 -> Clause()
+	 * f1 -> "||"
+	 * f2 -> Clause()
+	 */
+	public Base_t visit(LogicalOrExpression n, Base_t argu) throws Exception {
+		String end_label = labels_.newLabel();
+		String temp = newTemp();
+		String ret = newTemp();
+		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
+		this.asm_.append("MOVE ").append(temp).append(" NOT ").append(t1).append("\n");
+		this.asm_.append("MOVE ").append(ret).append(" ").append(t1).append("\n");
+		this.asm_.append("CJUMP ").append(temp).append(" ").append(end_label).append("\n");
+		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.asm_.append("MOVE ").append(ret).append(" ").append(t2).append("\n");
+		this.asm_.append(end_label).append(" NOOP\n");
+		return new Variable_t(null, null, ret);
 	}
 
 	/**
@@ -763,7 +799,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         String objreg = obj.getRegister();
         Class_t cl = st_.get(obj.getType());
         Method_t meth = cl.getMethod(func.getName());
-        int offset = meth.getMethNum() - 1;
+        int offset = meth.getMeth_num_() - 1;
 		String vtable_addr = newTemp();
 		String thisTemp = newTemp();
 		String methTemp = newTemp();
@@ -783,10 +819,85 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	    }
 		String ret = newTemp();
         this.asm_.append("MOVE ").append(ret).append(" CALL ").append(methTemp).append("( ").append(thisTemp).append(parStr).append(")\n");
-        return new Variable_t(meth.getType(), null, ret);
+        return new Variable_t(meth.getType_(), null, ret);
 	}
 
- /**
+	/**
+	 * f0 -> "("
+	 * f1 -> Expression()
+	 * f2 -> ")"
+	 * f3 -> "?"
+	 * f4 -> Expression()
+	 * f5 -> ":"
+	 * f6 -> Expression()
+	 */
+	public Base_t visit(TernaryExpression n, Base_t argu) throws Exception {
+		String else_label = labels_.newLabel();
+		String end_label = labels_.newLabel();
+		String res = newTemp();
+		String cond = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(else_label).append("\n"); //if cond not true go to else_label
+		Variable_t exp1 = (Variable_t) n.f4.accept(this, argu);
+		String reg_if = exp1.getRegister();
+		String return_type = exp1.getType();
+		this.asm_.append("MOVE ").append(res).append(" ").append(reg_if).append("\n");
+		this.asm_.append("JUMP ").append(end_label).append("\n");
+		this.asm_.append(else_label).append(" NOOP\n");
+		String reg_else = ((Variable_t) n.f6.accept(this, argu)).getRegister();
+		this.asm_.append("MOVE ").append(res).append(" ").append(reg_else).append("\n");
+		this.asm_.append(end_label).append(" NOOP\n");
+		return new Variable_t(return_type, null, res);
+	}
+
+	/**
+	 * f0 -> <PUBLIC_READ>
+	 * f1 -> "("
+	 * f2 -> ")"
+	 */
+	public Base_t visit(PublicReadExpression n, Base_t argu) throws Exception {
+		String ret = newTemp();
+		this.asm_.append("PUBREAD ").append(ret).append("\n");
+		return new Variable_t("int", null, ret);
+	}
+
+	/**
+	 * f0 -> <PRIVATE_READ>
+	 * f1 -> "("
+	 * f2 -> ")"
+	 */
+	public Base_t visit(PrivateReadExpression n, Base_t argu) throws Exception {
+		String ret = newTemp();
+		this.asm_.append("SECREAD ").append(ret).append("\n");
+		return new Variable_t("int", null, ret);
+	}
+
+	/**
+	 * f0 -> <PUBLIC_SEEK>
+	 * f1 -> "("
+	 * f2 -> PrimaryExpression()
+	 * f3 -> ")"
+	 */
+	public Base_t visit(PublicSeekExpression n, Base_t argu) throws Exception {
+		String ret = newTemp();
+		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.asm_.append("PUBSEEK ").append(ret).append(" ").append(t).append("\n");
+		return new Variable_t("int", null, ret);
+	}
+
+	/**
+	 * f0 -> <PRIVATE_SEEK>
+	 * f1 -> "("
+	 * f2 -> PrimaryExpression()
+	 * f3 -> ")"
+	 */
+	public Base_t visit(PrivateSeekExpression n, Base_t argu) throws Exception {
+		String ret = newTemp();
+		String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		this.asm_.append("SECSEEK ").append(ret).append(" ").append(t).append("\n");
+		return new Variable_t("int", null, ret);
+	}
+	
+ 	/**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
     */
@@ -891,7 +1002,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 			if (var != null) {								// if a parameter or a local var
                 return new Variable_t(var.getType(), id, var.getRegister());
 			} else {										// a field of class
-				cl = st_.get(meth.getFromClass().getName());
+				cl = st_.get(meth.getFrom_class_().getName());
 				if (cl == null) {
                     throw new Exception("something went wrong 2");
                 }
@@ -910,7 +1021,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f0 -> "this"
 	*/
 	public Base_t visit(ThisExpression n, Base_t argu) throws Exception {
-        Class_t cl = ((Method_t) argu).getFromClass();
+        Class_t cl = ((Method_t) argu).getFrom_class_();
         return new Variable_t(cl.getName(), "this", "TEMP 0");
 	}
 

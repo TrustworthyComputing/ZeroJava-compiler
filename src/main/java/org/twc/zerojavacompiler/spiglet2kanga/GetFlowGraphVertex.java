@@ -1,17 +1,19 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
 import java.util.*;
+
+import org.twc.zerojavacompiler.basetype.Method_t;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.*;
 
 public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 
-	HashMap<String, Method> method_map_;
+	HashMap<String, Method_t> method_map_;
 	HashMap<String, Integer> mLabel;
-	Method currMethod;
+	Method_t currMethod;
 	int vid = 0;
 
-	public GetFlowGraphVertex(HashMap<String, Method> method_map_, HashMap<String, Integer> mLabel) {
+	public GetFlowGraphVertex(HashMap<String, Method_t> method_map_, HashMap<String, Integer> mLabel) {
 		this.method_map_ = method_map_;
 		this.mLabel = mLabel;
 	}
@@ -33,7 +35,7 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 	 * f4 -> <EOF>
 	 */
 	public String visit(Goal n) throws Exception {
-		currMethod = new Method("MAIN", 0);
+		currMethod = new Method_t("MAIN", 0);
 		method_map_.put("MAIN", currMethod);
 		vid = 0;
 		// begin
@@ -56,8 +58,8 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 	public String visit(Procedure n) throws Exception {
 		vid = 0;
 		String methodName = n.f0.f0.toString();
-		int paramNum = Integer.parseInt(n.f2.accept(this));
-		currMethod = new Method(methodName, paramNum);
+		int num_parameters_ = Integer.parseInt(n.f2.accept(this));
+		currMethod = new Method_t(methodName, num_parameters_);
 		method_map_.put(methodName, currMethod);
 		n.f4.accept(this);
 		return null;
@@ -93,8 +95,9 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 		n.f3.accept(this);
 		currMethod.flowGraph.callPos.add(vid);
 		// callParamNum uses the MAX
-		if (currMethod.callParamNum < n.f3.size())
-			currMethod.callParamNum = n.f3.size();
+		if (currMethod.getCall_param_num_() < n.f3.size()) {
+			currMethod.setCall_param_num_(n.f3.size());
+		}
 		return null;
 	}
 
@@ -125,13 +128,13 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
 	 */
 	public String visit(Temp n) throws Exception {
 		Integer tempNo = Integer.parseInt(n.f1.accept(this));
-		if (!currMethod.mTemp.containsKey(tempNo)) {
-			if (tempNo < currMethod.paramNum)
+		if (!currMethod.temp_reg_intervals.containsKey(tempNo)) {
+			if (tempNo < currMethod.getNum_parameters_())
 				// parameter
-				currMethod.mTemp.put(tempNo, new LiveInterval(tempNo, 0, vid));
+				currMethod.temp_reg_intervals.put(tempNo, new LiveInterval(tempNo, 0, vid));
 			else
 				// local Temp (first shows up at vid)
-				currMethod.mTemp.put(tempNo, new LiveInterval(tempNo, vid, vid));
+				currMethod.temp_reg_intervals.put(tempNo, new LiveInterval(tempNo, vid, vid));
 		}
 		return (tempNo).toString();
 	}

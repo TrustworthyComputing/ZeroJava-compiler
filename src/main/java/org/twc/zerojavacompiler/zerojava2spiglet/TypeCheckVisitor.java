@@ -17,9 +17,9 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (var.getType() == null) {
             String inMethod = meth.methContains(var.getName());
             if (inMethod == null) {   // if not found in the function, we should seek in the class
-                Variable_t inclassvar = meth.getFromClass().classContainsVar(var.getName());
+                Variable_t inclassvar = meth.getFrom_class_().classContainsVar(var.getName());
                 if (inclassvar == null) {
-                    throw new Exception("Undecleared Variable " + var.getName());
+                    throw new Exception("Undeclared variable " + var.getName());
                 }
                 inMethod = inclassvar.getType();
             }
@@ -169,8 +169,8 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         n.f8.accept(this, meth);
         Variable_t retType = (Variable_t) n.f10.accept(this, meth);
         retType = findType(retType, meth);
-        if (!meth.getType().equals(retType.getType())) {
-            throw new Exception("Error at " + methName + " declaration, type_ is " + methType + " and return type_ is "+ retType.getType() + ", meth " +meth.getFromClass().getName());
+        if (!meth.getType_().equals(retType.getType())) {
+            throw new Exception("Error at " + methName + " declaration, type_ is " + methType + " and return type_ is "+ retType.getType() + ", meth " +meth.getFrom_class_().getName());
         }
         return null;
     }
@@ -365,7 +365,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      */
     public Base_t visit(CompoundOperator n, Base_t argu) throws Exception {
         String[] _ret = { "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="};
-        return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
+        return new Variable_t("int", _ret[n.f0.which]);
     }
 
     /**
@@ -416,7 +416,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (expr.getType().equals("boolean")) {
             return null;
         }
-        throw new Exception("If-condition is not a boolean Expression!");
+        throw new Exception("IfthenStatement is not a boolean expression: " + expr.getType());
     }
 
     /**
@@ -442,7 +442,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (expr.getType().equals("boolean")) {
             return null;
         }
-        throw new Exception("If-condition is not a boolean Expression!");
+        throw new Exception("IfthenElseStatement is not a boolean expression: " + expr.getType());
     }
 
     /**
@@ -464,16 +464,16 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (expr.getType().equals("boolean")) {
             return null;
         }
-        throw new Exception("while-condition is not a boolean Expression!");
+        throw new Exception("WhileStatement is not a boolean Expression");
     }
 
     /**
-    * f0 -> "System.out.println"
-    * f1 -> "("
-    * f2 -> Expression()
-    * f3 -> ")"
-    * f4 -> ";"
-    */
+     * f0 -> "System.out.println"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
     public Base_t visit(PrintStatement n, Base_t argu) throws Exception { //is int
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
@@ -486,35 +486,58 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (expr.getType().equals("boolean") || expr.getType().equals("int")) {
             return null;
         }
-        throw new Exception("Print Statement not boolean or int!");
+        throw new Exception("Print statement not boolean or int.");
+    }
+
+    /**
+    * f0 -> "System.out.println"
+    * f1 -> "("
+    * f2 -> ")"
+    * f3 -> ";"
+    */
+    public Base_t visit(PrintLineStatement n, Base_t argu) throws Exception { //is int
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        return null;
+    }
+
+    /**
+     * f0 -> "Prover.answer"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+    public Base_t visit(AnswerStatement n, Base_t argu) throws Exception { //is int
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t expr = (Variable_t) n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        if (expr.getType() == null) {
+            expr = findType(expr, (Method_t)argu);
+        }
+        if (expr.getType().equals("boolean") || expr.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Answer statement not boolean or int.");
     }
 
     /**
      * f0 -> LogicalAndExpression()
      *       | LogicalOrExpression()
-     *       | BinAndExpression()
-     *       | BinOrExpression()
-     *       | BinXorExpression()
+     *       | BinaryExpression()
      *       | BinNotExpression()
-     *       | ShiftLeftExpression()
-     *       | ShiftRightExpression()
-     *       | EqualExpression()
-     *       | NotEqualExpression()
-     *       | LessThanExpression()
-     *       | LessThanOrEqualExpression()
-     *       | GreaterThanExpression()
-     *       | GreaterThanOrEqualExpression()
-     *       | PlusExpression()
-     *       | MinusExpression()
-     *       | TimesExpression()
-     *       | DivExpression()
-     *       | ModExpression()
      *       | ArrayLookup()
      *       | ArrayLength()
      *       | MessageSend()
      *       | TernaryExpression()
      *       | PublicReadExpression()
      *       | PrivateReadExpression()
+     *       | PublicSeekExpression()
+     *       | PrivateSeekExpression()
      *       | Clause()
      */
     public Base_t visit(Expression n, Base_t argu) throws Exception {
@@ -568,12 +591,11 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         String t2 = findType(clause_2, (Method_t) argu).getType();
         if ("&".equals(operator) || "|".equals(operator) || "^".equals(operator) || "<<".equals(operator) || ">>".equals(operator)
                 || "+".equals(operator) || "-".equals(operator) || "*".equals(operator) || "/".equals(operator) || "%".equals(operator)
-                || "<".equals(operator) || "<=".equals(operator) || ">".equals(operator) || ">=".equals(operator)
         ) {
             if (t1.equals("int") && t2.equals("int")) {
                 return new Variable_t("int", null);
             }
-        } else if ("==".equals(operator) || "!=".equals(operator) ) {
+        } else if ("==".equals(operator) || "!=".equals(operator) || "<".equals(operator) || "<=".equals(operator) || ">".equals(operator) || ">=".equals(operator)) {
             if (t1.equals("boolean") && t2.equals("boolean")) {
                 return new Variable_t("boolean", null);
             } else if (t1.equals("int") && t2.equals("int")) {
@@ -603,7 +625,16 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      */
     public Base_t visit(BinOperator n, Base_t argu) throws Exception {
         String[] _ret = { "&", "|", "^", "<<", ">>", "+", "-", "*", "/", "%", "==", "!=", "<", "<=", ">", ">=" };
-        return new Variable_t(_ret[n.f0.which], _ret[n.f0.which]);
+        String operator = _ret[n.f0.which];
+        if ("&".equals(operator) || "|".equals(operator) || "^".equals(operator)
+                || "<<".equals(operator) || ">>".equals(operator) || "<<=".equals(operator) || ">>=".equals(operator)
+                || "+".equals(operator) || "-".equals(operator) || "*".equals(operator) || "/".equals(operator) || "%".equals(operator)) {
+            return new Variable_t("int", operator);
+        } else if ("==".equals(operator) || "!=".equals(operator) || "<".equals(operator) || "<=".equals(operator) || ">".equals(operator) || ">=".equals(operator)) {
+            return new Variable_t("boolean", operator);
+        } else {
+            throw new IllegalStateException("BinOperator: Unexpected value: " + operator);
+        }
     }
 
     /**
@@ -664,8 +695,9 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         clazz = findType(clazz, (Method_t) argu);                       // now clazz.type_() is the type_ of PrimaryExp
         Variable_t id = (Variable_t) n.f2.accept(this, argu);
         Class_t cl = st_.get(clazz.getType());
-        if (!cl.classContainsMeth(id.getName()))                        // check if class primary expr type_ contains method identifier
+        if (!cl.classContainsMeth(id.getName())) {                       // check if class primary expr type_ contains method identifier
             throw new Exception("Method " + id.getName() + " is not declared in class " + clazz.getType());
+        }
         Method_t existingmeth = cl.getMethod(id.getName());             // get method identifier (also parameters etc)
         Method_t keepParams = (Method_t) n.f4.accept(this, argu);
         if (n.f4.present()) {   // add parameters to method
@@ -696,7 +728,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
                 }
             }
         }
-        return new Variable_t(existingmeth.getType(), null);
+        return new Variable_t(existingmeth.getType_(), null);
     }
 
     /**
@@ -730,7 +762,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
             }
             throw new Exception("Ternary types missmatch: " + expr_1.getType() + " " + expr_2.getType());
         }
-        throw new Exception("If-condition is not a boolean Expression!");
+        throw new Exception("If-condition is not a boolean Expression");
     }
 
     /**
@@ -868,7 +900,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     */
     public Base_t visit(ThisExpression n, Base_t argu) throws Exception {
         n.f0.accept(this, argu);
-        return new Variable_t(((Method_t) argu).getFromClass().getName(), null);
+        return new Variable_t(((Method_t) argu).getFrom_class_().getName(), null);
     }
 
     /**
@@ -885,7 +917,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         Variable_t t = (Variable_t) n.f3.accept(this, argu);
         t = findType(t, (Method_t) argu);
         if (!t.getType().equals("int")) {
-            throw new Exception("Error: new int[" + t.getType() + "], " + t.getType() + " should be int!");
+            throw new Exception("Error: new int[" + t.getType() + "], " + t.getType() + " should be int");
         }
         n.f4.accept(this, argu);
         return new Variable_t("int[]", null);
@@ -904,13 +936,13 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         n.f3.accept(this, argu);
         // if class does not exist
         if (st_.get(classname.getType()) == null) {
-            throw new Exception("Cannot declare " + classname + " type_. This class does not exist!");
+            throw new Exception("Cannot declare " + classname + " type_. This class does not exist");
         }
         return classname;
     }
 
     /**
-    * f0 -> "!"
+    * f0 -> ""
     * f1 -> Clause()
     */
     public Base_t visit(NotExpression n, Base_t argu) throws Exception {
@@ -920,7 +952,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         if (t.getType().equals("boolean")) {
             return new Variable_t("boolean", null);
         }
-        throw new Exception("Error: Not Clause, " + t + " type_ given. Can apply only to boolean!");
+        throw new Exception("Error: Not Clause, " + t + " type_ given. Can apply only to boolean");
     }
 
     /**

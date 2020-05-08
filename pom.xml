@@ -11,6 +11,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <gen.sources.skip>false</gen.sources.skip> <!-- default -->
     </properties>
     <dependencies>
         <dependency>
@@ -40,6 +41,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>java</executable>
                             <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zerojava2spiglet</workingDirectory>
                             <arguments>
@@ -61,6 +63,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>javacc</executable>
                             <workingDirectory>src/main/java/org/twc/zerojavacompiler/zerojava2spiglet/zerojavaparser</workingDirectory>
                             <arguments>
@@ -76,6 +79,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>java</executable>
                             <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/spiglet2kanga</workingDirectory>
                             <arguments>
@@ -97,6 +101,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>javacc</executable>
                             <workingDirectory>src/main/java/org/twc/zerojavacompiler/spiglet2kanga/spigletparser</workingDirectory>
                             <arguments>
@@ -112,6 +117,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>java</executable>
                             <workingDirectory>src/main/java/org/twc/zerojavacompiler/kanga2zmips</workingDirectory>
                             <arguments>
@@ -133,6 +139,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>javacc</executable>
                             <workingDirectory>src/main/java/org/twc/zerojavacompiler/kanga2zmips/kangaparser</workingDirectory>
                             <arguments>
@@ -148,6 +155,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>java</executable>
                             <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer</workingDirectory>
                             <arguments>
@@ -169,6 +177,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${gen.sources.skip}</skip>
                             <executable>javacc</executable>
                             <workingDirectory>src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser</workingDirectory>
                             <arguments>

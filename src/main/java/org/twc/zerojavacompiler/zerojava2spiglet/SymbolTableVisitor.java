@@ -78,16 +78,16 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         Class_t mainclass = st_.get(classname);
         mainclass.setIsMain();
         if (! mainclass.addMethod(m)) {
-            throw new Exception("Method " + m.getName() + " already exists!");
+            throw new Exception("Method " + m.getName() + " already exists");
         }
         if (n.f14.present()) {
             for (int i = 0 ; i < n.f14.size() ; i++) {
                 if (!m.addVar((Variable_t) n.f14.nodes.get(i).accept(this))) {
-                    throw new Exception("Class " + classname + ": Variable " + n.f14.nodes.get(i).accept(this).getName() + " already exists!");
+                    throw new Exception("Class " + classname + ": Variable " + n.f14.nodes.get(i).accept(this).getName() + " already exists");
                 }
                 String vartype = ((Variable_t) n.f14.nodes.get(i).accept(this)).getType();
                 if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist!");
+                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
@@ -114,11 +114,11 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
             for (int i = 0 ; i < n.f3.size() ; i++) {   // for every variable
                 // if variable isnt unique
                 if (!st_.get(classname).addVar((Variable_t)n.f3.nodes.get(i).accept(this))) {
-                    throw new Exception("Class " + classname + ": Variable " + n.f3.nodes.get(i).accept(this).getName() + " already exists!");
+                    throw new Exception("Class " + classname + ": Variable " + n.f3.nodes.get(i).accept(this).getName() + " already exists");
                 }
                 String vartype = ((Variable_t) n.f3.nodes.get(i).accept(this)).getType();
                 if (! (vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist!");
+                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
@@ -127,11 +127,11 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
             for (int i = 0 ; i < n.f4.size() ; i++) {
                 // if method isnt unique
                 if (! st_.get(classname).addMethod((Method_t) n.f4.nodes.get(i).accept(this)) ) {
-                    throw new Exception("Class " + classname + ": Method " + n.f4.nodes.get(i).accept(this).getName() + " already exists!");
+                    throw new Exception("Class " + classname + ": Method " + n.f4.nodes.get(i).accept(this).getName() + " already exists");
                 }
-                String vartype = ((Method_t) n.f4.nodes.get(i).accept(this)).getType();
+                String vartype = ((Method_t) n.f4.nodes.get(i).accept(this)).getType_();
                 if (! (vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist!");
+                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
@@ -181,13 +181,13 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
 
                 // if method isnt unique
                 if (!newClass.addMethod(m)) {
-                    throw new Exception("Class " + id + ": Method " + m.getName() + " already exists!");
+                    throw new Exception("Class " + id + ": Method " + m.getName() + " already exists");
                 } else if (parentClass.classContainsMeth(m.getName())) { // if the parent-class has a method with this name
                     if (!parentClass.checkMethod(m)) { // and if it isnt exactly the same error
-                        throw new Exception("Class " + id + ": Method " + m.getName() + " is extended but has a different prototype from the first one!");
+                        throw new Exception("Class " + id + ": Method " + m.getName() + " is extended but has a different prototype from the first one");
                     }
                 }
-                String vartype = m.getType();
+                String vartype = m.getType_();
                 if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
                     throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
                 }
@@ -198,8 +198,8 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
                     int k = 0;
                     for (Map.Entry<String, Method_t> entry : newClass.class_methods_map.entrySet()) {
                         if (entry.getKey().equals(m.getName())) {
-                            m.setFromClass(newClass);
-                            m.setMethNum(k + 1);
+                            m.setFrom_class_(newClass);
+                            m.setMeth_num_(k + 1);
                             entry.setValue(m);
                         }
                         k++;
@@ -259,7 +259,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
                 meth.addParam(param);
                 String vartype = param.getType();
                 if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist!");
+                    throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
@@ -270,11 +270,11 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
             n.f7.accept(this);
             for (int i = 0 ; i < n.f7.size() ; i++) {
                 if (!meth.addVar((Variable_t) n.f7.nodes.get(i).accept(this))) {
-                    throw new Exception("Method " + meth_name + ": Variable " + n.f7.nodes.get(i).accept(this).getName() + " already exists!");
+                    throw new Exception("Method " + meth_name + ": Variable " + n.f7.nodes.get(i).accept(this).getName() + " already exists");
                 }
                 String vartype = ((Variable_t) n.f7.nodes.get(i).accept(this)).getType();
                 if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist!");
+                    throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
@@ -283,8 +283,8 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         n.f10.accept(this);
         n.f11.accept(this);
         n.f12.accept(this);
-        if (globals_ < meth.getNumParameters()) {
-            globals_ = meth.getNumParameters();
+        if (globals_ < meth.getNum_parameters_()) {
+            globals_ = meth.getNum_parameters_();
         }
         return meth;
     }
@@ -297,7 +297,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         Variable_t fp = (Variable_t) n.f0.accept(this);
         Method_t meth = (Method_t) n.f1.accept(this);
         if (!meth.addParam(fp)) {
-            throw new Exception("Parameter " + fp.getName() + " already exists!");
+            throw new Exception("Parameter " + fp.getName() + " already exists");
         }
         return meth;
     }
@@ -321,7 +321,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         if (n.f0.present()) {
             for (int i = 0 ; i < n.f0.size() ; i++) {
                 if (!meth.addParam((Variable_t) n.f0.nodes.get(i).accept(this))) {
-                    throw new Exception("Parameter " + n.f0.nodes.get(i).accept(this).getName() + " already exists!");
+                    throw new Exception("Parameter " + n.f0.nodes.get(i).accept(this).getName() + " already exists");
                 }
             }
         }

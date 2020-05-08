@@ -1,5 +1,8 @@
 package org.twc.zerojavacompiler.basetype;
 
+import org.twc.zerojavacompiler.spiglet2kanga.FlowGraph;
+import org.twc.zerojavacompiler.spiglet2kanga.LiveInterval;
+
 import java.util.*;
 
 public class Method_t extends Base_t {
@@ -12,6 +15,23 @@ public class Method_t extends Base_t {
     private int num_parameters_;
     private int meth_num_;
 
+    /**
+     * For register allocation
+     */
+    private int stack_num_;
+    private int call_param_num_;
+
+    // t0-t9
+    public HashMap<String, String> temp_regs_map;
+    // s0-s7
+    public HashMap<String, String> save_regs_map;
+    // SPILLEDARG *
+    public HashMap<String, String> spilled_regs_map;
+    // tempNo -> Interval
+    public HashMap<Integer, LiveInterval> temp_reg_intervals;
+
+    public FlowGraph flowGraph;
+
     public Method_t(String type, String name) {
         super(name);
         this.type_ = type;
@@ -21,36 +41,64 @@ public class Method_t extends Base_t {
         this.from_class_ = null;
     }
 
-    public Class_t getFromClass() {
+    public Method_t(String name, int num_parameters) {
+        super(name);
+        this.num_parameters_ = num_parameters;
+        this.stack_num_ = 0;
+        this.call_param_num_ = 0;
+        this.temp_regs_map = new HashMap<>();
+        this.save_regs_map = new HashMap<>();
+        this.spilled_regs_map = new HashMap<>();
+        this.temp_reg_intervals = new HashMap<>();
+        this.flowGraph = new FlowGraph();
+    }
+
+    public Class_t getFrom_class_() {
         return this.from_class_;
     }
 
-    public void setFromClass(Class_t from_class) {
+    public void setFrom_class_(Class_t from_class) {
         this.from_class_ = from_class;
     }
 
-    public String getType() {
+    public String getType_() {
         return this.type_;
     }
 
-    public void setType(String type) {
+    public void setType_(String type) {
         this.type_ = type;
     }
 
-    public int getNumParameters() {
+    public int getNum_parameters_() {
         return this.num_parameters_;
     }
 
-    public int getMethNum() {
+    public int getMeth_num_() {
         return this.meth_num_;
     }
 
-    public void setMethNum(int meth_num) {
+    public void setMeth_num_(int meth_num) {
         this.meth_num_ = meth_num;
     }
 
-    public LinkedList<Variable_t> getParams() {
+    public LinkedList<Variable_t> getMethod_params() {
         return this.method_params;
+    }
+
+    public int getStack_num_() {
+        return stack_num_;
+    }
+
+    public void setStack_num_(int stack_num_) {
+        this.stack_num_ = stack_num_;
+    }
+
+    public int getCall_param_num_() {
+        return call_param_num_;
+    }
+
+    public void setCall_param_num_(int call_param_num_) {
+        this.call_param_num_ = call_param_num_;
     }
 
     public String methContains(String varName) {

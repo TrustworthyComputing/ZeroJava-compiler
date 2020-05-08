@@ -56,9 +56,9 @@ public class Class_t extends Base_t {
         if (class_methods_map.containsKey(meth.getName())) {
             return false;
         }
-        meth.setFromClass(this);
+        meth.setFrom_class_(this);
         this.num_methods_++;
-        meth.setMethNum(this.num_methods_);
+        meth.setMeth_num_(this.num_methods_);
         class_methods_map.put(meth.getName(), meth);
         return true;
     }
@@ -94,13 +94,13 @@ public class Class_t extends Base_t {
     public boolean checkMethod(Method_t meth) { // check if meth is the same as this.method
         if (class_methods_map.containsKey(meth.getName())) {
             Method_t m_from_class = class_methods_map.get(meth.getName());
-            if (m_from_class.getType().equals(meth.getType())) {
-                LinkedList<Variable_t> parameters = m_from_class.getParams();
-                if (parameters.size() != meth.getParams().size()) {
+            if (m_from_class.getType_().equals(meth.getType_())) {
+                LinkedList<Variable_t> parameters = m_from_class.getMethod_params();
+                if (parameters.size() != meth.getMethod_params().size()) {
                     return false;
                 }
                 for (int j = 0 ; j < parameters.size() ; j++) {
-                    if (parameters.get(j).getType() != meth.getParams().get(j).getType()) {
+                    if (parameters.get(j).getType() != meth.getMethod_params().get(j).getType()) {
                         return false;
                     }
                 }

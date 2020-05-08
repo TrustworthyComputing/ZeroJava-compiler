@@ -1434,22 +1434,21 @@
 //     * f5 -> ":"
 //     * f6 -> Expression()
 //     */
-//    public Base_t visit(TernaryExpression n, Base_t argu) throws Exception {
-//		String res = newRegister();
-//		String end_label = labels_.newLabel();
-//		String else_label = labels_.newLabel();
-//		String cond = ((Variable_t) n.f1.accept(this, argu)).getRegister();
-//		this.asm_.append("beq " + cond + ", $zero, " + else_label + "\n");
-//
-//		String reg_if = ((Variable_t) n.f4.accept(this, argu)).getRegister();
-//		this.asm_.append("move " + res + ", " + reg_if + "\n");
-//		this.asm_.append("j " + end_label + "\n");
-//		this.asm_.append(else_label + "\n");
-//		String reg_else = ((Variable_t) n.f6.accept(this, argu)).getRegister();
-//		this.asm_.append("move " + res + ", " + reg_else + "\n");
-//		this.asm_.append(end_label + "\n");
-//		return new Variable_t("int", null, res);
-//    }
+   // public Base_t visit(TernaryExpression n, Base_t argu) throws Exception {
+	// 	String res = newRegister();
+	// 	String end_label = labels_.newLabel();
+	// 	String else_label = labels_.newLabel();
+	// 	String cond = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+	// 	this.asm_.append("beq " + cond + ", $zero, " + else_label + "\n");
+	// 	String reg_if = ((Variable_t) n.f4.accept(this, argu)).getRegister();
+	// 	this.asm_.append("move " + res + ", " + reg_if + "\n");
+	// 	this.asm_.append("j " + end_label + "\n");
+	// 	this.asm_.append(else_label + "\n");
+	// 	String reg_else = ((Variable_t) n.f6.accept(this, argu)).getRegister();
+	// 	this.asm_.append("move " + res + ", " + reg_else + "\n");
+	// 	this.asm_.append(end_label + "\n");
+	// 	return new Variable_t("int", null, res);
+   // }
 //
 //    /**
 //     * f0 -> <PUBLIC_READ>
@@ -1677,7 +1676,7 @@
 //	}
 //
 //	/**
-//	 * f0 -> "!"
+//	 * f0 -> ""
 //	 * f1 -> Clause()
 //	 */
 //	public Base_t visit(NotExpression n, Base_t argu) throws Exception {

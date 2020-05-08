@@ -1,22 +1,23 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
+import org.twc.zerojavacompiler.basetype.Method_t;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.*;
 import java.util.*;
 
 public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 
-	private final HashMap<String, Method> method_map_;
-	private Method currMethod;
+	private final HashMap<String, Method_t> method_map_;
+	private Method_t currMethod;
     private final StringBuilder asm_;
 
-    public Spiglet2Kanga(HashMap<String, Method> method_map_) {
+    public Spiglet2Kanga(HashMap<String, Method_t> method_map_) {
         this.asm_ = new StringBuilder();
         this.method_map_ = method_map_;
     }
 
 	String getNewLabel(String labelName) {
-		return labelName + "_" + currMethod.methodName;
+		return labelName + "_" + currMethod.getName();
 	}
 
     public String getASM() {
@@ -26,10 +27,10 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	// tempName->regName
 	// if spilled, load tempName in regName
 	String temp2Reg(String regName, String tempName) {
-		if (currMethod.regT.containsKey(tempName)) {
-			return currMethod.regT.get(tempName);
-		} else if (currMethod.regS.containsKey(tempName)) {
-			return currMethod.regS.get(tempName);
+		if (currMethod.temp_regs_map.containsKey(tempName)) {
+			return currMethod.temp_regs_map.get(tempName);
+		} else if (currMethod.save_regs_map.containsKey(tempName)) {
+			return currMethod.save_regs_map.get(tempName);
 		} else {
 			/*
 			asm_.append("*****" + tempName);
@@ -41,7 +42,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 				asm_.append("**" + i);
 			*/
 			// spilled
-			asm_.append("\t\tALOAD ").append(regName).append(" ").append(currMethod.regSpilled.get(tempName)).append("\n");
+			asm_.append("\t\tALOAD ").append(regName).append(" ").append(currMethod.spilled_regs_map.get(tempName)).append("\n");
 			return regName;
 		}
 	}
@@ -49,9 +50,9 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	// MOVE tempName exp
 	// if spilled, store in regSpilled
 	void moveToTemp(String tempName, String exp) {
-		if (currMethod.regSpilled.containsKey(tempName)) {
+		if (currMethod.spilled_regs_map.containsKey(tempName)) {
 			asm_.append("\t\tMOVE v0 ").append(exp).append("\n");
-			asm_.append("\t\tASTORE ").append(currMethod.regSpilled.get(tempName)).append(" v0\n");
+			asm_.append("\t\tASTORE ").append(currMethod.spilled_regs_map.get(tempName)).append(" v0\n");
 		} else {
 			tempName = temp2Reg("", tempName);
 			if (!tempName.equals(exp))
@@ -62,8 +63,9 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	// StmtList ::= ( (Label)?Stmt)*
 	// get Labels
 	public String visit(NodeOptional n) throws Exception {
-		if (n.present()) // print new label
-			System.out.print(getNewLabel(n.node.accept(this)));
+		if (n.present()) {
+			asm_.append(getNewLabel(n.node.accept(this)));
+		}
 		return null;
 	}
 
@@ -76,7 +78,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	 */
 	public String visit(Goal n) throws Exception {
 		currMethod = method_map_.get("MAIN");
-		asm_.append("MAIN [").append(currMethod.paramNum).append("][").append(currMethod.stackNum).append("][").append(currMethod.callParamNum).append("]\n");
+		asm_.append("MAIN [").append(currMethod.getNum_parameters_()).append("][").append(currMethod.getStack_num_()).append("][").append(currMethod.getCall_param_num_()).append("]\n");
 		n.f1.accept(this);
 		asm_.append("END");
 		n.f3.accept(this);
@@ -93,7 +95,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	public String visit(Procedure n) throws Exception {
 		String methodName = n.f0.accept(this);
 		currMethod = method_map_.get(methodName);
-		asm_.append("\n").append(methodName).append(" [").append(currMethod.paramNum).append("][").append(currMethod.stackNum).append("][").append(currMethod.callParamNum).append("]\n");
+		asm_.append("\n").append(methodName).append(" [").append(currMethod.getNum_parameters_()).append("][").append(currMethod.getStack_num_()).append("][").append(currMethod.getCall_param_num_()).append("]\n");
 		n.f4.accept(this);
 		return null;
 	}
@@ -154,7 +156,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		String tempTo = n.f1.accept(this);
 		String regFrom = temp2Reg("v1", n.f2.accept(this));
 		String offset = n.f3.accept(this);
-		if (currMethod.regSpilled.containsKey(tempTo)) {
+		if (currMethod.spilled_regs_map.containsKey(tempTo)) {
 			asm_.append("\t\tHLOAD v1 ").append(regFrom).append(" ").append(offset).append("\n");
 			moveToTemp(tempTo, "v1");
 		} else {
@@ -206,24 +208,24 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	 * f4 -> "END"
 	 */
 	public String visit(StmtExp n) throws Exception {
-		int stackIdx = currMethod.paramNum > 4 ? currMethod.paramNum - 4 : 0;
+		int stackIdx = currMethod.getNum_parameters_() > 4 ? currMethod.getNum_parameters_() - 4 : 0;
 		// store callee-saved S
-		if (currMethod.regS.size() != 0) {
-			for (int idx = stackIdx; idx < stackIdx + currMethod.regS.size(); idx++) {
+		if (currMethod.save_regs_map.size() != 0) {
+			for (int idx = stackIdx; idx < stackIdx + currMethod.save_regs_map.size(); idx++) {
 				if (idx - stackIdx > 7)
 					break;
 				asm_.append("\t\tASTORE SPILLEDARG ").append(idx).append(" s").append(idx - stackIdx);
 			}
 		}
 		// move params regA to TEMP
-		for (stackIdx = 0; stackIdx < currMethod.paramNum && stackIdx < 4; stackIdx++)
-			if (currMethod.mTemp.containsKey(stackIdx))
+		for (stackIdx = 0; stackIdx < currMethod.getNum_parameters_() && stackIdx < 4; stackIdx++)
+			if (currMethod.temp_reg_intervals.containsKey(stackIdx))
 				moveToTemp("TEMP " + stackIdx, "a" + stackIdx);
 		// load params(>4)
-		for (; stackIdx < currMethod.paramNum; stackIdx++) {
+		for (; stackIdx < currMethod.getNum_parameters_(); stackIdx++) {
 			String tempName = "TEMP " + stackIdx;
-			if (currMethod.mTemp.containsKey(stackIdx)) {
-				if (currMethod.regSpilled.containsKey(tempName)) {
+			if (currMethod.temp_reg_intervals.containsKey(stackIdx)) {
+				if (currMethod.spilled_regs_map.containsKey(tempName)) {
 					asm_.append("\t\tALOAD v0 SPILLEDARG ").append(stackIdx - 4).append("\n");
 					moveToTemp(tempName, "v0");
 				} else {
@@ -237,9 +239,9 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		asm_.append("\t\tMOVE v0 ").append(n.f3.accept(this));
 
 		// restore callee-saved S
-		stackIdx = currMethod.paramNum > 4 ? currMethod.paramNum - 4 : 0;
-		if (currMethod.regS.size() != 0) {
-			for (int j = stackIdx; j < stackIdx + currMethod.regS.size(); j++) {
+		stackIdx = currMethod.getNum_parameters_() > 4 ? currMethod.getNum_parameters_() - 4 : 0;
+		if (currMethod.save_regs_map.size() != 0) {
+			for (int j = stackIdx; j < stackIdx + currMethod.save_regs_map.size(); j++) {
 				if (j - stackIdx > 7)
 					break;
 				asm_.append("\t\tALOAD s").append(j - stackIdx).append(" SPILLEDARG ").append(j);

@@ -1,14 +1,16 @@
 package org.twc.zerojavacompiler.spiglet2kanga;
 
+import org.twc.zerojavacompiler.basetype.Method_t;
+
 import java.util.*;
 
 public class Temp2Reg {
 
-	HashMap<String, Method> method_map_;
+	HashMap<String, Method_t> method_map_;
 	FlowGraph currFlowGraph;
-	Method currMethod;
+	Method_t currMethod;
 
-	public Temp2Reg(HashMap<String, Method> method_map_) {
+	public Temp2Reg(HashMap<String, Method_t> method_map_) {
 		this.method_map_ = method_map_;
 	}
 
@@ -46,12 +48,12 @@ public class Temp2Reg {
 		for (int vid = 0; vid < size; vid++) {
 			FlowGraphVertex currVertex = currFlowGraph.mVertex.get(vid);
 			for (Integer tempNo : currVertex.In)
-				currMethod.mTemp.get(tempNo).end = vid;
+				currMethod.temp_reg_intervals.get(tempNo).end = vid;
 			for (Integer tempNo : currVertex.Out)
-				currMethod.mTemp.get(tempNo).end = vid;
+				currMethod.temp_reg_intervals.get(tempNo).end = vid;
 		}
 
-		for (LiveInterval interval : currMethod.mTemp.values()) {
+		for (LiveInterval interval : currMethod.temp_reg_intervals.values()) {
 			for (int callPos : currFlowGraph.callPos) {
 				// across a method call, better use callee-saved regS
 				if (interval.begin < callPos && interval.end > callPos) {
@@ -63,7 +65,7 @@ public class Temp2Reg {
 	}
 
 	public void LinearScan() {
-		for (Method method : method_map_.values()) {
+		for (Method_t method : method_map_.values()) {
 			// System.out.println(method.methodName);
 			currMethod = method;
 			currFlowGraph = currMethod.flowGraph;
@@ -72,7 +74,7 @@ public class Temp2Reg {
 
 			// sort the intervals by [begin, end]
 			ArrayList<LiveInterval> intervals = new ArrayList<>();
-			intervals.addAll(currMethod.mTemp.values());
+			intervals.addAll(currMethod.temp_reg_intervals.values());
 			Collections.sort(intervals);
 
 			LiveInterval[] Tinterval = new LiveInterval[10];
@@ -87,7 +89,7 @@ public class Temp2Reg {
 						// not empty
 						if (Tinterval[regIdx].end <= interval.begin) {
 							// interval already ends
-							currMethod.regT.put("TEMP " + Tinterval[regIdx].tempNo, "t" + regIdx);
+							currMethod.temp_regs_map.put("TEMP " + Tinterval[regIdx].tempNo, "t" + regIdx);
 							Tinterval[regIdx] = null;
 							emptyT = regIdx;
 						} else {
@@ -102,7 +104,7 @@ public class Temp2Reg {
 				for (int regIdx = 7; regIdx >= 0; regIdx--) {
 					if (Sinterval[regIdx] != null) {
 						if (Sinterval[regIdx].end <= interval.begin) {
-							currMethod.regS.put("TEMP " + Sinterval[regIdx].tempNo, "s" + regIdx);
+							currMethod.save_regs_map.put("TEMP " + Sinterval[regIdx].tempNo, "s" + regIdx);
 							Sinterval[regIdx] = null;
 							emptyS = regIdx;
 						} else {
@@ -143,24 +145,24 @@ public class Temp2Reg {
 				}
 				// if not assigned, spill it
 				if (interval != null)
-					currMethod.regSpilled.put("TEMP " + interval.tempNo, "");
+					currMethod.spilled_regs_map.put("TEMP " + interval.tempNo, "");
 			}
 			for (int idx = 0; idx < 10; idx++) {
 				if (Tinterval[idx] != null)
-					currMethod.regT.put("TEMP " + Tinterval[idx].tempNo, "t" + idx);
+					currMethod.temp_regs_map.put("TEMP " + Tinterval[idx].tempNo, "t" + idx);
 			}
 			for (int idx = 0; idx < 8; idx++) {
 				if (Sinterval[idx] != null)
-					currMethod.regS.put("TEMP " + Sinterval[idx].tempNo, "s" + idx);
+					currMethod.save_regs_map.put("TEMP " + Sinterval[idx].tempNo, "s" + idx);
 			}
 			// calculate stackNum:
 			// contains params(>4), spilled regs, callee-saved S
-			int stackIdx = (currMethod.paramNum > 4 ? currMethod.paramNum - 4 : 0) + currMethod.regS.size();
-			for (String temp : currMethod.regSpilled.keySet()) {
-				currMethod.regSpilled.put(temp, "SPILLEDARG " + stackIdx);
+			int stackIdx = (currMethod.getNum_parameters_() > 4 ? currMethod.getNum_parameters_() - 4 : 0) + currMethod.save_regs_map.size();
+			for (String temp : currMethod.spilled_regs_map.keySet()) {
+				currMethod.spilled_regs_map.put(temp, "SPILLEDARG " + stackIdx);
 				stackIdx++;
 			}
-			currMethod.stackNum = stackIdx;
+			currMethod.setStack_num_(stackIdx);
 		}
 	}
 
