@@ -23,7 +23,8 @@ public class ZMIPSPrinter {
     }
 
     public void printLabel(String s) {
-        asm_.append(s).append(":");
+//        asm_.append(s).append(":\n");
+        asm_.append(s).append("\n");
     }
 
     public void println(String s) {
@@ -46,7 +47,7 @@ public class ZMIPSPrinter {
         println(".text");
         println(".globl " + method);
         indent_ = 0;
-        println(method + ":");
+        println("__" + method + "__");
         indent_ = 2;
     }
 

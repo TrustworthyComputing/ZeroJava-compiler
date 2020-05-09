@@ -34,17 +34,22 @@ TOKEN :
 | < RSQPAREN: "]" >
 | < DOT: "." >
 | < LT: "LT" >
-| < LE: "LE" >
+| < LTE: "LTE" >
 | < GT: "GT" >
-| < GE: "GE" >
-| < NE: "NE" >
+| < GTE: "GTE" >
 | < EQ: "EQ" >
+| < NEQ: "NEQ" >
 | < PLUS: "PLUS" >
 | < MINUS: "MINUS" >
+| < TIMES : "TIMES" >
+| < DIV : "DIV" >
+| < MOD : "MOD" >
 | < AND : "AND" >
 | < OR : "OR" >
+| < BINXOR : "XOR" >
+| < SLL : "SLL" >
+| < SRL : "SRL" >
 | < NOT : "NOT" >
-| < TIMES : "TIMES" >
 | < MAIN: "MAIN" >
 | < CODE: "CODE" >
 | < HALLOCATE: "HALLOCATE" >
@@ -55,7 +60,12 @@ TOKEN :
 | < CALL : "CALL" >
 | < ERROR : "ERROR" >
 | < PRINT: "PRINT" >
+| < PRINTLN: "PRINTLN" >
 | < ANSWER: "ANSWER" >
+| < PUBLIC_READ: "PUBREAD" >
+| < PRIVATE_READ: "SECREAD" >
+| < PUBLIC_SEEK: "PUBSEEK" >
+| < PRIVATE_SEEK: "SECSEEK" >
 | < BEGIN: "BEGIN" >
 | < RETURN: "RETURN" >
 | < JUMP : "JUMP" >
@@ -177,30 +187,23 @@ void Stmt() :
 {}
 {
   NoOpStmt()
-|
-  ErrorStmt()
-|
-  CJumpStmt()
-|
-  JumpStmt()
-|
-  HStoreStmt()
-|
-  HLoadStmt()
-|
-  MoveStmt()
-|
-  PrintStmt()
-|
-  AnswerStmt()
-|
-  ALoadStmt()
-|
-  AStoreStmt()
-|
-  PassArgStmt()
-|
-  CallStmt()
+| ErrorStmt()
+| CJumpStmt()
+| JumpStmt()
+| HStoreStmt()
+| HLoadStmt()
+| MoveStmt()
+| PrintStmt()
+| PrintlnStmt()
+| AnswerStmt()
+| PublicReadStmt()
+| PrivateReadStmt()
+| PublicSeekStmt()
+| PrivateSeekStmt()
+| ALoadStmt()
+| AStoreStmt()
+| PassArgStmt()
+| CallStmt()
 }
 
 void NoOpStmt() :
@@ -251,11 +254,42 @@ void PrintStmt() :
   "PRINT" SimpleExp()
 }
 
+void PrintlnStmt() :
+{}
+{
+  "PRINTLN" SimpleExp()
+}
+
 void AnswerStmt() :
 {}
 {
   "ANSWER" SimpleExp()
 }
+
+void PublicReadStmt() :
+{}
+{
+  "PUBREAD" Reg()
+}
+
+void PrivateReadStmt() :
+{}
+{
+  "SECREAD" Reg()
+}
+
+void PublicSeekStmt() :
+{}
+{
+  "PUBSEEK" Reg() SimpleExp()
+}
+
+void PrivateSeekStmt() :
+{}
+{
+  "SECSEEK" Reg() SimpleExp()
+}
+
 
 void ALoadStmt() :
 {}
@@ -286,10 +320,9 @@ void Exp():
 {}
 {
   HAllocate()
-|
-  BinOp()
-|
-  SimpleExp()
+| BinOp()
+| NotExp()
+| SimpleExp()
 }
 
 
@@ -309,12 +342,27 @@ void Operator() :
 {}
 {
   "LT"
-|
-  "PLUS"
-|
-  "MINUS"
-|
-  "TIMES"
+| "LTE"
+| "GT"
+| "GTE"
+| "EQ"
+| "NEQ"
+| "PLUS"
+| "MINUS"
+| "TIMES"
+| "DIV"
+| "MOD"
+| "AND"
+| "OR"
+| "XOR"
+| "SLL"
+| "SRL"
+}
+
+void NotExp() :
+{}
+{
+  "NOT" SimpleExp()
 }
 
 void SpilledArg() :
@@ -327,62 +375,37 @@ void SimpleExp() :
 {}
 {
   Reg()
-|
-  IntegerLiteral()
-|
-  Label()
+| IntegerLiteral()
+| Label()
 }
 
 void Reg() :
 {}
 {
   "a0"
-|
-  "a1"
-|
-  "a2"
-|
-  "a3"
-|
-  "t0"
-|
-  "t1"
-|
-  "t2"
-|
-  "t3"
-|
-  "t4"
-|
-  "t5"
-|
-  "t6"
-|
-  "t7"
-|
-  "s0"
-|
-  "s1"
-|
-  "s2"
-|
-  "s3"
-|
-  "s4"
-|
-  "s5"
-|
-  "s6"
-|
-  "s7"
-|
-  "t8"
-|
-  "t9"
-|
-  "v0"
-|
-  "v1"
+| "a1"
+| "a2"
+| "a3"
+| "t0"
+| "t1"
+| "t2"
+| "t3"
+| "t4"
+| "t5"
+| "t6"
+| "t7"
+| "s0"
+| "s1"
+| "s2"
+| "s3"
+| "s4"
+| "s5"
+| "s6"
+| "s7"
+| "t8"
+| "t9"
+| "v0"
+| "v1"
 }
 
 void IntegerLiteral() :

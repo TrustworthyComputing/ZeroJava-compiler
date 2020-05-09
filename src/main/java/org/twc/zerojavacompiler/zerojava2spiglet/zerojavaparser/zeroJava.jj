@@ -38,17 +38,22 @@ TOKEN :
 	| < LTE: "<=" >
 	| < GT: ">" >
 	| < GTE: ">=" >
+	| < EQ: "==" >
+	| < NEQ: "!=" >
+	| < NOT : "!" >
 	| < PLUS: "+" >
 	| < MINUS: "-" >
+	| < TIMES: "*" >
+	| < DIV: "/" >
+	| < MOD: "%" >
 	| < AND : "&&" >
 	| < OR : "||" >
-	| < NOT : "!" >
 	| < BINAND : "&" >
 	| < BINOR : "|" >
-	| < BINNOT : "~" >
 	| < BINXOR : "^" >
 	| < SLL : "<<" >
 	| < SRL : ">>" >
+	| < BINNOT : "~" >
 	| < BOOLEAN: "boolean" >
 	| < CLASS: "class" >
 	| < INTERFACE: "interface" >

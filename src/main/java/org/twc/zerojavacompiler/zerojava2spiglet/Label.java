@@ -1,4 +1,4 @@
-package org.twc.zerojavacompiler.zmipsgenerator;
+package org.twc.zerojavacompiler.zerojava2spiglet;
 
 public class Label {
 
@@ -11,11 +11,11 @@ public class Label {
 	}
 
 	public String newLabel() {
-		return "__L_" + (++this.labels_) + "__";
+		return "L" + (++this.labels_);
 	}
 
 	public String newVTableLabel(String str) {
-		return new String(str + "_vTable");
+		return str + "_vTable";
 	}
 
 	public String getErrorLabel() {

@@ -3,7 +3,7 @@ package org.twc.zerojavacompiler.zerojava2spiglet;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor.GJDepthFirst;
 import org.twc.zerojavacompiler.basetype.*;
-import org.twc.zerojavacompiler.zmipsgenerator.Label;
+
 import java.util.*;
 
 public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
@@ -640,8 +640,10 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		String end_label = labels_.newLabel();
 		String temp = newTemp();
 		String ret = newTemp();
+		String one = newTemp();
 		String t1 = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(temp).append(" NOT ").append(t1).append("\n");
+		this.asm_.append("MOVE ").append(one).append(" 1\n");
+		this.asm_.append("MOVE ").append(temp).append(" MINUS ").append(one).append(" ").append(t1).append("\n");
 		this.asm_.append("MOVE ").append(ret).append(" ").append(t1).append("\n");
 		this.asm_.append("CJUMP ").append(temp).append(" ").append(end_label).append("\n");
 		String t2 = ((Variable_t) n.f2.accept(this, argu)).getRegister();

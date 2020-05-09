@@ -17,7 +17,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     }
 
 	String getNewLabel(String labelName) {
-		return labelName + "_" + currMethod.getName();
+		return "__" + labelName + "_" + currMethod.getName() + "__";
 	}
 
     public String getASM() {
@@ -104,7 +104,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	 * f0 -> "NOOP"
 	 */
 	public String visit(NoOpStmt n) throws Exception {
-		asm_.append("\t\tNOOP");
+		asm_.append("\t\tNOOP\n");
 		return null;
 	}
 
@@ -184,6 +184,15 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		return null;
 	}
 
+	/**
+	 * f0 -> "PRINTLN"
+	 * f1 -> SimpleExp()
+	 */
+	public String visit(PrintlnStmt n) throws Exception {
+		asm_.append("\t\tPRINTLN ").append(n.f1.accept(this)).append("\n");
+		return null;
+	}
+
     /**
      * f0 -> "ANSWER"
      * f1 -> SimpleExp()
@@ -194,7 +203,49 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     }
 
 	/**
-	 * f0 -> Call() | HAllocate() | BinOp() | SimpleExp()
+	 * f0 -> "PUBREAD"
+	 * f1 -> Temp()
+	 */
+	public String visit(PublicReadStmt n) throws Exception {
+		asm_.append("\t\tPUBREAD ").append(n.f1.accept(this)).append("\n");
+		return null;
+	}
+
+	/**
+	 * f0 -> "SECREAD"
+	 * f1 -> Temp()
+	 */
+	public String visit(PrivateReadStmt n) throws Exception {
+		asm_.append("\t\tSECREAD ").append(n.f1.accept(this)).append("\n");
+		return null;
+	}
+
+	/**
+	 * f0 -> "PUBSEEK"
+	 * f1 -> Temp()
+	 * f2 -> SimpleExp()
+	 */
+	public String visit(PublicSeekStmt n) throws Exception {
+		asm_.append("\t\tPUBSEEK ").append(n.f1.accept(this)).append(" ").append(n.f2.accept(this)).append("\n");
+		return null;
+	}
+
+	/**
+	 * f0 -> "SECSEEK"
+	 * f1 -> Temp()
+	 * f2 -> SimpleExp()
+	 */
+	public String visit(PrivateSeekStmt n) throws Exception {
+		asm_.append("\t\tSECSEEK ").append(n.f1.accept(this)).append(" ").append(n.f2.accept(this)).append("\n");
+		return null;
+	}
+
+	/**
+	 * f0 -> Call()
+	 *       | HAllocate()
+	 *       | BinOp()
+	 *       | NotExp()
+	 *       | SimpleExp()
 	 */
 	public String visit(Exp n) throws Exception {
 		return n.f0.accept(this);
@@ -290,11 +341,35 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	}
 
 	/**
-	 * f0 -> "LT" | "PLUS" | "MINUS" | "TIMES"
+	 * f0 -> "LT"
+	 *       | "LTE"
+	 *       | "GT"
+	 *       | "GTE"
+	 *       | "EQ"
+	 *       | "NEQ"
+	 *       | "PLUS"
+	 *       | "MINUS"
+	 *       | "TIMES"
+	 *       | "DIV"
+	 *       | "MOD"
+	 *       | "AND"
+	 *       | "OR"
+	 *       | "XOR"
+	 *       | "SLL"
+	 *       | "SRL"
 	 */
 	public String visit(Operator n) throws Exception {
-		String[] _ret = { "LT ", "PLUS ", "MINUS ", "TIMES " };
+		String[] _ret = { "LT ", "LTE ", "GT ", "GTE ", "EQ ", "NEQ ", "PLUS ", "MINUS ",
+				"TIMES ", "DIV ", "MOD ", "AND ", "OR ", "XOR ", "SLL ", "SRL " };
 		return _ret[n.f0.which];
+	}
+
+	/**
+	 * f0 -> "NOT"
+	 * f1 -> SimpleExp()
+	 */
+	public String visit(NotExp n) throws Exception {
+		return "NOT " + n.f1.accept(this);
 	}
 
 	/**

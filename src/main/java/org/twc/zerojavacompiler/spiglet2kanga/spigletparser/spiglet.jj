@@ -35,17 +35,22 @@ TOKEN :
 | < RSQPAREN: "]" >
 | < DOT: "." >
 | < LT: "LT" >
-| < LE: "LE" >
+| < LTE: "LTE" >
 | < GT: "GT" >
-| < GE: "GE" >
-| < NE: "NE" >
+| < GTE: "GTE" >
 | < EQ: "EQ" >
+| < NEQ: "NEQ" >
 | < PLUS: "PLUS" >
 | < MINUS: "MINUS" >
+| < TIMES : "TIMES" >
+| < DIV : "DIV" >
+| < MOD : "MOD" >
 | < AND : "AND" >
 | < OR : "OR" >
+| < BINXOR : "XOR" >
+| < SLL : "SLL" >
+| < SRL : "SRL" >
 | < NOT : "NOT" >
-| < TIMES : "TIMES" >
 | < MAIN: "MAIN" >
 | < CODE: "CODE" >
 | < HALLOCATE: "HALLOCATE" >
@@ -55,6 +60,11 @@ TOKEN :
 | < CALL : "CALL" >
 | < ERROR : "ERROR" >
 | < PRINT: "PRINT" >
+| < PRINTLN: "PRINTLN" >
+| < PUBLIC_READ: "PUBREAD" >
+| < PRIVATE_READ: "SECREAD" >
+| < PUBLIC_SEEK: "PUBSEEK" >
+| < PRIVATE_SEEK: "SECSEEK" >
 | < ANSWER: "ANSWER" >
 | < BEGIN: "BEGIN" >
 | < RETURN: "RETURN" >
@@ -157,6 +167,8 @@ void Stmt() :
 |
   PrintStmt()
 |
+  PrintlnStmt()
+|
   AnswerStmt()
 }
 
@@ -208,10 +220,40 @@ void PrintStmt() :
   "PRINT" SimpleExp()
 }
 
+void PrintlnStmt() :
+{}
+{
+  "PRINTLN" SimpleExp()
+}
+
 void AnswerStmt() :
 {}
 {
   "ANSWER" SimpleExp()
+}
+
+void PublicReadStmt() :
+{}
+{
+  "PUBREAD" Temp()
+}
+
+void PrivateReadStmt() :
+{}
+{
+  "SECREAD" Temp()
+}
+
+void PublicSeekStmt() :
+{}
+{
+  "PUBSEEK" Temp() SimpleExp()
+}
+
+void PrivateSeekStmt() :
+{}
+{
+  "SECSEEK" Temp() SimpleExp()
 }
 
 void Exp():
@@ -222,6 +264,8 @@ void Exp():
   HAllocate()
 |
   BinOp()
+|
+  NotExp()
 |
   SimpleExp()
 }
@@ -254,12 +298,27 @@ void Operator() :
 {}
 {
   "LT"
-|
-  "PLUS"
-|
-  "MINUS"
-|
-  "TIMES"
+| "LTE"
+| "GT"
+| "GTE"
+| "EQ"
+| "NEQ"
+| "PLUS"
+| "MINUS"
+| "TIMES"
+| "DIV"
+| "MOD"
+| "AND"
+| "OR"
+| "XOR"
+| "SLL"
+| "SRL"
+}
+
+void NotExp() :
+{}
+{
+  "NOT" SimpleExp()
 }
 
 void SimpleExp() :
