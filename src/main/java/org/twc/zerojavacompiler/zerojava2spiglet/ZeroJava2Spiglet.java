@@ -24,23 +24,17 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	private void initVtables() {
         for (Map.Entry<String, Class_t> entry : st_.entrySet()) {
 			Class_t cl = entry.getValue();
-			if (cl.isMain()) {
-				continue;
-			}
-			String label = labels_.newVTableLabel(cl.getName());
-			String vtable = newTemp();
-			String temp = newTemp();
-			this.asm_.append("MOVE ").append(vtable).append(" ").append(hp_).append("\n");
+			if (cl.isMain()) continue;
+			String vtable_reg = newTemp();
+			this.asm_.append("MOVE ").append(vtable_reg).append(" ").append(hp_).append("\n");
 			cl.setVTableAddress(hp_);
 			hp_ += cl.getNumMethods();
-			int offset = cl.getNumMethods();
-			this.asm_.append("MOVE ").append(temp).append(" HALLOCATE ").append(offset * 4).append("\n");
-			this.asm_.append("HSTORE ").append(vtable).append(" 0 ").append(temp).append("\n");
             for (Map.Entry<String, Method_t> methods : cl.class_methods_map.entrySet()) {
-                String newTemp = newTemp();
+                String new_temp = newTemp();
                 Method_t meth = methods.getValue();
-                this.asm_.append("MOVE ").append(newTemp).append(" ").append(meth.getFrom_class_().getName()).append("_").append(meth.getName()).append("\n");
-                this.asm_.append("HSTORE ").append(temp).append(" ").append(meth.getMeth_num_() * 4).append(" ").append(newTemp).append("\n");
+				String meth_label = meth.getFrom_class_().getName() + "_" + meth.getName();
+                this.asm_.append("MOVE " + new_temp + " " + meth_label + "\n");
+                this.asm_.append("HSTORE " + vtable_reg + " " + (meth.getMeth_num_() - 1) + " " + new_temp + "\n");
 			}
 			this.asm_.append("\n");
     	}
@@ -98,6 +92,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         initVtables();
 		n.f14.accept(this, meth);
 		n.f15.accept(this, meth);
+		this.asm_.append("Runtime_Error NOOP\n");
 		this.asm_.append("END\n");
 		return null;
 	}
@@ -156,18 +151,17 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(VarDeclaration n, Base_t argu) throws Exception {
 		Method_t meth = (Method_t) argu;
 		String varName = n.f1.f0.toString();
-		if (meth.getFrom_class_() != null) { 												// is a variable of a function
+		if (meth.getFrom_class_() != null) { // is a variable of a function
 			String newTemp = newTemp();
-			if ((meth = meth.getFrom_class_().getMethod(meth.getName())) != null) {		// if you found method
+			if ((meth = meth.getFrom_class_().getMethod(meth.getName())) != null) {
 				meth.addRegToVar(varName, newTemp);
 			} else {
 				throw new Exception("VarDeclaration Error 1");
 			}
 			this.asm_.append("MOVE ").append(newTemp).append(" 0\n");
-		} else {																	// is a var (field) of a class
+		} else { // is a field of a class
 			Class_t cl = st_.get(meth.getName());
-			if (cl == null)															// do nothing for now
-			{
+			if (cl == null) {
 				throw new Exception("VarDeclaration Error 2");
 			}
 		}
@@ -319,7 +313,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
                 }
 				var = cl.classContainsVar(id);
 				if (var != null) { // class field
-                    this.asm_.append("HSTORE " + " TEMP 0 ").append(var.getNum() * 4).append(" ").append(expr).append("\n");
+                    this.asm_.append("HSTORE " + " TEMP 0 ").append(var.getNum()).append(" ").append(expr).append("\n");
                 }
 				return null;
 			} else { // if a local var
@@ -347,9 +341,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 				var = cl.classContainsVar(id);
 				if (var != null) { // class field
 					String temp = newTemp();
-					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum()).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" PLUS ").append(temp).append(" 1\n");
-					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum()).append(" ").append(temp).append("\n");
 				}
 				return null;
 			} else { // if a local var
@@ -377,9 +371,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 				var = cl.classContainsVar(id);
 				if (var != null) { // class field
 					String temp = newTemp();
-					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum()).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" MINUS ").append(temp).append(" 1\n");
-					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum()).append(" ").append(temp).append("\n");
 				}
 				return null;
 			} else {
@@ -421,7 +415,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		} else if ("^=".equals(operator)) {
 			opcode = "XOR";
 		} else {
-			throw new IllegalStateException("CompoundAssignmentStatement: Unexpected value: " + operator);
+			throw new IllegalStateException("CompoundAssignmentStatement: unexpected value " + operator);
 		}
 		Method_t meth = (Method_t) argu;
 		if (meth != null) {
@@ -434,9 +428,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 				var = cl.classContainsVar(id);
 				if (var != null) { // class field
 					String temp = newTemp();
-					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
+					this.asm_.append("HLOAD ").append(temp).append(" TEMP 0 ").append(var.getNum()).append("\n");
 					this.asm_.append("MOVE ").append(temp).append(" ").append(opcode).append(" ").append(temp).append(" 1\n");
-					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum() * 4).append(" ").append(temp).append("\n");
+					this.asm_.append("HSTORE TEMP 0 ").append(var.getNum()).append(" ").append(temp).append("\n");
 				}
 				return null;
 			} else { // if a local var
@@ -475,27 +469,23 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(ArrayAssignmentStatement n, Base_t argu) throws Exception {
 		String length = newTemp();
 		String cond = newTemp();
-		String error = labels_.newLabel();
-		String noerror = labels_.newLabel();
+		String error_label = "Runtime_Error";
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.asm_.append("HLOAD ").append(length).append(" ").append(array).append(" 0\n"); 			// load real size to length
-		String pos = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(cond).append(" LT ").append(pos).append(" ").append(length).append("\n");	// if pos < arr.length
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(error).append("\n");
-		this.asm_.append("MOVE ").append(cond).append(" LT ").append(pos).append(" 0\n");				// if arr.length > 0 g
+		this.asm_.append("HLOAD ").append(length).append(" ").append(array).append(" 0\n"); // load length
+		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
 		String one = newTemp();
+		// if idx < arr.length
+		this.asm_.append("MOVE ").append(cond).append(" LT ").append(idx).append(" ").append(length).append("\n");
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(error_label).append("\n");
+		// if idx >= 0
+		this.asm_.append("MOVE ").append(cond).append(" LT ").append(idx).append(" 0\n");
 		this.asm_.append("MOVE ").append(one).append(" 1\n");
 		this.asm_.append("MOVE ").append(cond).append(" MINUS ").append(one).append(" ").append(cond).append("\n");
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(error).append("\n");
-		this.asm_.append("JUMP ").append(noerror).append("\n");
-		this.asm_.append(error).append(" NOOP\n");
-		this.asm_.append("ERROR\n").append(noerror).append(" NOOP\n");
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(error_label).append("\n");
 		String temp_array = newTemp();
-		this.asm_.append("MOVE ").append(temp_array).append(" ").append(array).append("\n");			// temp_array = &array
-		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" 4\n");
-		String temp = newTemp();
-		this.asm_.append("MOVE ").append(temp).append(" TIMES ").append(pos).append(" 4\n");
-		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" ").append(temp).append("\n");
+		// temp_array = &array
+		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(array).append(" 1\n");
+		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" ").append(idx).append("\n");
 		String expr = ((Variable_t) n.f5.accept(this, argu)).getRegister();
 		this.asm_.append("HSTORE ").append(temp_array).append(" 0 ").append(expr).append("\n");
 		return new Variable_t(temp_array, null);
@@ -767,27 +757,24 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(ArrayLookup n, Base_t argu) throws Exception {
 		String length = newTemp();
 		String cond = newTemp();
-		String error = labels_.newLabel();
-		String noerror = labels_.newLabel();
+		String error_label = "Runtime_Error";
 		String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
-		this.asm_.append("HLOAD ").append(length).append(" ").append(array).append(" 0\n"); 			// load real size to length
-		String pos = ((Variable_t) n.f2.accept(this, argu)).getRegister();
-		this.asm_.append("MOVE ").append(cond).append(" LT ").append(pos).append(" ").append(length).append("\n");	// if pos < arr.length
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(error).append("\n");
-		this.asm_.append("MOVE ").append(cond).append(" LT ").append(pos).append(" 0\n");				// if arr.length > 0 g
+		// load length
+		this.asm_.append("HLOAD ").append(length).append(" ").append(array).append(" 0\n");
+		String idx = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+		// if idx < arr.length
+		this.asm_.append("MOVE ").append(cond).append(" LT ").append(idx).append(" ").append(length).append("\n");
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(error_label).append("\n");
+		// if idx >= 0
+		this.asm_.append("MOVE ").append(cond).append(" LT ").append(idx).append(" 0\n");
 		String one = newTemp();
 		this.asm_.append("MOVE ").append(one).append(" 1\n");
 		this.asm_.append("MOVE ").append(cond).append(" MINUS ").append(one).append(" ").append(cond).append("\n");
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(error).append("\n");
-		this.asm_.append("JUMP ").append(noerror).append("\n");
-		this.asm_.append(error).append(" NOOP\n");
-		this.asm_.append("ERROR\n").append(noerror).append(" NOOP\n");
+		this.asm_.append("CJUMP ").append(cond).append(" ").append(error_label).append("\n");
 		String temp_array = newTemp();
-		this.asm_.append("MOVE ").append(temp_array).append(" ").append(array).append("\n");			// temp_array = &array
-		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" 4\n");
-		String temp = newTemp();
-		this.asm_.append("MOVE ").append(temp).append(" TIMES ").append(pos).append(" 4\n");
-		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" ").append(temp).append("\n");
+		// skip length
+		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(array).append(" 1\n");
+		this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" ").append(idx).append("\n");
 		String ret = newTemp();
 		this.asm_.append("HLOAD ").append(ret).append(" ").append(temp_array).append(" 0\n");
         return new Variable_t(null, null, ret);
@@ -821,24 +808,28 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         Method_t meth = cl.getMethod(func.getName());
         int offset = meth.getMeth_num_() - 1;
 		String vtable_addr = newTemp();
-		String thisTemp = newTemp();
-		String methTemp = newTemp();
-        this.asm_.append("MOVE ").append(thisTemp).append(" ").append(objreg).append("\n"); 	// load the address of vtable
-        this.asm_.append("HLOAD ").append(vtable_addr).append(" ").append(thisTemp).append(" 0\n"); 	// load the address of vtable
-        this.asm_.append("HLOAD ").append(methTemp).append(" ").append(vtable_addr).append(" ").append(offset * 4).append("\n");	// load the right method from vtable
-        // add params to method call
+		String this_temp = newTemp();
+		String meth_temp = newTemp();
+		// load the correct method from the vtable
+        this.asm_.append("MOVE ").append(this_temp).append(" ").append(objreg).append("\n");
+        this.asm_.append("HLOAD ").append(vtable_addr).append(" ").append(this_temp).append(" 0\n");
+        this.asm_.append("HLOAD ").append(meth_temp).append(" ").append(vtable_addr).append(" ").append(offset).append("\n");
+
+// TODO: check if TEMP 0 is this.
+
+		// add parameters to method
+		// this.asm_.append("MOVE TEMP 0").append(this_temp).append("\n");
 		StringBuilder parStr = new StringBuilder(" ");
-        if (n.f4.present()) {														// if meth has params
+        if (n.f4.present()) {
             Method_t params = (Method_t) n.f4.accept(this, argu);
 	        for (int i = 0 ; i < params.method_params.size() ; i++) {				// for every par
-	        	Variable_t var = params.method_params.get(i);
-				String parTemp = newTemp();
-	        	this.asm_.append("MOVE ").append(parTemp).append(" ").append(var.getRegister()).append("\n");
-	        	parStr.append(parTemp).append(" ");
+				String par_temp = newTemp();
+	        	this.asm_.append("MOVE " + par_temp + " " + ((Variable_t) params.method_params.get(i)).getRegister() + "\n");
+	        	parStr.append(par_temp).append(" ");
 	        }
 	    }
 		String ret = newTemp();
-        this.asm_.append("MOVE ").append(ret).append(" CALL ").append(methTemp).append("( ").append(thisTemp).append(parStr).append(")\n");
+        this.asm_.append("MOVE ").append(ret).append(" CALL ").append(meth_temp).append("( ").append(this_temp).append(parStr).append(")\n");
         return new Variable_t(meth.getType_(), null, ret);
 	}
 
@@ -916,7 +907,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		this.asm_.append("SECSEEK ").append(ret).append(" ").append(t).append("\n");
 		return new Variable_t("int", null, ret);
 	}
-	
+
  	/**
     * f0 -> Expression()
     * f1 -> ExpressionTail()
@@ -933,9 +924,12 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     */
     public Base_t visit(ExpressionTail n, Base_t argu) throws Exception {
         Method_t meth = new Method_t(null, null);
-        if (n.f0.present())                 // create a linked list of variables. (parameters list)
-            for (int i = 0 ; i < n.f0.size() ; i++)
-                meth.method_params.addLast( (Variable_t)n.f0.nodes.get(i).accept(this, argu) );
+		// create a linked list of variables. (parameters list)
+        if (n.f0.present()) {
+			for (int i = 0 ; i < n.f0.size() ; i++) {
+				meth.method_params.addLast( (Variable_t)n.f0.nodes.get(i).accept(this, argu) );
+			}
+		}
         return meth;
     }
 
@@ -1031,9 +1025,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 				if (var == null) {
                     return new Variable_t(null, id);
                 }
-				String newTemp = newTemp();
-				this.asm_.append("HLOAD ").append(newTemp).append(" TEMP 0 ").append(var.getNum() * 4).append("\n");
-                return new Variable_t(var.getType(), id, newTemp);
+				String new_temp = newTemp();
+				this.asm_.append("HLOAD ").append(new_temp).append(" TEMP 0 ").append(var.getNum()).append("\n");
+                return new Variable_t(var.getType(), id, new_temp);
 			}
 		}
 	}
@@ -1054,33 +1048,20 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	* f4 -> "]"
 	*/
 	public Base_t visit(ArrayAllocationExpression n, Base_t argu) throws Exception {
-		String lstart = labels_.newLabel();
-		String lend = labels_.newLabel();
-		String noerror = labels_.newLabel();
-		String expr = ((Variable_t) n.f3.accept(this, argu)).getRegister();
-		String zero = newTemp();
-		String cnt = newTemp();
+		String len = ((Variable_t) n.f3.accept(this, argu)).getRegister();
 		String cond = newTemp();
-		String size = newTemp();
-		String alloc_sz = newTemp();
+		String one = newTemp();
+		String len_to_alloc = newTemp();
 		String array = newTemp();
-		String array_addr = newTemp();
-		this.asm_.append("MOVE ").append(cond).append(" LT ").append(expr).append(" 0\n"); 						// check if given length > 0
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(noerror).append("\n");
-		this.asm_.append("ERROR\n").append(noerror).append(" NOOP\n");
-		this.asm_.append("MOVE ").append(size).append(" PLUS ").append(expr).append(" 1\n"); 						// create room for arraylength
-		this.asm_.append("MOVE ").append(alloc_sz).append(" TIMES ").append(size).append(" 4\n");					// *4 for bytes
-		this.asm_.append("MOVE ").append(array).append(" HALLOCATE ").append(alloc_sz).append("\n"); 				// allocate
-		this.asm_.append("HSTORE ").append(array).append(" 0 ").append(expr).append("\n");							// store array length in first position
-		this.asm_.append("MOVE ").append(array_addr).append(" ").append(array).append("\nMOVE ").append(cnt).append(" 4\n");	// keep array address and init a counter
-		this.asm_.append(lstart).append(" NOOP\nMOVE ").append(cond).append(" LT ").append(cnt).append(" ").append(alloc_sz).append("\n");
-		this.asm_.append("CJUMP ").append(cond).append(" ").append(lend).append("\n"); 							// if !cond goto end
-		this.asm_.append("MOVE ").append(array).append(" PLUS ").append(array).append(" 4\n");						// &array++
-		this.asm_.append("MOVE ").append(zero).append(" 0\n");
-		this.asm_.append("HSTORE ").append(array).append(" 0 ").append(zero).append("\n");
-		this.asm_.append("MOVE ").append(cnt).append(" PLUS ").append(cnt).append(" 4\n");							// cnt++
-		this.asm_.append("JUMP ").append(lstart).append("\n").append(lend).append(" NOOP\n");						// loop
-        return new Variable_t(null, null, array_addr);
+		// check if length > 0
+		this.asm_.append("MOVE ").append(cond).append(" LT ").append(len).append(" 0\n");
+		this.asm_.append("MOVE ").append(one).append(" 1\n");
+		this.asm_.append("MOVE ").append(cond).append(" MINUS ").append(one).append(" " + cond + "\n");
+		this.asm_.append("CJUMP ").append(cond).append(" Runtime_Error\n");
+		this.asm_.append("MOVE ").append(len_to_alloc).append(" PLUS ").append(len).append(" 1\n"); // create room for array length
+		this.asm_.append("MOVE ").append(array).append(" HALLOCATE ").append(len_to_alloc).append("\n"); // allocate
+		this.asm_.append("HSTORE ").append(array).append(" 0 ").append(len).append("\n"); // store array length in first position
+        return new Variable_t(null, null, array);
 	}
 
 	/**
@@ -1093,16 +1074,15 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		String id = n.f1.accept(this, argu).getName();
         Class_t cl = st_.get(id);
 		String new_obj = newTemp();
-		String vtable_ptr = newTemp();
-		String vtable_addr = newTemp();
-        this.asm_.append("MOVE ").append(new_obj).append(" HALLOCATE ").append((1 + cl.getNumVars()) * 4).append("\n");
-        this.asm_.append("MOVE ").append(vtable_addr).append(" ").append(cl.getVTableAddress()).append("\n");
-        this.asm_.append("HLOAD ").append(vtable_ptr).append(" ").append(vtable_addr).append(" 0\n");
-        this.asm_.append("HSTORE ").append(new_obj).append(" 0 ").append(vtable_ptr).append("\n");
+		// String vtable_ptr = newTemp();
+		String vtable = newTemp();
+        this.asm_.append("MOVE ").append(new_obj).append(" HALLOCATE ").append(1 + cl.getNumVars()).append("\n");
+        this.asm_.append("MOVE ").append(vtable).append(" ").append(cl.getVTableAddress()).append("\n");
+        this.asm_.append("HSTORE ").append(new_obj).append(" 0 ").append(vtable).append("\n");
 		String zero = newTemp();
         this.asm_.append("MOVE ").append(zero).append(" 0\n");
         for (int i = 1 ; i <= cl.getNumVars() ; i++) {
-            this.asm_.append("HSTORE ").append(new_obj).append(" ").append(i * 4).append(" ").append(zero).append("\n");
+            this.asm_.append("HSTORE ").append(new_obj).append(" ").append(i).append(" ").append(zero).append("\n");
         }
         this.asm_.append("\n");
         return new Variable_t(id, id, new_obj);

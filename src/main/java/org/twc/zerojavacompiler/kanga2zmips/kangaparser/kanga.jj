@@ -35,8 +35,6 @@ TOKEN :
 | < DOT: "." >
 | < LT: "LT" >
 | < LTE: "LTE" >
-//| < GT: "GT" >
-//| < GTE: "GTE" >
 | < EQ: "EQ" >
 | < NEQ: "NEQ" >
 | < PLUS: "PLUS" >

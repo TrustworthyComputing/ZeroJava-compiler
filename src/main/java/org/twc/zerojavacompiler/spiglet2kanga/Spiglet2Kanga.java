@@ -17,6 +17,9 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     }
 
 	String getNewLabel(String labelName) {
+		if ("Runtime_Error".equals(labelName)) {
+			return "__" + labelName + "__";
+		}
 		return "__" + labelName + "_" + currMethod.getName() + "__";
 	}
 
@@ -263,15 +266,16 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		// store callee-saved S
 		if (currMethod.save_regs_map.size() != 0) {
 			for (int idx = stackIdx; idx < stackIdx + currMethod.save_regs_map.size(); idx++) {
-				if (idx - stackIdx > 7)
-					break;
+				if (idx - stackIdx > 7) break;
 				asm_.append("\t\tASTORE SPILLEDARG ").append(idx).append(" s").append(idx - stackIdx);
 			}
 		}
 		// move params regA to TEMP
-		for (stackIdx = 0; stackIdx < currMethod.getNum_parameters_() && stackIdx < 4; stackIdx++)
-			if (currMethod.temp_reg_intervals.containsKey(stackIdx))
+		for (stackIdx = 0; stackIdx < currMethod.getNum_parameters_() && stackIdx < 4; stackIdx++) {
+			if (currMethod.temp_reg_intervals.containsKey(stackIdx)) {
 				moveToTemp("TEMP " + stackIdx, "a" + stackIdx);
+			}
+		}
 		// load params(>4)
 		for (; stackIdx < currMethod.getNum_parameters_(); stackIdx++) {
 			String tempName = "TEMP " + stackIdx;
@@ -288,13 +292,11 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		n.f1.accept(this);
 		// v0 stores returnValue
 		asm_.append("\t\tMOVE v0 ").append(n.f3.accept(this));
-
 		// restore callee-saved S
 		stackIdx = currMethod.getNum_parameters_() > 4 ? currMethod.getNum_parameters_() - 4 : 0;
 		if (currMethod.save_regs_map.size() != 0) {
 			for (int j = stackIdx; j < stackIdx + currMethod.save_regs_map.size(); j++) {
-				if (j - stackIdx > 7)
-					break;
+				if (j - stackIdx > 7) break;
 				asm_.append("\t\tALOAD s").append(j - stackIdx).append(" SPILLEDARG ").append(j);
 			}
 		}
@@ -379,8 +381,9 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	 */
 	public String visit(SimpleExp n) throws Exception {
 		String _ret = n.f0.accept(this);
-		if (n.f0.which == 0)
+		if (n.f0.which == 0) {
 			_ret = temp2Reg("v1", _ret);
+		}
 		return _ret;
 	}
 

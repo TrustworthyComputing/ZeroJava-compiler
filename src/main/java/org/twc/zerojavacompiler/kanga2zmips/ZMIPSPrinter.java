@@ -23,8 +23,8 @@ public class ZMIPSPrinter {
     }
 
     public void printLabel(String s) {
+        if ("__Runtime_Error__".equals(s)) return;
         asm_.append(s).append(":\n");
-//        asm_.append(s).append("\n");
     }
 
     public void println(String s) {

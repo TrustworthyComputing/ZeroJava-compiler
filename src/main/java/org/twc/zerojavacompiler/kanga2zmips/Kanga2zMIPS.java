@@ -12,7 +12,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     private int num_parameters_;
 
     public Kanga2zMIPS(int hp) {
-        int INIT_STACK_OFFSET_ = 10000;
+        int INIT_STACK_OFFSET_ = 1000;
         this.sp_ = INIT_STACK_OFFSET_;
         this.label_num_ = 0;
         this.hp_ = hp;
@@ -52,7 +52,6 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f12 -> ( Procedure() )*
      * f13 -> <EOF>
      */
-
     public String visit(Goal n) throws Exception {
         num_parameters_ = Integer.parseInt(n.f2.accept(this));
         num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
@@ -62,8 +61,8 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         int stackNum = Integer.parseInt(n.f5.accept(this));
         stackNum = stackNum - num_parameters_ + callParamNum + 2;
 
-//        String[] beginLines = { "move $sp, " + sp_, "sw $fp, -8($sp)", "sw $ra, -4($sp)", "move $fp, $sp", "sub $sp, $sp, " + 4 * stackNum };
-//        String[] endLines = { "lw $ra, -4($fp)", "lw $fp, -8($fp)", "add $sp, $sp, " + 4 * stackNum, "jr $ra" };
+//        String[] beginLines = { "move $sp, " + sp_, "sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum };
+//        String[] endLines = { "lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra" };
         zmipsPrinter_.begin("main");
         zmipsPrinter_.println("move $hp, " + hp_);
         zmipsPrinter_.println("move $sp, " + sp_);
@@ -112,8 +111,8 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         stackNum = stackNum - num_parameters_ + callParamNum + 2;
         // parameters of this method is stored above this stack frame
         // additional 2: $ra $fp
-        String[] beginLines = { "sw $fp, -8($sp)", "sw $ra, -4($sp)", "move $fp, $sp", "sub $sp, $sp, " + 4 * stackNum };
-        String[] endLines = { "lw $ra, -4($fp)", "lw $fp, -8($fp)", "add $sp, $sp, " + 4 * stackNum, "jr $ra" };
+        String[] beginLines = { "sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum };
+        String[] endLines = { "lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra" };
 
         zmipsPrinter_.begin(method);
         for (String line : beginLines) {
@@ -304,7 +303,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         // PASSARG starts from 1
         int offset = Integer.parseInt(n.f1.accept(this)) - 1;
         String regFrom = n.f2.accept(this);
-        zmipsPrinter_.println("sw " + regFrom + ", " + 4 * offset + "($sp)");
+        zmipsPrinter_.println("sw " + regFrom + ", " + offset + "($sp)");
         return null;
     }
 
@@ -313,8 +312,6 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f1 -> SimpleExp()
      */
     public String visit(CallStmt n) throws Exception {
-// TODO
-//        zmipsPrinter_.println("jalr " + label);
         String label = n.f1.accept(this);
         String return_addr = getNewLabel();
         zmipsPrinter_.println("la $ra, " + return_addr);
@@ -376,10 +373,9 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      *       | "SRL"
      */
     public String visit(Operator n) throws Exception {
-// TODO
         String[] retValue = {
                 "slt", "sle", "seq", "sne",         // comparison
-                "add", "sub", "mul", "div", "mod",  // arithmetic
+                "add", "sub", "mult", "div", "mod", // arithmetic
                 "and", "or", "xor", "sll", "slr"    // bitwise
         };
         return retValue[n.f0.which];
@@ -408,7 +404,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
             // is spilled register/saved register
             idx = num_parameters_ - idx - 3;// below $fp [$ra] [$fp]
         }
-        return 4 * idx + "($fp)";
+        return idx + "($fp)";
     }
 
     /**
