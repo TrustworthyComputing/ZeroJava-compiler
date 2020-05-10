@@ -359,8 +359,10 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 	 *       | "SRL"
 	 */
 	public String visit(Operator n) throws Exception {
-		String[] _ret = { "LT ", "LTE ", "GT ", "GTE ", "EQ ", "NEQ ", "PLUS ", "MINUS ",
-				"TIMES ", "DIV ", "MOD ", "AND ", "OR ", "XOR ", "SLL ", "SRL " };
+		String[] _ret = {
+				"LT ", "LTE ", "GT ", "GTE ", "EQ ", "NEQ ",
+				"PLUS ", "MINUS ", "TIMES ", "DIV ", "MOD ",
+				"AND ", "OR ", "XOR ", "SLL ", "SRL " };
 		return _ret[n.f0.which];
 	}
 

@@ -35,8 +35,8 @@ TOKEN :
 | < DOT: "." >
 | < LT: "LT" >
 | < LTE: "LTE" >
-| < GT: "GT" >
-| < GTE: "GTE" >
+//| < GT: "GT" >
+//| < GTE: "GTE" >
 | < EQ: "EQ" >
 | < NEQ: "NEQ" >
 | < PLUS: "PLUS" >
@@ -343,8 +343,8 @@ void Operator() :
 {
   "LT"
 | "LTE"
-| "GT"
-| "GTE"
+//| "GT"
+//| "GTE"
 | "EQ"
 | "NEQ"
 | "PLUS"

@@ -338,11 +338,8 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f1 -> SimpleExp()
      */
     public String visit(HAllocate n) throws Exception {
-// TODO
         String _ret = "$v0";
         String reg = n.f1.accept(this);
-//        zmipsPrinter_.println("move $a0, " + reg);
-//        zmipsPrinter_.println("jal _halloc");
         zmipsPrinter_.println("move " + _ret + ", $hp");
         zmipsPrinter_.println("add $hp, $hp, " + reg);
         return _ret;
@@ -354,7 +351,6 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f2 -> SimpleExp()
      */
     public String visit(BinOp n) throws Exception {
-// TODO
         String _ret = "$v1";
         String op = n.f0.accept(this);
         String reg1 = n.f1.accept(this);
@@ -366,8 +362,6 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     /**
      * f0 -> "LT"
      *       | "LTE"
-     *       | "GT"
-     *       | "GTE"
      *       | "EQ"
      *       | "NEQ"
      *       | "PLUS"
@@ -382,8 +376,12 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      *       | "SRL"
      */
     public String visit(Operator n) throws Exception {
-        String[] retValue = { "slt", "sle", "sgt", "sge", "seq", "sne",
-                "add", "sub", "mul", "div", "mod", "and", "or", "xor", "sll", "slr" };
+// TODO
+        String[] retValue = {
+                "slt", "sle", "seq", "sne",         // comparison
+                "add", "sub", "mul", "div", "mod",  // arithmetic
+                "and", "or", "xor", "sll", "slr"    // bitwise
+        };
         return retValue[n.f0.which];
     }
 

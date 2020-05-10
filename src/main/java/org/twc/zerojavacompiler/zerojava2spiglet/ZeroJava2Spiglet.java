@@ -710,7 +710,17 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		} else {
 			throw new IllegalStateException("CompoundAssignmentStatement: Unexpected value: " + operator);
 		}
-		this.asm_.append("MOVE ").append(ret).append(" ").append(opcode).append(" ").append(t1).append(" ").append(t2).append("\n");
+		if ("GT".equals(opcode)) {
+			String new_temp = newTemp();
+			this.asm_.append("MOVE ").append(new_temp).append(" ").append(t2).append("\n");
+			this.asm_.append("MOVE ").append(ret).append(" LT ").append(new_temp).append(" ").append(t1).append("\n");
+		} else if ("GTE".equals(opcode)) {
+			String new_temp = newTemp();
+			this.asm_.append("MOVE ").append(new_temp).append(" ").append(t2).append("\n");
+			this.asm_.append("MOVE ").append(ret).append(" LTE ").append(new_temp).append(" ").append(t1).append("\n");
+		} else {
+			this.asm_.append("MOVE ").append(ret).append(" ").append(opcode).append(" ").append(t1).append(" ").append(t2).append("\n");
+		}
         return new Variable_t(null, null, ret);
 	}
 
