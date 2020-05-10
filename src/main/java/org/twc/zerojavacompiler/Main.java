@@ -77,6 +77,7 @@ public class Main {
                 if (debug_) {
                     System.out.println(zerojava2spiglet.getASM());
                 }
+                int hp_ = zerojava2spiglet.getHP();
                 writer.close();
                 System.out.println("[ \u2713 ] Spiglet code generated to \"" + spiglet_output_path + "\"");
 
@@ -112,7 +113,7 @@ public class Main {
                 KangaParser kanga_parser = new KangaParser(fis);
                 org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
                 // Kanga to MIPS
-                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS();
+                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(hp_);
                 kanga_ast.accept(kanga2zmips);
 
                 path = fp.getPath();

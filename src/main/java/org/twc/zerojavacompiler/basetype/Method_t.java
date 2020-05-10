@@ -126,7 +126,7 @@ public class Method_t extends Base_t {
             return false;
         }
         param.setNum(++this.num_parameters_);
-        param.setRegister("$a" + param.getNum());
+        param.setRegister("TEMP " + param.getNum());
         method_params.add(param);
         return true;
     }

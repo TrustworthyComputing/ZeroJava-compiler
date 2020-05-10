@@ -12,11 +12,13 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	private final Label labels_;
     private final Map<String, Class_t> st_;
     private int globals_;
+	private int hp_;
 
 	public ZeroJava2Spiglet(Map<String, Class_t> st, int globals) {
 		this.labels_ = new Label();
         this.st_ = st;
         this.globals_ = globals;
+        this.hp_ = 0;
 	}
 
 	private void initVtables() {
@@ -28,7 +30,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 			String label = labels_.newVTableLabel(cl.getName());
 			String vtable = newTemp();
 			String temp = newTemp();
-			this.asm_.append("MOVE ").append(vtable).append(" ").append(label).append("\n");
+			this.asm_.append("MOVE ").append(vtable).append(" ").append(hp_).append("\n");
+			cl.setVTableAddress(hp_);
+			hp_ += cl.getNumMethods();
 			int offset = cl.getNumMethods();
 			this.asm_.append("MOVE ").append(temp).append(" HALLOCATE ").append(offset * 4).append("\n");
 			this.asm_.append("HSTORE ").append(vtable).append(" 0 ").append(temp).append("\n");
@@ -46,7 +50,11 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		return asm_.toString();
 	}
 
-    public String newTemp() {
+	public int getHP() {
+		return this.hp_;
+	}
+
+	public String newTemp() {
 		return "TEMP " + ++globals_;
     }
 
@@ -986,8 +994,9 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	*/
 	public Base_t visit(Identifier n, Base_t argu) throws Exception {
 		String id = n.f0.toString();
-		if (argu == null)
+		if (argu == null) {
 			return new Variable_t(null, id);
+		}
 		Class_t cl = st_.get(argu.getName());
 		if (cl != null) {									// if argu is a class name
 			Variable_t var = cl.classContainsVar(id);
@@ -1073,21 +1082,20 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 	public Base_t visit(AllocationExpression n, Base_t argu) throws Exception {
 		String id = n.f1.accept(this, argu).getName();
         Class_t cl = st_.get(id);
-		String t = newTemp();
-		String vtable = newTemp();
+		String new_obj = newTemp();
+		String vtable_ptr = newTemp();
 		String vtable_addr = newTemp();
-		String label = labels_.newVTableLabel(cl.getName());
-        this.asm_.append("MOVE ").append(t).append(" HALLOCATE ").append((1 + cl.getNumVars()) * 4).append("\n");
-        this.asm_.append("MOVE ").append(vtable_addr).append(" ").append(label).append("\n");
-        this.asm_.append("HLOAD ").append(vtable).append(" ").append(vtable_addr).append(" 0\n");
-        this.asm_.append("HSTORE ").append(t).append(" 0 ").append(vtable).append("\n");
+        this.asm_.append("MOVE ").append(new_obj).append(" HALLOCATE ").append((1 + cl.getNumVars()) * 4).append("\n");
+        this.asm_.append("MOVE ").append(vtable_addr).append(" ").append(cl.getVTableAddress()).append("\n");
+        this.asm_.append("HLOAD ").append(vtable_ptr).append(" ").append(vtable_addr).append(" 0\n");
+        this.asm_.append("HSTORE ").append(new_obj).append(" 0 ").append(vtable_ptr).append("\n");
 		String zero = newTemp();
         this.asm_.append("MOVE ").append(zero).append(" 0\n");
         for (int i = 1 ; i <= cl.getNumVars() ; i++) {
-            this.asm_.append("HSTORE ").append(t).append(" ").append(i * 4).append(" ").append(zero).append("\n");
+            this.asm_.append("HSTORE ").append(new_obj).append(" ").append(i * 4).append(" ").append(zero).append("\n");
         }
         this.asm_.append("\n");
-        return new Variable_t(id, id, t);
+        return new Variable_t(id, id, new_obj);
 	}
 
 	/**
