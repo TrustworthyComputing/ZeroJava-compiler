@@ -6,14 +6,13 @@ import org.twc.zerojavacompiler.kanga2zmips.kangavisitor.*;
 public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
 
     private final ZMIPSPrinter zmipsPrinter_;
-    private int sp_;
-    private int hp_;
+    private final int sp_;
+    private final int hp_;
     private int label_num_;
     private int num_parameters_;
 
     public Kanga2zMIPS(int hp) {
-        int INIT_STACK_OFFSET_ = 1000;
-        this.sp_ = INIT_STACK_OFFSET_;
+        this.sp_ = 2000;
         this.label_num_ = 0;
         this.hp_ = hp;
         this.zmipsPrinter_ = new ZMIPSPrinter();
@@ -56,11 +55,10 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         num_parameters_ = Integer.parseInt(n.f2.accept(this));
         num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
         // 4 params using registers
-        int callParamNum = Integer.parseInt(n.f8.accept(this));
-        callParamNum = callParamNum > 4 ? callParamNum - 4 : 0;
-        int stackNum = Integer.parseInt(n.f5.accept(this));
-        stackNum = stackNum - num_parameters_ + callParamNum + 2;
-
+//        int callParamNum = Integer.parseInt(n.f8.accept(this));
+//        callParamNum = callParamNum > 4 ? callParamNum - 4 : 0;
+//        int stackNum = Integer.parseInt(n.f5.accept(this));
+//        stackNum = stackNum - num_parameters_ + callParamNum + 2;
 //        String[] beginLines = { "move $sp, " + sp_, "sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum };
 //        String[] endLines = { "lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra" };
         zmipsPrinter_.begin("main");
@@ -192,7 +190,11 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     public String visit(MoveStmt n) throws Exception {
         String regTo = n.f1.accept(this);
         String regFrom = n.f2.accept(this);
-        zmipsPrinter_.println("move " + regTo + ", " + regFrom);
+        if (regFrom.startsWith("__") && regFrom.endsWith("__")) {
+            zmipsPrinter_.println("la " + regTo + ", " + regFrom);
+        } else {
+            zmipsPrinter_.println("move " + regTo + ", " + regFrom);
+        }
         return null;
     }
 
@@ -414,17 +416,12 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      */
     // returns a simple register
     public String visit(SimpleExp n) throws Exception {
-        String _ret = "$v1";
         String str = n.f0.accept(this);
-        if (n.f0.which == 0) { // if register
-            _ret = str;
-        } else if (n.f0.which == 1) { // if immediate
-            _ret = str;
-//            zmipsPrinter_.println("li $v1, " + str);
+        if (n.f0.which == 2) { // if label
+            return "__" + str + "__";
         } else {
-            zmipsPrinter_.println("la $v1, __" + str + "__");
+            return str;
         }
-        return _ret;
     }
 
     /**

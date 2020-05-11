@@ -18,7 +18,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 		this.labels_ = new Label();
         this.st_ = st;
         this.globals_ = globals;
-        this.hp_ = 0;
+        this.hp_ = 1000;
 	}
 
 	private void initVtables() {
