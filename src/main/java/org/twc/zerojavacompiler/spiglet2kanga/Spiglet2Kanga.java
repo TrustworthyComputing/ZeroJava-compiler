@@ -267,7 +267,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 		if (currMethod.save_regs_map.size() != 0) {
 			for (int idx = stackIdx; idx < stackIdx + currMethod.save_regs_map.size(); idx++) {
 				if (idx - stackIdx > 7) break;
-				asm_.append("\t\tASTORE SPILLEDARG ").append(idx).append(" s").append(idx - stackIdx);
+				asm_.append("\t\tASTORE SPILLEDARG ").append(idx).append(" s").append(idx - stackIdx).append("\n");
 			}
 		}
 		// move params regA to TEMP
@@ -291,13 +291,14 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 
 		n.f1.accept(this);
 		// v0 stores returnValue
-		asm_.append("\t\tMOVE v0 ").append(n.f3.accept(this));
+		String ret_exp = n.f3.accept(this);
+		asm_.append("\t\tMOVE v0 ").append(ret_exp).append("\n");
 		// restore callee-saved S
 		stackIdx = currMethod.getNum_parameters_() > 4 ? currMethod.getNum_parameters_() - 4 : 0;
 		if (currMethod.save_regs_map.size() != 0) {
 			for (int j = stackIdx; j < stackIdx + currMethod.save_regs_map.size(); j++) {
 				if (j - stackIdx > 7) break;
-				asm_.append("\t\tALOAD s").append(j - stackIdx).append(" SPILLEDARG ").append(j);
+				asm_.append("\t\tALOAD s").append(j - stackIdx).append(" SPILLEDARG ").append(j).append("\n");
 			}
 		}
 		asm_.append("\nEND");
