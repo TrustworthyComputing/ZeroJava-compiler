@@ -99,7 +99,7 @@ public class Class_t extends Base_t {
                 if (parameters.size() != meth.getMethod_params().size()) {
                     return false;
                 }
-                for (int j = 0 ; j < parameters.size() ; j++) {
+                for (int j = 0; j < parameters.size(); j++) {
                     if (parameters.get(j).getType() != meth.getMethod_params().get(j).getType()) {
                         return false;
                     }

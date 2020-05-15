@@ -76,7 +76,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         n.f12.accept(this);
         // final
         zmipsPrinter_.begin("Runtime_Error");
-        String[] finalLines = { "move $t0, 0xffffffffffffffff", "answer $t0" };
+        String[] finalLines = {"move $t0, 0xffffffffffffffff", "answer $t0"};
         for (String line : finalLines) {
             zmipsPrinter_.println(line);
         }
@@ -109,8 +109,8 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         stackNum = stackNum - num_parameters_ + callParamNum + 2;
         // parameters of this method is stored above this stack frame
         // additional 2: $ra $fp
-        String[] beginLines = { "sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum };
-        String[] endLines = { "lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra" };
+        String[] beginLines = {"sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum};
+        String[] endLines = {"lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra"};
 
         zmipsPrinter_.begin(method);
         for (String line : beginLines) {
@@ -324,9 +324,9 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
 
     /**
      * f0 -> HAllocate()
-     *       | BinOp()
-     *       | NotExp()
-     *       | SimpleExp()
+     * | BinOp()
+     * | NotExp()
+     * | SimpleExp()
      */
     public String visit(Exp n) throws Exception {
         return n.f0.accept(this);
@@ -360,19 +360,19 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
 
     /**
      * f0 -> "LT"
-     *       | "LTE"
-     *       | "EQ"
-     *       | "NEQ"
-     *       | "PLUS"
-     *       | "MINUS"
-     *       | "TIMES"
-     *       | "DIV"
-     *       | "MOD"
-     *       | "AND"
-     *       | "OR"
-     *       | "XOR"
-     *       | "SLL"
-     *       | "SRL"
+     * | "LTE"
+     * | "EQ"
+     * | "NEQ"
+     * | "PLUS"
+     * | "MINUS"
+     * | "TIMES"
+     * | "DIV"
+     * | "MOD"
+     * | "AND"
+     * | "OR"
+     * | "XOR"
+     * | "SLL"
+     * | "SRL"
      */
     public String visit(Operator n) throws Exception {
         String[] retValue = {
@@ -451,8 +451,8 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * | "v1"
      */
     public String visit(Reg n) throws Exception {
-        String[] retValue = { "a0", "a1", "a2", "a3", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "s0", "s1", "s2",
-                "s3", "s4", "s5", "s6", "s7", "t8", "t9", "v0", "v1" };
+        String[] retValue = {"a0", "a1", "a2", "a3", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "s0", "s1", "s2",
+                "s3", "s4", "s5", "s6", "s7", "t8", "t9", "v0", "v1"};
         return "$" + retValue[n.f0.which];
     }
 

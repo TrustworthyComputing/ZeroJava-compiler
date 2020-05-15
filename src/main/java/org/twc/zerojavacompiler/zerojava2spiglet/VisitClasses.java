@@ -3,6 +3,7 @@ package org.twc.zerojavacompiler.zerojava2spiglet;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor.GJNoArguDepthFirst;
 import org.twc.zerojavacompiler.basetype.*;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -78,7 +79,7 @@ public class VisitClasses extends GJNoArguDepthFirst<Class_t> {
         if (st_.containsKey(class_name)) {
             throw new Exception("Class " + class_name + " already exists.");
         }
-        if (! st_.containsKey(class_extends_name)) {
+        if (!st_.containsKey(class_extends_name)) {
             throw new Exception("Class " + class_extends_name + " is not defined. Cannot extend a class before declaring it.");
         }
         st_.put(class_name, new Class_t(class_name, class_extends_name));
@@ -86,8 +87,8 @@ public class VisitClasses extends GJNoArguDepthFirst<Class_t> {
     }
 
     /**
-    * f0 -> <IDENTIFIER>
-    */
+     * f0 -> <IDENTIFIER>
+     */
     public Class_t visit(Identifier n) throws Exception {
         return new Class_t(n.f0.toString(), null);
     }

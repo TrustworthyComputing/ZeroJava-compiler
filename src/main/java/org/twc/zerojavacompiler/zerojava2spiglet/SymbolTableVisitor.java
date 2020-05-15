@@ -3,6 +3,7 @@ package org.twc.zerojavacompiler.zerojava2spiglet;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.*;
 import org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor.GJNoArguDepthFirst;
 import org.twc.zerojavacompiler.basetype.*;
+
 import java.util.Map;
 
 /* Second Visitor Pattern creates the Symbol Table */
@@ -33,25 +34,25 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
     }
 
     /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> "public"
-    * f4 -> "static"
-    * f5 -> "void"
-    * f6 -> "main"
-    * f7 -> "("
-    * f8 -> "String"
-    * f9 -> "["
-    * f10 -> "]"
-    * f11 -> Identifier()
-    * f12 -> ")"
-    * f13 -> "{"
-    * f14 -> ( VarDeclaration() )*
-    * f15 -> ( Statement() )*
-    * f16 -> "}"
-    * f17 -> "}"
-    */
+     * f0 -> "class"
+     * f1 -> Identifier()
+     * f2 -> "{"
+     * f3 -> "public"
+     * f4 -> "static"
+     * f5 -> "void"
+     * f6 -> "main"
+     * f7 -> "("
+     * f8 -> "String"
+     * f9 -> "["
+     * f10 -> "]"
+     * f11 -> Identifier()
+     * f12 -> ")"
+     * f13 -> "{"
+     * f14 -> ( VarDeclaration() )*
+     * f15 -> ( Statement() )*
+     * f16 -> "}"
+     * f17 -> "}"
+     */
     public Base_t visit(MainClass n) throws Exception {
         n.f0.accept(this);
         n.f1.accept(this);
@@ -77,11 +78,11 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         String classname = n.f1.accept(this).getName();
         Class_t mainclass = st_.get(classname);
         mainclass.setIsMain();
-        if (! mainclass.addMethod(m)) {
+        if (!mainclass.addMethod(m)) {
             throw new Exception("Method " + m.getName() + " already exists");
         }
         if (n.f14.present()) {
-            for (int i = 0 ; i < n.f14.size() ; i++) {
+            for (int i = 0; i < n.f14.size(); i++) {
                 if (!m.addVar((Variable_t) n.f14.nodes.get(i).accept(this))) {
                     throw new Exception("Class " + classname + ": Variable " + n.f14.nodes.get(i).accept(this).getName() + " already exists");
                 }
@@ -95,13 +96,13 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
     }
 
     /**
-    * f0 -> "class"
-    * f1 -> Identifier()
-    * f2 -> "{"
-    * f3 -> ( VarDeclaration() )*
-    * f4 -> ( MethodDeclaration() )*
-    * f5 -> "}"
-    */
+     * f0 -> "class"
+     * f1 -> Identifier()
+     * f2 -> "{"
+     * f3 -> ( VarDeclaration() )*
+     * f4 -> ( MethodDeclaration() )*
+     * f5 -> "}"
+     */
     public Base_t visit(ClassDeclaration n) throws Exception {
         n.f0.accept(this);
         String classname = n.f1.accept(this).getName();
@@ -111,26 +112,26 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         n.f5.accept(this);
         // add Class Variables
         if (n.f3.present()) {
-            for (int i = 0 ; i < n.f3.size() ; i++) {   // for every variable
+            for (int i = 0; i < n.f3.size(); i++) {   // for every variable
                 // if variable isnt unique
-                if (!st_.get(classname).addVar((Variable_t)n.f3.nodes.get(i).accept(this))) {
+                if (!st_.get(classname).addVar((Variable_t) n.f3.nodes.get(i).accept(this))) {
                     throw new Exception("Class " + classname + ": Variable " + n.f3.nodes.get(i).accept(this).getName() + " already exists");
                 }
                 String vartype = ((Variable_t) n.f3.nodes.get(i).accept(this)).getType();
-                if (! (vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
                     throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
                 }
             }
         }
         // add Class Methods
         if (n.f4.present()) {
-            for (int i = 0 ; i < n.f4.size() ; i++) {
+            for (int i = 0; i < n.f4.size(); i++) {
                 // if method isnt unique
-                if (! st_.get(classname).addMethod((Method_t) n.f4.nodes.get(i).accept(this)) ) {
+                if (!st_.get(classname).addMethod((Method_t) n.f4.nodes.get(i).accept(this))) {
                     throw new Exception("Class " + classname + ": Method " + n.f4.nodes.get(i).accept(this).getName() + " already exists");
                 }
                 String vartype = ((Method_t) n.f4.nodes.get(i).accept(this)).getType_();
-                if (! (vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
                     throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
                 }
             }
@@ -161,9 +162,9 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         Class_t parentClass = st_.get(parent_id);
         // add Class Variables
         if (n.f5.present()) {
-            for (int i = 0 ; i < n.f5.size() ; i++) {
+            for (int i = 0; i < n.f5.size(); i++) {
                 Variable_t var = (Variable_t) n.f5.nodes.get(i).accept(this);
-                if (! newClass.addVar( var) ) { // if variable isnt unique
+                if (!newClass.addVar(var)) { // if variable isnt unique
                     throw new Exception("Class " + id + ": Variable " + var.getName() + " already exists.");
                 }
                 String vartype = var.getType();
@@ -173,10 +174,10 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
             }
         }
         //add variables from parent-class
-        parentClass.class_vars_map.forEach((k, v) -> newClass.copyVar(v) );
+        parentClass.class_vars_map.forEach((k, v) -> newClass.copyVar(v));
         // add Class Methods
         if (n.f6.present()) {
-            for (int i = 0 ; i < n.f6.size() ; i++) {
+            for (int i = 0; i < n.f6.size(); i++) {
                 Method_t m = (Method_t) n.f6.nodes.get(i).accept(this);
 
                 // if method isnt unique
@@ -210,7 +211,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         //add methods from parent-class
         for (Method_t parentsMeth : parentClass.class_methods_map.values()) {
             if (parentsMeth.getName().equals("main")) {
-                continue ;
+                continue;
             }
             newClass.addMethod(parentsMeth);
             newClass.setNumMethods(parentClass.getNumMethods());
@@ -254,7 +255,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         // add parameters to method
         if (n.f4.present()) {
             Method_t m = (Method_t) n.f4.accept(this);
-            for (int i = 0 ; i < m.method_params.size() ; i++) {
+            for (int i = 0; i < m.method_params.size(); i++) {
                 Variable_t param = m.method_params.get(i);
                 meth.addParam(param);
                 String vartype = param.getType();
@@ -268,7 +269,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         // add method Variables
         if (n.f7.present()) {
             n.f7.accept(this);
-            for (int i = 0 ; i < n.f7.size() ; i++) {
+            for (int i = 0; i < n.f7.size(); i++) {
                 if (!meth.addVar((Variable_t) n.f7.nodes.get(i).accept(this))) {
                     throw new Exception("Method " + meth_name + ": Variable " + n.f7.nodes.get(i).accept(this).getName() + " already exists");
                 }
@@ -319,7 +320,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         Method_t meth = new Method_t(null, null);
         // create a linked list of variables. (parameters list)
         if (n.f0.present()) {
-            for (int i = 0 ; i < n.f0.size() ; i++) {
+            for (int i = 0; i < n.f0.size(); i++) {
                 if (!meth.addParam((Variable_t) n.f0.nodes.get(i).accept(this))) {
                     throw new Exception("Parameter " + n.f0.nodes.get(i).accept(this).getName() + " already exists");
                 }
@@ -340,9 +341,9 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
 
     /**
      * f0 -> ArrayType()
-     *       | BooleanType()
-     *       | IntegerType()
-     *       | Identifier()
+     * | BooleanType()
+     * | IntegerType()
+     * | Identifier()
      */
     public Base_t visit(Type n) throws Exception {
         return n.f0.accept(this);

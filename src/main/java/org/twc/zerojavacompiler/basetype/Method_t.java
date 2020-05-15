@@ -160,7 +160,7 @@ public class Method_t extends Base_t {
                 System.out.print(", ");
             }
         }
-        System.out.println(") <"+ from_class_.getName() +">\n\t\tMethod Variables:");
+        System.out.println(") <" + from_class_.getName() + ">\n\t\tMethod Variables:");
         for (Variable_t v : method_vars) {
             System.out.print("\t\t\t");
             v.printVar();
