@@ -8,7 +8,7 @@ public class ArgumentType extends FactType {
 
     public ArgumentType(String meth_name, String temp) {
         super(meth_name);
-        this.temp = temp;
+        this.temp = "\"" + temp + "\"";
     }
 
     public void writeRecord(PrintWriter writer, boolean print) {

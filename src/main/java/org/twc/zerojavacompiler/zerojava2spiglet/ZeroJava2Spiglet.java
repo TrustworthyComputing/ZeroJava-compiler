@@ -830,7 +830,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
             }
         }
         String ret = newTemp();
-        this.asm_.append("MOVE ").append(ret).append(" CALL ").append(meth_temp).append("( ").append(this_temp).append(parStr).append(")\n");
+        this.asm_.append("MOVE ").append(ret).append(" CALL ").append(meth_temp).append(" ( ").append(this_temp).append(parStr).append(")\n");
         return new Variable_t(meth.getType_(), null, ret);
     }
 

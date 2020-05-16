@@ -537,6 +537,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
             for (ConditionalJumpType cjump : conditional_jumps_) {
                 cjump.writeRecord(file, print_facts);
             }
+            file.close();
 
             file = new PrintWriter(path + "/Args.iris");
             if (print_facts) System.out.println("\nArgs:");
