@@ -90,7 +90,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
      */
     public Base_t visit(MainClass n, Base_t argu) throws Exception {
         this.asm_ = new StringBuilder();
-        this.asm_.append("MAIN\n\n");
+        this.asm_.append("MAIN\n");
         String id = n.f1.accept(this, argu).getName();
         Method_t meth = st_.get(id).getMethod("main");
         initVtables();
@@ -916,7 +916,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     public Base_t visit(ExpressionList n, Base_t argu) throws Exception {
         Variable_t expr = (Variable_t) n.f0.accept(this, argu);
         Method_t meth = (Method_t) n.f1.accept(this, argu);
-        meth.method_params.addLast(expr);
+        meth.method_params.add(expr);
         return meth;
     }
 
@@ -928,7 +928,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         // create a linked list of variables. (parameters list)
         if (n.f0.present()) {
             for (int i = 0; i < n.f0.size(); i++) {
-                meth.method_params.addLast((Variable_t) n.f0.nodes.get(i).accept(this, argu));
+                meth.method_params.add((Variable_t) n.f0.nodes.get(i).accept(this, argu));
             }
         }
         return meth;

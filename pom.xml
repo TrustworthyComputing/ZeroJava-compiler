@@ -147,44 +147,6 @@
                             </arguments>
                         </configuration>
                     </execution>
-                    <!-- zMIPS -->
-                    <execution>
-                        <id>generate-zmips-visitors</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${gen.sources.skip}</skip>
-                            <executable>java</executable>
-                            <workingDirectory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer</workingDirectory>
-                            <arguments>
-                                <argument>-jar</argument>
-                                <argument>${basedir}/lib/jtb132di.jar</argument>
-                                <argument>-te</argument>
-                                <argument>./zmipsparser/zmips.jj</argument>
-                                <argument>-np</argument>
-                                <argument>org.twc.zerojavacompiler.zmipsoptimizer.zmipssyntaxtree</argument>
-                                <argument>-vp</argument>
-                                <argument>org.twc.zerojavacompiler.zmipsoptimizer.zmipsvisitor</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>generate-zmips-parser</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${gen.sources.skip}</skip>
-                            <executable>javacc</executable>
-                            <workingDirectory>src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser</workingDirectory>
-                            <arguments>
-                                <argument>zmips-jtb.jj</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <!-- Install Iris jars -->
@@ -338,31 +300,6 @@
                             </includes>
                             <excludes>
                                 <exclude>**/kanga.jj</exclude>
-                            </excludes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <!-- zMIPS -->
-                        <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipssyntaxtree</directory>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsvisitor</directory>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>${basedir}/src/main/java/org/twc/zerojavacompiler/zmipsoptimizer/zmipsparser</directory>
-                            <includes>
-                                <include>**/*.java</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/zmips.jj</exclude>
                             </excludes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>

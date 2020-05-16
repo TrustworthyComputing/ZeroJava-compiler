@@ -1,0 +1,197 @@
+// Next instruction of i is j
+next(?meth, ?i, ?j) :- 	
+    instruction(?meth, ?i, ?x),
+    instruction(?meth, ?j, ?y),
+    ?i+1 = ?j,
+    !jumpInstr(?meth, ?i, ?label).
+
+next(?meth, ?i, ?j) :- 
+    instruction(?meth, ?i, ?x),
+    instruction(?meth, ?j, ?label),
+    jumpInstr(?meth, ?i, ?label).
+
+next(?meth, ?i, ?j) :-
+    instruction(?meth, ?i, ?x),
+    instruction(?meth, ?j, ?label),
+    cjumpInstr(?meth, ?i, ?label).
+
+// Path from i to j
+reachable(?meth, ?i, ?j) :-	
+    next(?meth, ?i, ?j).
+
+reachable(?meth, ?i, ?j) :-
+    next(?meth, ?i, ?k),
+    reachable(?meth, ?k, ?j).
+
+// Label instruction
+label(?meth, ?line) :-
+    jumpInstr(?meth, ?i, ?lab),
+    instruction(?meth, ?line, ?lab).
+
+label(?meth, ?line) :-
+    cjumpInstr(?meth, ?i, ?lab),
+    instruction(?meth, ?line, ?lab).
+
+// Move type
+move(?meth, ?l, ?var, ?v) :-
+    constMove(?meth, ?l, ?var, ?v).
+    
+move(?meth, ?l, ?var, ?v) :-
+    varMove(?meth, ?l, ?var, ?v).
+
+// Jump type
+jtype(?meth, ?l) :-
+    jumpInstr(?meth, ?l, ?label).
+jtype(?meth, ?l) :-
+    cjumpInstr(?meth, ?l, ?label).
+
+// Last instruction of program
+lastInstr(?meth, ?l) :-
+    instruction(?meth, ?l, ?smth),
+    !next(?meth, ?l, ?j).
+
+lastInstr(?meth, ?l) :-
+	instruction(?meth, ?l, ?smth),
+	answerInstruction(?meth, ?l, ?smth).
+
+// Live Variable at i
+live(?meth, ?var, ?i):-
+    varUse(?meth, ?i, ?var).
+
+live(?meth, ?var, ?i):-
+    !varDef(?meth, ?i, ?var),
+    next(?meth, ?i, ?k),
+    live(?meth, ?var, ?k).
+
+// Dead Code
+deadCode(?meth, ?l, ?var) :-
+    varDef(?meth, ?l, ?var),
+    !binOpMove(?meth, ?l, ?var, ?smth), // a variable may be dead, but a meth could be void 
+    next(?meth, ?l, ?j),
+    !live(?meth, ?var, ?j).
+
+deadCode(?meth, ?l, ?var) :-
+    varDef(?meth, ?l, ?var),
+    !binOpMove(?meth, ?l, ?var, ?smth), // a variable may be dead, but a meth could be void 
+    lastInstr(?meth, ?l).
+
+// Path from smth to the first reachable def
+pathtoDef(?meth, ?i, ?j, ?var) :-
+    next(?meth, ?i, ?j),
+    var(?meth, ?var).
+
+pathtoDef(?meth, ?i, ?j, ?var) :-
+    !varDef(?meth, ?k, ?var),
+    var(?meth, ?var),
+    next(?meth, ?i, ?k),
+    pathtoDef(?meth, ?k, ?j, ?var).
+
+// constant propagations from the last move at line k to Use at line l.
+prop(?meth, ?k, ?l, ?var) :-
+    varDef(?meth, ?k, ?var),
+    pathtoDef(?meth, ?k, ?l, ?var),
+    varUse(?meth, ?l, ?var),
+    !arg(?meth, ?var).
+
+
+// Cannot propagate if you have 2 different values for 1 var at line k
+noConstProp(?meth, ?l, ?var, ?val1) :-
+    prop(?meth, ?k1, ?l, ?var1),
+    prop(?meth, ?k2, ?l, ?var2),
+    constMove(?meth, ?k1, ?var, ?val1),
+    constMove(?meth, ?k2, ?var, ?val2),
+    ?val1 != ?val2.
+
+noConstProp(?meth, ?l, ?var, ?val1) :-
+    prop(?meth, ?k1, ?l, ?var1),
+    prop(?meth, ?k2, ?l, ?var2),
+    constMove(?meth, ?k1, ?var, ?val1),
+    binOpMove(?meth, ?k2, ?var, ?val2),
+    ?val1 != ?val2.
+    
+// Cannot propagate if you have 2 different values for 1 var at line k
+noCopyProp(?meth, ?l, ?var, ?val1) :-
+    prop(?meth, ?k1, ?l, ?var1),
+    prop(?meth, ?k2, ?l, ?var2),
+    varMove(?meth, ?k1, ?var, ?val1),
+    varMove(?meth, ?k2, ?var, ?val2),
+    ?val1 != ?val2.
+
+noCopyProp(?meth, ?l, ?var, ?val1) :-
+    prop(?meth, ?k1, ?l, ?var1),
+    prop(?meth, ?k2, ?l, ?var2),
+    varMove(?meth, ?k1, ?var, ?val1),
+    binOpMove(?meth, ?k2, ?var, ?val2),
+    ?val1 != ?val2.
+
+// Cannot propagate if you have 2 different values for 1 var at line k
+noBothProp(?meth, ?l, ?var, ?val1) :-
+    prop(?meth, ?k1, ?l, ?var1),
+    prop(?meth, ?k2, ?l, ?var2),
+    constMove(?meth, ?k1, ?var, ?val1),
+    varMove(?meth, ?k2, ?var, ?val2),
+    ?val1 != ?val2.
+
+// Constant Propagation
+constProp(?meth, ?l, ?var, ?val) :-
+    prop(?meth, ?k, ?l, ?var),
+    constMove(?meth, ?k, ?var, ?val),
+    !noConstProp(?meth, ?l, ?var, ?val),
+    !noBothProp(?meth, ?l, ?var, ?v2),
+    var(?meth, ?var),
+    varUse(?meth, ?l, ?var).
+
+// Copy Propagation
+copyProp(?meth, ?l, ?var, ?val) :-
+    prop(?meth, ?k, ?l, ?var),
+    varMove(?meth, ?k, ?var, ?val),
+    !noCopyProp(?meth, ?l, ?var, ?val),
+    !noBothProp(?meth, ?l, ?var, ?v2),
+    var(?meth, ?var),
+    varUse(?meth, ?l, ?var).
+
+// Basic Block Starts at:								
+bbstarts(?meth, ?start) :-
+    instruction(?meth, ?start, ?smth),
+    ?start = 1.
+
+bbstarts(?meth, ?start) :-
+    label(?meth, ?start).
+
+bbstarts(?meth, ?start) :-
+    jtype(?meth, ?i),
+    ?i+1 = ?start.
+
+// Basic Block Ends at:								
+bbends(?meth, ?end) :-
+    lastInstr(?meth, ?end).
+
+bbends(?meth, ?end) :-
+    jtype(?meth, ?end).
+
+bbends(?meth, ?end) :-
+    label(?meth, ?i),
+    ?end+1 = ?i.
+
+// Path from start to end without unnecessary insertions 
+pathtoBlockEnd(?meth, ?s, ?e) :-
+    instruction(?meth, ?s, ?smth),
+    next(?meth, ?s, ?e),
+    !bbstarts(?meth, ?e).
+
+pathtoBlockEnd(?meth, ?s, ?e) :-
+    !bbends(?meth, ?k),
+    !bbstarts(?meth, ?k),
+    next(?meth, ?s, ?k),
+    pathtoBlockEnd(?meth, ?k, ?e).
+
+// Basic Block
+basicBlock(?meth, ?s, ?e):-
+    bbstarts(?meth, ?s),
+    pathtoBlockEnd(?meth, ?s, ?e),
+    bbends(?meth, ?e).
+
+basicBlock(?meth, ?s, ?e):-
+    bbstarts(?meth, ?s),
+    bbends(?meth, ?e),
+    ?s = ?e.
