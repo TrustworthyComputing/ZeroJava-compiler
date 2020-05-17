@@ -3,35 +3,9 @@ package org.twc.zerojavacompiler.spigletoptimizer;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.*;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletvisitor.GJDepthFirst;
 
-import java.util.Enumeration;
 import java.util.Map;
 
-class Optimizations {
-
-    public String instr_or_temp_;
-    public String const_prop_;
-
-    public Optimizations(String instr_or_temp) {
-        this.instr_or_temp_ = instr_or_temp;
-        this.const_prop_ = null;
-    }
-
-    public Optimizations(String instr_or_temp, String const_prop_) {
-        this.instr_or_temp_ = instr_or_temp;
-        this.const_prop_ = const_prop_;
-    }
-
-    public String getOptimizedTemp() {
-        if (this.const_prop_ != null) {
-            return this.const_prop_;
-        } else {
-            return this.instr_or_temp_;
-        }
-    }
-
-}
-
-public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
+public class OptimizerVisitor extends GJDepthFirst<OptimizationWrapper, String> {
 
     private final StringBuilder asm_;
     public int instr_cnt_;
@@ -77,9 +51,9 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
     }
 
     // get Labels
-    public Optimizations visit(NodeOptional n, String argu) throws Exception {
+    public OptimizationWrapper visit(NodeOptional n, String argu) throws Exception {
         if (n.present()) {
-            asm_.append(n.node.accept(this, argu).instr_or_temp_);
+            asm_.append(n.node.accept(this, argu).getInstr_or_temp_());
         }
         return null;
     }
@@ -91,7 +65,7 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f3 -> ( Procedure() )*
      * f4 -> <EOF>
      */
-    public Optimizations visit(Goal n, String argu) throws Exception {
+    public OptimizationWrapper visit(Goal n, String argu) throws Exception {
         this.asm_.append("MAIN\n");
         n.f1.accept(this, "MAIN");
         this.asm_.append("END\n");
@@ -102,16 +76,16 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
     /**
      * f0 -> ( ( Label() )? Stmt() )*
      */
-    public Optimizations visit(StmtList n, String argu) throws Exception {
+    public OptimizationWrapper visit(StmtList n, String argu) throws Exception {
         if (n.f0.present()) {
             for (int i = 0; i < n.f0.size(); i++) {
-                Optimizations opt = n.f0.elementAt(i).accept(this, argu);
+                OptimizationWrapper opt = n.f0.elementAt(i).accept(this, argu);
                 if (opt == null) {
                     this.instr_cnt_++;
                     continue;
                 }
-                System.out.println(opt.instr_or_temp_);
-                String str = opt.instr_or_temp_;
+                System.out.println(opt.getInstr_or_temp_());
+                String str = opt.getInstr_or_temp_();
                 if (str.matches("L(.*)")) {
                     this.asm_.append(str).append("\n");
                 }
@@ -131,10 +105,10 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f3 -> "]"
      * f4 -> StmtExp()
      */
-    public Optimizations visit(Procedure n, String argu) throws Exception {
+    public OptimizationWrapper visit(Procedure n, String argu) throws Exception {
         this.instr_cnt_ = 1;
-        String id = n.f0.accept(this, argu).instr_or_temp_;
-        String args = n.f2.accept(this, argu).instr_or_temp_;
+        String id = n.f0.accept(this, argu).getInstr_or_temp_();
+        String args = n.f2.accept(this, argu).getInstr_or_temp_();
         this.asm_.append(id).append("[").append(args).append("]\n");
         n.f4.accept(this, id);
         return null;
@@ -152,23 +126,23 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * | PrintlnStmt()
      * | AnswerStmt()
      */
-    public Optimizations visit(Stmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(Stmt n, String argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
     /**
      * f0 -> "NOOP"
      */
-    public Optimizations visit(NoOpStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(NoOpStmt n, String argu) throws Exception {
         asm_.append("\t\tNOOP\n");
-        return new Optimizations("NOOP");
+        return new OptimizationWrapper("NOOP");
     }
 
     /**
      * f0 -> "ERROR"
      */
-    public Optimizations visit(ErrorStmt n, String argu) throws Exception {
-        return new Optimizations("ERROR");
+    public OptimizationWrapper visit(ErrorStmt n, String argu) throws Exception {
+        return new OptimizationWrapper("ERROR");
     }
 
     /**
@@ -176,23 +150,23 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f1 -> Temp()
      * f2 -> Label()
      */
-    public Optimizations visit(CJumpStmt n, String argu) throws Exception {
-        String tmp = n.f1.accept(this, argu).instr_or_temp_;
-        String label = n.f2.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(CJumpStmt n, String argu) throws Exception {
+        String tmp = n.f1.accept(this, argu).getInstr_or_temp_();
+        String label = n.f2.accept(this, argu).getInstr_or_temp_();
         String instr = "CJUMP " + tmp + " " + label + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "JUMP"
      * f1 -> Label()
      */
-    public Optimizations visit(JumpStmt n, String argu) throws Exception {
-        String label = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(JumpStmt n, String argu) throws Exception {
+        String label = n.f1.accept(this, argu).getInstr_or_temp_();
         String instr = "JUMP " + label + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -201,13 +175,13 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f2 -> IntegerLiteral()
      * f3 -> Temp()
      */
-    public Optimizations visit(HStoreStmt n, String argu) throws Exception {
-        String tmp1 = n.f1.accept(this, argu).instr_or_temp_;
-        String lit = n.f2.accept(this, argu).instr_or_temp_;
-        String tmp2 = n.f3.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(HStoreStmt n, String argu) throws Exception {
+        String tmp1 = n.f1.accept(this, argu).getInstr_or_temp_();
+        String lit = n.f2.accept(this, argu).getInstr_or_temp_();
+        String tmp2 = n.f3.accept(this, argu).getInstr_or_temp_();
         String instr = "HSTORE " + tmp1 + " " + lit + " " + tmp2 + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -216,13 +190,13 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f2 -> Temp()
      * f3 -> IntegerLiteral()
      */
-    public Optimizations visit(HLoadStmt n, String argu) throws Exception {
-        String tmp1 = n.f1.accept(this, argu).instr_or_temp_;
-        String tmp2 = n.f2.accept(this, argu).instr_or_temp_;
-        String lit = n.f3.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(HLoadStmt n, String argu) throws Exception {
+        String tmp1 = n.f1.accept(this, argu).getInstr_or_temp_();
+        String tmp2 = n.f2.accept(this, argu).getInstr_or_temp_();
+        String lit = n.f3.accept(this, argu).getInstr_or_temp_();
         String instr = "HLOAD " + tmp1 + " " + tmp2 + " " + lit + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -230,68 +204,68 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f1 -> Temp()
      * f2 -> Exp()
      */
-    public Optimizations visit(MoveStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(MoveStmt n, String argu) throws Exception {
         n.f0.accept(this, argu);
-        String tmp = n.f1.accept(this, argu).instr_or_temp_;
+        String tmp = n.f1.accept(this, argu).getInstr_or_temp_();
         String exp = n.f2.accept(this, argu).getOptimizedTemp();
         String instr = "MOVE " + tmp + " " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "PRINT"
      * f1 -> SimpleExp()
      */
-    public Optimizations visit(PrintStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(PrintStmt n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "PRINT " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "PRINTLN"
      * f1 -> SimpleExp()
      */
-    public Optimizations visit(PrintlnStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(PrintlnStmt n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "PRINTLN " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "ANSWER"
      * f1 -> SimpleExp()
      */
-    public Optimizations visit(AnswerStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(AnswerStmt n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "ANSWER " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "PUBREAD"
      * f1 -> Temp()
      */
-    public Optimizations visit(PublicReadStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(PublicReadStmt n, String argu) throws Exception {
         String expr = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "PUBREAD " + expr + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
      * f0 -> "SECREAD"
      * f1 -> Temp()
      */
-    public Optimizations visit(PrivateReadStmt n, String argu) throws Exception {
+    public OptimizationWrapper visit(PrivateReadStmt n, String argu) throws Exception {
         String expr = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "SECREAD " + expr + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -299,12 +273,12 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f1 -> Temp()
      * f2 -> SimpleExp()
      */
-    public Optimizations visit(PublicSeekStmt n, String argu) throws Exception {
-        String tmp = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(PublicSeekStmt n, String argu) throws Exception {
+        String tmp = n.f1.accept(this, argu).getInstr_or_temp_();
         String exp = n.f2.accept(this, argu).getOptimizedTemp();
         String instr = "PUBSEEK " + tmp + " " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -312,12 +286,12 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f1 -> Temp()
      * f2 -> SimpleExp()
      */
-    public Optimizations visit(PrivateSeekStmt n, String argu) throws Exception {
-        String tmp = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(PrivateSeekStmt n, String argu) throws Exception {
+        String tmp = n.f1.accept(this, argu).getInstr_or_temp_();
         String exp = n.f2.accept(this, argu).getOptimizedTemp();
         String instr = "SECSEEK " + tmp + " " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -327,7 +301,7 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * | NotExp()
      * | SimpleExp()
      */
-    public Optimizations visit(Exp n, String argu) throws Exception {
+    public OptimizationWrapper visit(Exp n, String argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -338,7 +312,7 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f3 -> SimpleExp()
      * f4 -> "END"
      */
-    public Optimizations visit(StmtExp n, String argu) throws Exception {
+    public OptimizationWrapper visit(StmtExp n, String argu) throws Exception {
         this.asm_.append("BEGIN\n");
         n.f1.accept(this, argu);
         String exp = n.f3.accept(this, argu).getOptimizedTemp();
@@ -354,12 +328,12 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f3 -> ( Temp() )*
      * f4 -> ")"
      */
-    public Optimizations visit(Call n, String argu) throws Exception {
-        String exp = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(Call n, String argu) throws Exception {
+        String exp = n.f1.accept(this, argu).getInstr_or_temp_();
         StringBuilder args = new StringBuilder("(");
         if (n.f3.present()) {
             for (int i = 0; i < n.f3.size(); i++) {
-                String temp = n.f3.nodes.get(i).accept(this, argu).instr_or_temp_;
+                String temp = n.f3.nodes.get(i).accept(this, argu).getInstr_or_temp_();
                 args.append(temp);
                 if (i < n.f3.size() - 1) {
                     args.append(" ");
@@ -367,16 +341,16 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
             }
         }
         args.append(")");
-        return new Optimizations("CALL " + exp + " " + args);
+        return new OptimizationWrapper("CALL " + exp + " " + args);
     }
 
     /**
      * f0 -> "HALLOCATE"
      * f1 -> SimpleExp()
      */
-    public Optimizations visit(HAllocate n, String argu) throws Exception {
+    public OptimizationWrapper visit(HAllocate n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
-        return new Optimizations("HALLOCATE " + exp);
+        return new OptimizationWrapper("HALLOCATE " + exp);
     }
 
     /**
@@ -384,11 +358,11 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f1 -> Temp()
      * f2 -> SimpleExp()
      */
-    public Optimizations visit(BinOp n, String argu) throws Exception {
-        String op = n.f0.accept(this, argu).instr_or_temp_;
-        String tmp = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(BinOp n, String argu) throws Exception {
+        String op = n.f0.accept(this, argu).getInstr_or_temp_();
+        String tmp = n.f1.accept(this, argu).getInstr_or_temp_();
         String exp = n.f2.accept(this, argu).getOptimizedTemp();
-        return new Optimizations(op + " " + tmp + " " + exp);
+        return new OptimizationWrapper(op + " " + tmp + " " + exp);
     }
 
     /**
@@ -409,19 +383,19 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * | "SLL"
      * | "SRL"
      */
-    public Optimizations visit(Operator n, String argu) throws Exception {
-        return new Optimizations(n.f0.choice.toString());
+    public OptimizationWrapper visit(Operator n, String argu) throws Exception {
+        return new OptimizationWrapper(n.f0.choice.toString());
     }
 
     /**
      * f0 -> "NOT"
      * f1 -> SimpleExp()
      */
-    public Optimizations visit(NotExp n, String argu) throws Exception {
+    public OptimizationWrapper visit(NotExp n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "NOT " + exp + "\n";
         checkIfDeadCode(argu, instr);
-        return new Optimizations(instr);
+        return new OptimizationWrapper(instr);
     }
 
     /**
@@ -429,7 +403,7 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * | IntegerLiteral()
      * | Label()
      */
-    public Optimizations visit(SimpleExp n, String argu) throws Exception {
+    public OptimizationWrapper visit(SimpleExp n, String argu) throws Exception {
         return n.f0.accept(this, argu);
     }
 
@@ -437,13 +411,13 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
      * f0 -> "TEMP"
      * f1 -> IntegerLiteral()
      */
-    public Optimizations visit(Temp n, String argu) throws Exception {
-        String t = n.f1.accept(this, argu).instr_or_temp_;
+    public OptimizationWrapper visit(Temp n, String argu) throws Exception {
+        String t = n.f1.accept(this, argu).getInstr_or_temp_();
         String ret = "TEMP " + t;
         String copy_prop_fact = optimizations_.get("copyProp").get(argu + instr_cnt_);
         if (copy_prop_fact != null) {
             if (getMethFromFact(copy_prop_fact).equals(argu) && getFirstTempFromFact(copy_prop_fact).equals(ret)) {
-                return new Optimizations(getSecondTempFromFact(copy_prop_fact));
+                return new OptimizationWrapper(getSecondTempFromFact(copy_prop_fact));
             }
         }
         String const_prop_fact = optimizations_.get("constProp").get(argu + instr_cnt_);
@@ -451,29 +425,29 @@ public class OptimizerVisitor extends GJDepthFirst<Optimizations, String> {
             if (getMethFromFact(const_prop_fact).equals(argu)) {
                 if (copy_prop_fact != null && getFirstTempFromFact(copy_prop_fact).equals(getFirstTempFromFact(const_prop_fact))) {
                     if (getFirstTempFromFact(copy_prop_fact).equals(ret) && getMethFromFact(copy_prop_fact).equals(argu)) {
-                        return new Optimizations(getImmediateFromFact(copy_prop_fact));
+                        return new OptimizationWrapper(getImmediateFromFact(copy_prop_fact));
                     }
                 }
                 if (getFirstTempFromFact(const_prop_fact).equals(ret)) {
-                    return new Optimizations(ret, getImmediateFromFact(const_prop_fact));
+                    return new OptimizationWrapper(ret, getImmediateFromFact(const_prop_fact));
                 }
             }
         }
-        return new Optimizations(ret);
+        return new OptimizationWrapper(ret);
     }
 
     /**
      * f0 -> <INTEGER_LITERAL>
      */
-    public Optimizations visit(IntegerLiteral n, String argu) throws Exception {
-        return new Optimizations(n.f0.toString());
+    public OptimizationWrapper visit(IntegerLiteral n, String argu) throws Exception {
+        return new OptimizationWrapper(n.f0.toString());
     }
 
     /**
      * f0 -> <IDENTIFIER>
      */
-    public Optimizations visit(Label n, String argu) throws Exception {
-        return new Optimizations(n.f0.toString());
+    public OptimizationWrapper visit(Label n, String argu) throws Exception {
+        return new OptimizationWrapper(n.f0.toString());
     }
 
 }

@@ -30,9 +30,7 @@ public class SpigletOptimizer {
         String filepath_no_extension = fp.getPath();
         filepath_no_extension = filepath_no_extension.substring(0, filepath_no_extension.lastIndexOf('.'));
         String spg_filepath = filepath_no_extension + ".spg";
-
-        System.out.println("\n\n===================================================================================");
-        System.out.println("Optimizing file \"" + spg_filepath + "\"\n");
+        System.out.println("[  \u2022  ] Optimizing Spiglet code until a fixed-point");
 
         boolean can_optimize = true;
         Map<String, Map<String, String>> prev_optimizations_map;
@@ -50,7 +48,7 @@ public class SpigletOptimizer {
             FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
             spiglet_root.accept(factgen_visitor, null);
             factgen_visitor.writeFacts(facts_output_path, debug_);
-            System.out.println("[ 1/3 ] Spiglet code relations inference phase completed");
+            System.out.println("\t[ 1/3 ] Spiglet code relations inference phase completed");
 
             org.deri.iris.compiler.Parser iris_parser = new Parser();
             Map<IPredicate, IRelation> factMap = new HashMap<>();
@@ -73,19 +71,20 @@ public class SpigletOptimizer {
             Reader rulesReader = new FileReader(rulesFile);
             File queriesFile = new File("src/main/java/org/twc/zerojavacompiler/spigletoptimizer/staticanalysis/queries.iris");
             Reader queriesReader = new FileReader(queriesFile);
-            iris_parser.parse(rulesReader);                                 // Parse rules file.
-            List<IRule> rules = iris_parser.getRules();                     // Retrieve the rules from the parsed file.
-            iris_parser.parse(queriesReader);                               // Parse queries file.
-            List<IQuery> queries = iris_parser.getQueries();                // Retrieve the queries from the parsed file.
-            Configuration configuration = new Configuration();              // Create a default configuration.
-            configuration.programOptmimisers.add(new MagicSets());          // Enable Magic Sets together with rule filtering.
-            IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration); // Create the knowledge base.
+            iris_parser.parse(rulesReader);
+            List<IRule> rules = iris_parser.getRules();
+            iris_parser.parse(queriesReader);
+            List<IQuery> queries = iris_parser.getQueries();
+            Configuration configuration = new Configuration();
+            configuration.programOptmimisers.add(new MagicSets());
+            IKnowledgeBase knowledgeBase = new KnowledgeBase(factMap, rules, configuration);
             optimizations_map = new HashMap<>();
-            for (IQuery query : queries) { // Evaluate all queries over the knowledge base.
+            // Evaluate all queries over the knowledge base.
+            for (IQuery query : queries) {
                 List<IVariable> variableBindings = new ArrayList<>();
                 IRelation relation = knowledgeBase.execute(query, variableBindings);
                 if (debug_) {
-                    System.out.println("\n" + query.toString() + "\n" + variableBindings); // Output the variables.
+                    System.out.println("\n" + query.toString() + "\n" + variableBindings);
                 }
                 String queryType = null;
                 switch ((query.toString())) {
@@ -123,7 +122,7 @@ public class SpigletOptimizer {
             if (debug_) { // Print optimizations map
                 printOptMap(optimizations_map);
             }
-            System.out.println("[ 2/3 ] Static analysis phase completed");
+            System.out.println("\t[ 2/3 ] Static analysis phase completed");
 
             OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimizations_map);
             spiglet_root.accept(optimizer_visitor, null);
@@ -133,13 +132,15 @@ public class SpigletOptimizer {
             }
             writer.println(optimizer_visitor.getAsm());
             writer.close();
-            System.out.println("[ 3/3 ] Optimization phase completed");
-
+            System.out.println("\t[ 3/3 ] Performed static analysis optimizations");
             can_optimize = prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map);
-            System.out.println("\n");
+            if (can_optimize) {
+                System.out.println("\t[ \033[0;32m \u2713 \033[0m ] Optimization phase completed, proceeding to next iteration");
+            } else {
+                System.out.println("\t[ \033[0;32m \u2713 \033[0m ] Optimization phase completed, reached a fixed-point");
+            }
         }
         System.out.println("[ \033[0;32m \u2713 \033[0m ] Spiglet optimized code generated to \"" + spg_filepath + "\"");
-        System.out.println("===================================================================================");
     }
 
     private static int getLine(String fact) {
