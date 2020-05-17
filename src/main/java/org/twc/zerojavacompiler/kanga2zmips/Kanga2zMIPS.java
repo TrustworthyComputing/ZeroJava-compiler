@@ -26,8 +26,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         return "__RA_" + (label_num_++) + "__";
     }
 
-    // when StmtList ::= ( ( Label() )? Stmt() )*
-    // should print Label
+    // print Labels
     public String visit(NodeOptional n) throws Exception {
         if (n.present()) {
             zmipsPrinter_.printLabel(n.node.accept(this));
@@ -54,23 +53,11 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     public String visit(Goal n) throws Exception {
         num_parameters_ = Integer.parseInt(n.f2.accept(this));
         num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
-        // 4 params using registers
-//        int callParamNum = Integer.parseInt(n.f8.accept(this));
-//        callParamNum = callParamNum > 4 ? callParamNum - 4 : 0;
-//        int stackNum = Integer.parseInt(n.f5.accept(this));
-//        stackNum = stackNum - num_parameters_ + callParamNum + 2;
-//        String[] beginLines = { "move $sp, " + sp_, "sw $fp, -2($sp)", "sw $ra, -1($sp)", "move $fp, $sp", "sub $sp, $sp, " + stackNum };
-//        String[] endLines = { "lw $ra, -1($fp)", "lw $fp, -2($fp)", "add $sp, $sp, " + stackNum, "jr $ra" };
         zmipsPrinter_.begin("main");
+// TODO: Avoid adding the following two lines if they are not required
         zmipsPrinter_.println("move $hp, " + hp_);
         zmipsPrinter_.println("move $sp, " + sp_);
-//        for (String line : beginLines) {
-//            zmipsPrinter_.println(line);
-//        }
         n.f10.accept(this);
-//        for (String line : endLines) {
-//            zmipsPrinter_.println(line);
-//        }
         zmipsPrinter_.end();
         // other methods
         n.f12.accept(this);
@@ -123,14 +110,6 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         zmipsPrinter_.end();
         return null;
     }
-
-//    /**
-//     * f0 -> "NOOP"
-//     */
-//    public String visit(NoOpStmt n) throws Exception {
-//        zmipsPrinter_.println("nop");
-//        return null;
-//    }
 
     /**
      * f0 -> "CJUMP"

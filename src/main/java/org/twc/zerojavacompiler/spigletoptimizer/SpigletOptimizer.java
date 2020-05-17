@@ -13,6 +13,7 @@ import org.deri.iris.optimisations.magicsets.MagicSets;
 import org.deri.iris.storage.IRelation;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,24 +27,20 @@ public class SpigletOptimizer {
         this.debug_ = debug;
     }
 
-    public void performOptimizations(File fp) throws Exception {
-        String filepath_no_extension = fp.getPath();
-        filepath_no_extension = filepath_no_extension.substring(0, filepath_no_extension.lastIndexOf('.'));
-        String spg_filepath = filepath_no_extension + ".spg";
+    public InputStream performOptimizations(InputStream input_stream, String filepath) throws Exception {
+        String filepath_no_extension = filepath.substring(0, filepath.lastIndexOf('.'));
         System.out.println("[  \u2022  ] Optimizing Spiglet code until a fixed-point");
 
+        Map<String, Map<String, String>> prev_optimizations_map, optimizations_map = null;
+        String facts_output_path = "target/Facts/" + filepath_no_extension;
+        Path p = Paths.get(facts_output_path);
+        if (!Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
+            throw new IOException("Error creating folder " + facts_output_path);
+        }
         boolean can_optimize = true;
-        Map<String, Map<String, String>> prev_optimizations_map;
-        Map<String, Map<String, String>> optimizations_map = null;
         while (can_optimize) {
             prev_optimizations_map = optimizations_map;
-            String facts_output_path = "target/Facts/" + filepath_no_extension;
-            Path p = Paths.get(facts_output_path);
-            if (!Files.exists(p) && !(new File(facts_output_path)).mkdirs()) {
-                throw new IOException("Error creating folder " + facts_output_path);
-            }
-            FileInputStream fis = new FileInputStream(spg_filepath);
-            SpigletParser spiglet_parser = new SpigletParser(fis);
+            SpigletParser spiglet_parser = new SpigletParser(input_stream);
             org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.Goal spiglet_root = spiglet_parser.Goal();
             FactGeneratorVisitor factgen_visitor = new FactGeneratorVisitor();
             spiglet_root.accept(factgen_visitor, null);
@@ -64,7 +61,7 @@ public class SpigletOptimizer {
                     }
                 }
             } else {
-                System.err.println("Invalid facts directory facts_output_path");
+                System.err.println("Invalid facts directory: " + facts_output_path);
                 System.exit(-1);
             }
             File rulesFile = new File("src/main/java/org/twc/zerojavacompiler/spigletoptimizer/staticanalysis/rules.iris");
@@ -126,13 +123,19 @@ public class SpigletOptimizer {
 
             OptimizerVisitor optimizer_visitor = new OptimizerVisitor(optimizations_map);
             spiglet_root.accept(optimizer_visitor, null);
-            PrintWriter writer = new PrintWriter(spg_filepath);
+            String code = optimizer_visitor.getAsm();
             if (debug_) {
-                System.out.println("\n" + optimizer_visitor.getAsm());
+                String spg_filepath = filepath_no_extension + ".spg";
+                System.out.println("\n" + code);
+                PrintWriter writer = new PrintWriter(spg_filepath);
+                writer.println(code);
+                writer.close();
+                input_stream = new FileInputStream(spg_filepath);
+            } else {
+                input_stream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
             }
-            writer.println(optimizer_visitor.getAsm());
-            writer.close();
             System.out.println("\t[ 3/3 ] Performed static analysis optimizations");
+
             can_optimize = prev_optimizations_map == null || !optMapsEquals(prev_optimizations_map, optimizations_map);
             if (can_optimize) {
                 System.out.println("\t[ \033[0;32m \u2713 \033[0m ] Optimization phase completed, proceeding to next iteration");
@@ -140,7 +143,12 @@ public class SpigletOptimizer {
                 System.out.println("\t[ \033[0;32m \u2713 \033[0m ] Optimization phase completed, reached a fixed-point");
             }
         }
-        System.out.println("[ \033[0;32m \u2713 \033[0m ] Spiglet optimized code generated to \"" + spg_filepath + "\"");
+        if (debug_) {
+            System.out.println("[ \033[0;32m \u2713 \033[0m ] Spiglet optimized code generated to \"" + filepath_no_extension + ".spg\"");
+        } else {
+            System.out.println("[ \033[0;32m \u2713 \033[0m ] Generated Spiglet optimized code");
+        }
+        return input_stream;
     }
 
     private static int getLine(String fact) {

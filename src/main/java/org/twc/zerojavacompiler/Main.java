@@ -2,6 +2,7 @@ package org.twc.zerojavacompiler;
 
 import org.twc.zerojavacompiler.basetype.Class_t;
 import org.twc.zerojavacompiler.basetype.Method_t;
+import org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.Node;
 import org.twc.zerojavacompiler.spigletoptimizer.SpigletOptimizer;
 import org.twc.zerojavacompiler.zerojava2spiglet.SymbolTableVisitor;
 import org.twc.zerojavacompiler.zerojava2spiglet.TypeCheckVisitor;
@@ -16,8 +17,10 @@ import org.twc.zerojavacompiler.spiglet2kanga.Temp2Reg;
 import org.twc.zerojavacompiler.spiglet2kanga.spigletparser.SpigletParser;
 import org.twc.zerojavacompiler.kanga2zmips.Kanga2zMIPS;
 import org.twc.zerojavacompiler.kanga2zmips.kangaparser.KangaParser;
+import org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.Goal;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Main {
@@ -41,15 +44,18 @@ public class Main {
             }
         }
         for (String arg : input_files) {
-            FileInputStream fis = null;
+            InputStream input_stream = null;
             PrintWriter writer = null;
+            File fp = new File(arg);
+            String path = fp.getPath();
+            path = path.substring(0, path.lastIndexOf('.'));
             try {
                 // zerojava2spiglet
                 System.out.println("===================================================================================");
                 System.out.println("Compiling file \"" + arg + "\"");
-                fis = new FileInputStream(arg);
-                ZeroJavaParser zerojava_parser = new ZeroJavaParser(fis);
-                org.twc.zerojavacompiler.zerojava2spiglet.zerojavasyntaxtree.Goal zerojava_root = zerojava_parser.Goal();
+                input_stream = new FileInputStream(arg);
+                ZeroJavaParser zerojava_parser = new ZeroJavaParser(input_stream);
+                Goal zerojava_root = zerojava_parser.Goal();
                 VisitClasses firstvisit = new VisitClasses();
                 zerojava_root.accept(firstvisit);
                 System.out.println("[ 1/3 ] Class name collection phase completed");
@@ -69,29 +75,30 @@ public class Main {
                 // generate Spiglet code
                 ZeroJava2Spiglet zerojava2spiglet = new ZeroJava2Spiglet(symbol_table, symtable_visit.getGlobalsNumber());
                 zerojava_root.accept(zerojava2spiglet, null);
-                File fp = new File(arg);
-                String path = fp.getPath();
-                path = path.substring(0, path.lastIndexOf('.'));
-                String spiglet_output_path = path + ".spg";
-                writer = new PrintWriter(spiglet_output_path);
-                writer.print(zerojava2spiglet.getASM());
-                if (debug_) {
-                    System.out.println(zerojava2spiglet.getASM());
-                }
                 int hp_ = zerojava2spiglet.getHP();
-                writer.close();
-                System.out.println("[ \033[0;32m \u2713 \033[0m ] Spiglet code generated to \"" + spiglet_output_path + "\"");
+                String code = zerojava2spiglet.getASM();
+                if (debug_) {
+                    String spiglet_output_path = path + ".spg";
+                    writer = new PrintWriter(spiglet_output_path);
+                    writer.print(code);
+                    writer.close();
+                    System.out.println(code);
+                    System.out.println("[ \033[0;32m \u2713 \033[0m ] Spiglet code generated to \"" + spiglet_output_path + "\"");
+                    input_stream = new FileInputStream(spiglet_output_path);
+                } else {
+                    System.out.println("[ \033[0;32m \u2713 \033[0m ] Generated Spiglet code");
+                    input_stream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+                }
 
                 // optimize zMIPS code
                 if (enable_opts_) {
                     SpigletOptimizer spq_optimizer = new SpigletOptimizer(debug_);
-                    spq_optimizer.performOptimizations(fp);
+                    input_stream = spq_optimizer.performOptimizations(input_stream, fp.getPath());
                 }
 
                 // generate Kanga code
-                fis = new FileInputStream(spiglet_output_path);
-                SpigletParser spiglet_parser = new SpigletParser(fis);
-                org.twc.zerojavacompiler.spiglet2kanga.spigletsyntaxtree.Node spiglet_ast = spiglet_parser.Goal();
+                SpigletParser spiglet_parser = new SpigletParser(input_stream);
+                Node spiglet_ast = spiglet_parser.Goal();
                 HashMap<String, Method_t> method_map_ = new HashMap<>();
                 HashMap<String, Integer> mLabel = new HashMap<>();
                 spiglet_ast.accept(new GetFlowGraphVertex(method_map_, mLabel));
@@ -102,33 +109,32 @@ public class Main {
                 Spiglet2Kanga spiglet2kanga = new Spiglet2Kanga(method_map_);
                 spiglet_ast.accept(spiglet2kanga);
                 System.out.println("[ 3/3 ] Register allocation phase completed");
-                path = fp.getPath();
-                path = path.substring(0, path.lastIndexOf('.'));
-                String kanga_output_path = path + ".kg";
-                writer = new PrintWriter(kanga_output_path);
-                writer.print(spiglet2kanga.getASM());
+                code = spiglet2kanga.getASM();
                 if (debug_) {
-                    System.out.println(spiglet2kanga.getASM());
+                    System.out.println(code);
+                    String kanga_output_path = path + ".kg";
+                    writer = new PrintWriter(kanga_output_path);
+                    writer.print(code);
+                    writer.close();
+                    System.out.println("[ \033[0;32m \u2713 \033[0m ] Kanga code generated to \"" + kanga_output_path + "\"");
+                    input_stream = new FileInputStream(kanga_output_path);
+                } else {
+                    System.out.println("[ \033[0;32m \u2713 \033[0m ] Generated Kanga code");
+                    input_stream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
                 }
-                writer.close();
-                System.out.println("[ \033[0;32m \u2713 \033[0m ] Kanga code generated to \"" + kanga_output_path + "\"");
-
 
                 // generate zMIPS code from Kanga
-                fis = new FileInputStream(kanga_output_path);
-                KangaParser kanga_parser = new KangaParser(fis);
+                KangaParser kanga_parser = new KangaParser(input_stream);
                 org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
                 Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(hp_);
                 kanga_ast.accept(kanga2zmips);
-                path = fp.getPath();
-                path = path.substring(0, path.lastIndexOf('.'));
                 String zmips_output_path = path + ".zmips";
                 writer = new PrintWriter(zmips_output_path);
                 writer.print(kanga2zmips.getASM());
+                writer.close();
                 if (debug_) {
                     System.out.println(kanga2zmips.getASM());
                 }
-                writer.close();
                 System.out.println("[ \033[0;32m \u2713 \033[0m ] zMIPS code generated to \"" + zmips_output_path + "\"");
                 System.out.println("===================================================================================");
             } catch (ParseException
@@ -141,7 +147,7 @@ public class Main {
                 System.exit(-1);
             } finally {
                 try {
-                    if (fis != null) fis.close();
+                    if (input_stream != null) input_stream.close();
                     if (writer != null) writer.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
