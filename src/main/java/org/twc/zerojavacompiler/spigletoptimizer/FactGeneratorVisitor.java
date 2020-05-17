@@ -340,8 +340,6 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
         String exp = n.f3.accept(this, argu);
         String ret = "RETURN " + exp;
         this.inst_num_++;
-// TODO
-        // instructions_.add(new InstructionType(argu + " ", this.inst_num_, ret));
         instructions_.add(new InstructionType(argu, this.inst_num_, ret));
         if (exp != null && exp.matches("TEMP(.*)")) {
             var_uses_.add(new VarUseType(argu, this.inst_num2_, exp));
