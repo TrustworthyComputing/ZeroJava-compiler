@@ -9,9 +9,11 @@ import java.util.Map;
 public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
 
     private Map<String, Class_t> st_;
+    private boolean has_answer_;
 
     public TypeCheckVisitor(Map<String, Class_t> st_) {
         this.st_ = st_;
+        this.has_answer_ = false;
     }
 
     public static Variable_t findType(Variable_t var, Method_t meth) throws Exception {
@@ -38,6 +40,9 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
+        if (!this.has_answer_) {
+            throw new Exception("Warning: no answer statement in the program");
+        }
         return null;
     }
 
@@ -512,6 +517,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      * f4 -> ";"
      */
     public Base_t visit(AnswerStatement n, Base_t argu) throws Exception { //is int
+        this.has_answer_ = true;
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         Variable_t expr = (Variable_t) n.f2.accept(this, argu);
