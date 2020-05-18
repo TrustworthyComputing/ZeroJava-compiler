@@ -43,6 +43,19 @@ public class Main {
                 input_files.add(arg);
             }
         }
+
+        Properties memory_properties = new Properties();
+        try {
+            memory_properties.load(new FileInputStream("src/main/java/org/twc/zerojavacompiler/zilch-memory.properties"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (debug_) {
+            memory_properties.list(System.out);
+        }
+        final int init_heap_offset = Integer.parseInt(memory_properties.getProperty("Initial_Heap_Offset"));
+        final int init_stack_offset = Integer.parseInt(memory_properties.getProperty("Initial_Stack_Offset"));
+
         for (String arg : input_files) {
             InputStream input_stream = null;
             PrintWriter writer = null;
@@ -50,10 +63,10 @@ public class Main {
             String path = fp.getPath();
             path = path.substring(0, path.lastIndexOf('.'));
             try {
-                // zerojava2spiglet
                 System.out.println("===================================================================================");
                 System.out.println("Compiling file \"" + arg + "\"");
                 input_stream = new FileInputStream(arg);
+                // zerojava typechecking
                 ZeroJavaParser zerojava_parser = new ZeroJavaParser(input_stream);
                 Goal zerojava_root = zerojava_parser.Goal();
                 VisitClasses firstvisit = new VisitClasses();
@@ -73,7 +86,7 @@ public class Main {
                 System.out.println("[ \033[0;32m \u2713 \033[0m ] All checks passed");
 
                 // generate Spiglet code
-                ZeroJava2Spiglet zerojava2spiglet = new ZeroJava2Spiglet(symbol_table, symtable_visit.getGlobalsNumber());
+                ZeroJava2Spiglet zerojava2spiglet = new ZeroJava2Spiglet(symbol_table, symtable_visit.getGlobalsNumber(), init_heap_offset);
                 zerojava_root.accept(zerojava2spiglet, null);
                 int hp_ = zerojava2spiglet.getHP();
                 String code = zerojava2spiglet.getASM();
@@ -126,7 +139,7 @@ public class Main {
                 // generate zMIPS code from Kanga
                 KangaParser kanga_parser = new KangaParser(input_stream);
                 org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
-                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(hp_);
+                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(init_heap_offset, init_stack_offset, hp_, spiglet2kanga.hasProcedures());
                 kanga_ast.accept(kanga2zmips);
                 String zmips_output_path = path + ".zmips";
                 writer = new PrintWriter(zmips_output_path);

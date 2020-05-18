@@ -18,11 +18,11 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         return "L" + (++this.label_cnt_);
     }
 
-    public ZeroJava2Spiglet(Map<String, Class_t> st, int globals) {
+    public ZeroJava2Spiglet(Map<String, Class_t> st, int globals, int init_heap_offset) {
         this.label_cnt_ = 0;
         this.st_ = st;
         this.globals_ = globals;
-        this.hp_ = 1000;
+        this.hp_ = init_heap_offset;
     }
 
     private void initVtables() {

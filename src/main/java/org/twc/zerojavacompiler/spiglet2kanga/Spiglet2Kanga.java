@@ -11,10 +11,12 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     private final HashMap<String, Method_t> method_map_;
     private Method_t currMethod;
     private final StringBuilder asm_;
+    private boolean has_procedures_;
 
     public Spiglet2Kanga(HashMap<String, Method_t> method_map_) {
         this.asm_ = new StringBuilder();
         this.method_map_ = method_map_;
+        this.has_procedures_ = false;
     }
 
     String getNewLabel(String labelName) {
@@ -26,6 +28,10 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
 
     public String getASM() {
         return asm_.toString();
+    }
+
+    public boolean hasProcedures() {
+        return this.has_procedures_;
     }
 
     // tempName->regName
@@ -97,6 +103,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f4 -> StmtExp()
      */
     public String visit(Procedure n) throws Exception {
+        this.has_procedures_ = true;
         String methodName = n.f0.accept(this);
         currMethod = method_map_.get(methodName);
         asm_.append("\n").append(methodName).append(" [").append(currMethod.getNum_parameters_()).append("][").append(currMethod.getStack_num_()).append("][").append(currMethod.getCall_param_num_()).append("]\n");

@@ -8,13 +8,17 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     private final ZMIPSPrinter zmipsPrinter_;
     private final int sp_;
     private final int hp_;
+    private final int init_heap_offset_;
+    private final boolean has_procedures_;
     private int label_num_;
     private int num_parameters_;
 
-    public Kanga2zMIPS(int hp) {
-        this.sp_ = 2000;
-        this.label_num_ = 0;
+    public Kanga2zMIPS(int init_heap_offset, int init_stack_offset, int hp, boolean has_procedures) {
+        this.init_heap_offset_ = init_heap_offset;
+        this.sp_ = init_stack_offset;
         this.hp_ = hp;
+        this.has_procedures_ = has_procedures;
+        this.label_num_ = 0;
         this.zmipsPrinter_ = new ZMIPSPrinter();
     }
 
@@ -54,9 +58,14 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         num_parameters_ = Integer.parseInt(n.f2.accept(this));
         num_parameters_ = num_parameters_ > 4 ? num_parameters_ - 4 : 0;
         zmipsPrinter_.begin("main");
-// TODO: Avoid adding the following two lines if they are not required
-        zmipsPrinter_.println("move $hp, " + hp_);
-        zmipsPrinter_.println("move $sp, " + sp_);
+        // if the heap offset is not modified, do not initialize hp
+        if (init_heap_offset_ != hp_) {
+            zmipsPrinter_.println("move $hp, " + hp_);
+        }
+        // if IR does not have any methods, do not initialize sp
+        if (has_procedures_) {
+            zmipsPrinter_.println("move $sp, " + sp_);
+        }
         n.f10.accept(this);
         zmipsPrinter_.end();
         // other methods
