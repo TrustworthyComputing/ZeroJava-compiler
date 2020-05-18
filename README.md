@@ -1,12 +1,14 @@
 # ![alt text][compiler-logo] ZeroJava to zMIPS compiler [![License MIT][badge-license]](LICENSE)
 
-A compiler to translate ZeroJava, a subset of Java designed for zero-knowledge proofs, to zMIPS.
+A compiler to translate ZeroJava, a subset of Java designed for zero-knowledge arguments, to zMIPS.
+zMIPS assembly can in turn be consumed by the [Zilch framework](https://github.com/TrustworthyComputing/Zilch) to create zero-knowledge proofs.
 
 
 ## ZeroJava Language
 ZeroJava is inspired by the MiniJava language and is a custom subset of Java tailored to zero-knowledge proofs.
 Thus, it is possible to compile ZeroJava programs to byte code with a Java compiler if the ZK-specific instructions are omitted.
 ZeroJava abstains from features of Java that complicate the run-time system, such as exceptions and multi-threading.
+
 
 Below we briefly describe the language.
 
@@ -24,7 +26,7 @@ Local variables are defined only at the beginning of a method and local variable
 
 In ZeroJava, the `new` operator calls a default void constructor.
 In addition, there are no inner classes and there are no static methods or fields.
-A ZeroJava program begins with a special main class that does not have fields and methods and contains the `main` method (i.e., `public static void main(String[] args)`).
+A ZeroJava program begins with a special main class which does not have fields and methods and contains the `main` method (i.e., `public static void main(String[] args)`).
 After main class, other classes may be defined that can have fields and methods.
 
 
@@ -121,12 +123,12 @@ $ java -jar target/zerojava-compiler-1.0.jar /path-to-zerojava-example/example.j
 ```
 
 
-Our compiler supports zMIPS static analysis and optimizations.
+Our compiler supports IR static analysis and optimizations.
 In order to enable the optimizer pass the argument `--opts` command line argument.
 
 
 We provide various ZeroJava examples in the [src/test/resources/](./src/test/resources/) directory.
-Those examples include `if-else` statements, comparisons, `while` loops, examples with `int[]` accesses and others that will help getting started with ZeroJava programming language.
+Those examples include `if-else` statements, comparisons, `while` loops, examples with `int[]` accesses and others that will help get started with ZeroJava programming language.
 
 For instance, a simple program that performs addition:
 ```
@@ -150,21 +152,34 @@ class Add {
 
 Which generates the following lines of zMIPS assembly:
 ```
-move $r1, 0
-move $r3, 12
-move $r4, 21
-add $r2, $r3, $r4
-move $r1, $r2
-print $r1
-answer $r1
+        .text
+        .globl main
+__main__:
+        move $t0, 0
+        move $t1, 12
+        move $t2, 21
+        add $v1, $t1, $t2
+        move $t1, $v1
+        move $t0, $t1
+        move $t1, 10
+        add $v1, $t0, $t1
+        move $t0, $v1
+        print $t0
+        answer $t0
 ```
 
 Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
 ```
-move $r3, 12
-add $r2, $r3, 21
-print $r2
-answer $r2
+        .text
+        .globl main
+__main__:
+        move $t0, 12
+        add $v1, $t0, 21
+        move $t0, $v1
+        add $v1, $t0, 10
+        move $t0, $v1
+        print $t0
+        answer $t0
 ```
 
 
