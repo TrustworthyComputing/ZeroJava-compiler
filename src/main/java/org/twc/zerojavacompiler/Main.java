@@ -139,7 +139,7 @@ public class Main {
                 // generate zMIPS code from Kanga
                 KangaParser kanga_parser = new KangaParser(input_stream);
                 org.twc.zerojavacompiler.kanga2zmips.kangasyntaxtree.Node kanga_ast = kanga_parser.Goal();
-                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(init_heap_offset, init_stack_offset, hp_, spiglet2kanga.hasProcedures());
+                Kanga2zMIPS kanga2zmips = new Kanga2zMIPS(init_heap_offset, init_stack_offset, hp_, spiglet2kanga.hasProcedures(), zerojava2spiglet.mayHasError());
                 kanga_ast.accept(kanga2zmips);
                 String zmips_output_path = path + ".zmips";
                 writer = new PrintWriter(zmips_output_path);

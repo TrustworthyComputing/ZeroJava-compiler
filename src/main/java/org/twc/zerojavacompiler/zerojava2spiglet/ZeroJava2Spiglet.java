@@ -13,9 +13,14 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     private int label_cnt_;
     private int globals_;
     private int hp_;
+    private boolean may_has_error_;
 
     public String newLabel() {
         return "L" + (++this.label_cnt_);
+    }
+
+    public boolean mayHasError() {
+        return this.may_has_error_;
     }
 
     public ZeroJava2Spiglet(Map<String, Class_t> st, int globals, int init_heap_offset) {
@@ -23,6 +28,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         this.st_ = st;
         this.globals_ = globals;
         this.hp_ = init_heap_offset;
+        this.may_has_error_ = false;
     }
 
     private void initVtables() {
@@ -473,6 +479,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     public Base_t visit(ArrayAssignmentStatement n, Base_t argu) throws Exception {
         String length = newTemp();
         String cond = newTemp();
+        this.may_has_error_ = true;
         String error_label = "Runtime_Error";
         String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
         this.asm_.append("HLOAD ").append(length).append(" ").append(array).append(" 0\n"); // load length
@@ -761,6 +768,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
     public Base_t visit(ArrayLookup n, Base_t argu) throws Exception {
         String length = newTemp();
         String cond = newTemp();
+        this.may_has_error_ = true;
         String error_label = "Runtime_Error";
         String array = ((Variable_t) n.f0.accept(this, argu)).getRegister();
         // load length
@@ -1056,6 +1064,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         String len_to_alloc = newTemp();
         String array = newTemp();
         // check if length > 0
+        this.may_has_error_ = true;
         this.asm_.append("MOVE ").append(cond).append(" LT ").append(len).append(" 0\n");
         this.asm_.append("MOVE ").append(one).append(" 1\n");
         this.asm_.append("MOVE ").append(cond).append(" MINUS ").append(one).append(" ").append(cond).append("\n");

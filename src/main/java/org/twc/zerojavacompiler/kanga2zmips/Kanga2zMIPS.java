@@ -10,14 +10,16 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     private final int hp_;
     private final int init_heap_offset_;
     private final boolean has_procedures_;
+    private final boolean may_has_error_;
     private int label_num_;
     private int num_parameters_;
 
-    public Kanga2zMIPS(int init_heap_offset, int init_stack_offset, int hp, boolean has_procedures) {
+    public Kanga2zMIPS(int init_heap_offset, int init_stack_offset, int hp, boolean has_procedures, boolean may_has_error) {
         this.init_heap_offset_ = init_heap_offset;
         this.sp_ = init_stack_offset;
         this.hp_ = hp;
         this.has_procedures_ = has_procedures;
+        this.may_has_error_ = may_has_error;
         this.label_num_ = 0;
         this.zmipsPrinter_ = new ZMIPSPrinter();
     }
@@ -71,12 +73,14 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         // other methods
         n.f12.accept(this);
         // final
-        zmipsPrinter_.begin("Runtime_Error");
-        String[] finalLines = {"move $t0, 0xffffffffffffffff", "answer $t0"};
-        for (String line : finalLines) {
-            zmipsPrinter_.println(line);
+        if (may_has_error_) {
+            zmipsPrinter_.begin("Runtime_Error");
+            String[] finalLines = {"move $t0, 0xffffffffffffffff", "answer $t0"};
+            for (String line : finalLines) {
+                zmipsPrinter_.println(line);
+            }
+            zmipsPrinter_.end();
         }
-        zmipsPrinter_.end();
         return null;
     }
 
