@@ -218,7 +218,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f1 -> Temp()
      */
     public String visit(PublicReadStmt n) throws Exception {
-        asm_.append("\t\tPUBREAD ").append(n.f1.accept(this)).append("\n");
+        asm_.append("\t\tPUBREAD ").append(temp2Reg("", n.f1.accept(this))).append("\n");
         return null;
     }
 
@@ -227,7 +227,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f1 -> Temp()
      */
     public String visit(PrivateReadStmt n) throws Exception {
-        asm_.append("\t\tSECREAD ").append(n.f1.accept(this)).append("\n");
+        asm_.append("\t\tSECREAD ").append(temp2Reg("", n.f1.accept(this))).append("\n");
         return null;
     }
 
@@ -237,7 +237,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f2 -> SimpleExp()
      */
     public String visit(PublicSeekStmt n) throws Exception {
-        asm_.append("\t\tPUBSEEK ").append(n.f1.accept(this)).append(" ").append(n.f2.accept(this)).append("\n");
+        asm_.append("\t\tPUBSEEK ").append(temp2Reg("", n.f1.accept(this))).append(" ").append(n.f2.accept(this)).append("\n");
         return null;
     }
 
@@ -247,7 +247,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f2 -> SimpleExp()
      */
     public String visit(PrivateSeekStmt n) throws Exception {
-        asm_.append("\t\tSECSEEK ").append(n.f1.accept(this)).append(" ").append(n.f2.accept(this)).append("\n");
+        asm_.append("\t\tSECSEEK ").append(temp2Reg("", n.f1.accept(this))).append(" ").append(n.f2.accept(this)).append("\n");
         return null;
     }
 

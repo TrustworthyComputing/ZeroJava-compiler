@@ -63,6 +63,12 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
      * | HLoadStmt()
      * | MoveStmt()
      * | PrintStmt()
+     * | PrintlnStmt()
+     * | AnswerStmt()
+     * | PublicReadStmt()
+     * | PrivateReadStmt()
+     * | PublicSeekStmt()
+     * | PrivateSeekStmt()
      */
     public String visit(Stmt n) throws Exception {
         currVertex = currMethod.flowGraph.getVertex(vid);
@@ -183,6 +189,74 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
     }
 
     /**
+     * f0 -> "PRINTLN"
+     * f1 -> SimpleExp()
+     */
+    public String visit(PrintlnStmt n) throws Exception {
+        n.f1.accept(this);
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        return null;
+    }
+
+    /**
+     * f0 -> "ANSWER"
+     * f1 -> SimpleExp()
+     */
+    public String visit(AnswerStmt n) throws Exception {
+        n.f1.accept(this);
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        return null;
+    }
+
+    /**
+     * f0 -> "PUBREAD"
+     * f1 -> Temp()
+     */
+    public String visit(PublicReadStmt n) throws Exception {
+        int tempNo = Integer.parseInt(n.f1.accept(this));
+        currVertex.Use.add(tempNo);
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        return null;
+    }
+
+    /**
+     * f0 -> "SECREAD"
+     * f1 -> Temp()
+     */
+    public String visit(PrivateReadStmt n) throws Exception {
+        int tempNo = Integer.parseInt(n.f1.accept(this));
+        currVertex.Use.add(tempNo);
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        return null;
+    }
+
+    /**
+     * f0 -> "PUBSEEK"
+     * f1 -> Temp()
+     * f2 -> SimpleExp()
+     */
+    public String visit(PublicSeekStmt n) throws Exception {
+        // Temp Def
+        currVertex.Def.add(Integer.parseInt(n.f1.accept(this)));
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        n.f2.accept(this);
+        return null;
+    }
+
+    /**
+     * f0 -> "SECSEEK"
+     * f1 -> Temp()
+     * f2 -> SimpleExp()
+     */
+    public String visit(PrivateSeekStmt n) throws Exception {
+        // Temp Def
+        currVertex.Def.add(Integer.parseInt(n.f1.accept(this)));
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        n.f2.accept(this);
+        return null;
+    }
+
+    /**
      * f0 -> Call()
      * | HAllocate()
      * | BinOp()
@@ -226,6 +300,14 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
         currVertex.Use.add(Integer.parseInt(n.f1.accept(this)));
         n.f2.accept(this);
         return null;
+    }
+
+    /**
+     * f0 -> "NOT"
+     * f1 -> SimpleExp()
+     */
+    public String visit(NotExp n) throws Exception {
+        return n.f1.accept(this);
     }
 
     /**

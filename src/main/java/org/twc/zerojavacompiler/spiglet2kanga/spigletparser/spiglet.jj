@@ -152,24 +152,19 @@ void Stmt() :
 {}
 {
   NoOpStmt()
-|
-  ErrorStmt()
-|
-  CJumpStmt()
-|
-  JumpStmt()
-|
-  HStoreStmt()
-|
-  HLoadStmt()
-|
-  MoveStmt()
-|
-  PrintStmt()
-|
-  PrintlnStmt()
-|
-  AnswerStmt()
+| ErrorStmt()
+| CJumpStmt()
+| JumpStmt()
+| HStoreStmt()
+| HLoadStmt()
+| MoveStmt()
+| PrintStmt()
+| PrintlnStmt()
+| AnswerStmt()
+| PublicReadStmt()
+| PrivateReadStmt()
+| PublicSeekStmt()
+| PrivateSeekStmt()
 }
 
 void NoOpStmt() :

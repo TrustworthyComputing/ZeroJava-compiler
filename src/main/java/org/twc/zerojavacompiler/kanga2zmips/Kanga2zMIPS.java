@@ -248,7 +248,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     public String visit(PublicSeekStmt n) throws Exception {
         String reg = n.f1.accept(this);
         String idx = n.f2.accept(this);
-        zmipsPrinter_.println("pubread $" + reg + ", " + idx);
+        zmipsPrinter_.println("pubseek " + reg + ", " + idx);
         return null;
     }
 
@@ -260,7 +260,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     public String visit(PrivateSeekStmt n) throws Exception {
         String reg = n.f1.accept(this);
         String idx = n.f2.accept(this);
-        zmipsPrinter_.println("secread " + reg + ", " + idx);
+        zmipsPrinter_.println("secseek " + reg + ", " + idx);
         return null;
     }
 
