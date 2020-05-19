@@ -8,8 +8,8 @@ class range_query {
 		max = PublicTape.read();
 		val = PrivateTape.read();
 		if ((min <= val) && (val <= max)) {
-			Prover.answer(1);
+			Prover.answer(true);
 		}
-		Prover.answer(0);
+		Prover.answer(false);
 	}
 }
