@@ -42,16 +42,22 @@ Below we present the various ZeroJava operators.
 ### ZeroJava Arithmetic Operators
 | Operator | Description        											|
 |----------|----------------------------------------------------------------|
-| `+`      | Adds two operands.			 									|
-| `-`      | Subtracts second operand from the first.				 		|
-| `*`      | Multiplies both operands.			 							|
-| `/`      | Divides numerator by de-numerator.			 					|
-| `%`      | Modulus Operator and remainder of after an integer division.	|
-| `++`     | Increment operator increases the integer value by one.			|
-| `--`     | Decrement operator decreases the integer value by one.			|
+| `+`      | Adds two operands			 									|
+| `-`      | Subtracts second operand from the first				 		|
+| `*`      | Multiplies both operands			 							|
+| `/`      | Divides numerator by de-numerator			 					|
+| `%`      | Modulus Operator and remainder of after an integer division	|
+| `++`     | Increment operator increases the integer value by one			|
+| `--`     | Decrement operator decreases the integer value by one			|
 
+### ZeroJava Logical Operators
+| Operator | Description        	|
+|----------|------------------------|
+| `!`      | Logical `not`			|
+| `&&`     | Logical `and`			|
+| `\|\|`   | Logical `or`			|
 
-### ZeroJava Comparison and Logical Operators
+### ZeroJava Relational Operators
 | Operator | Description        	|
 |----------|------------------------|
 | `==`     | Equal 					|
@@ -60,10 +66,6 @@ Below we present the various ZeroJava operators.
 | `>`      | Greater than			|
 | `<=`     | Less or Equal than		|
 | `>=`     | Greater or Equal than	|
-| `&&`     | Logical `and`			|
-| `\|\|`   | Logical `or`			|
-| `!`      | Logical `not`			|
-
 
 ### ZeroJava Bitwise Operators
 | Operator | Description        			|
@@ -71,25 +73,23 @@ Below we present the various ZeroJava operators.
 | `&`      | Binary and 					|
 | `\|`     | Binary or						|
 | `^`      | Binary xor						|
-| `<<`     | Binary Left shift operator. 	|
-| `>>`     | Binary Right shift operator. 	|
-
+| `<<`     | Binary Left shift operator 	|
+| `>>`     | Binary Right shift operator 	|
 
 ### ZeroJava Assignment Operators
 | Operator | Description        					|
 |----------|----------------------------------------|
-| `=`      | Simple assignment operator. 			|
-| `+=`     | Add and assignment operator.  			|
-| `-=`     | Subtract and assignment operator. 		|
-| `*=`     | Multiply and assignment operator. 		|
-| `/=`     | Divide and assignment operator. 		|
-| `%=`     | Modulo and assignment operator. 		|
-| `<<=`    | Left shift and assignment operator.	|
-| `>>=`    | Right shift and assignment operator. 	|
-| `&=`     | Bitwise and assignment operator. 		|
-| `^=`     | Bitwise xor and assignment operator.	|
-| `\|=`    | Bitwise or and assignment operator. 	|
-
+| `=`      | Simple assignment operator 			|
+| `+=`     | Add and assignment operator  			|
+| `-=`     | Subtract and assignment operator 		|
+| `*=`     | Multiply and assignment operator 		|
+| `/=`     | Divide and assignment operator 		|
+| `%=`     | Modulo and assignment operator 		|
+| `<<=`    | Left shift and assignment operator		|
+| `>>=`    | Right shift and assignment operator 	|
+| `&=`     | Bitwise and assignment operator 		|
+| `^=`     | Bitwise xor and assignment operator	|
+| `\|=`    | Bitwise or and assignment operator 	|
 
 ### Built in ZeroJava Functions
 | Built in ZeroJava Function Name   | zMIPS instruction | Description 		|
@@ -99,7 +99,7 @@ Below we present the various ZeroJava operators.
 | `int PublicTape.read();`			| `pubread dst`		| return next word from public tape								|
 | `int PrivateTape.read();`			| `secread dst`		| return next word from private tape 							|
 | `int PublicTape.seek(int);`		| `pubseek dst, idx`| return the nth word from public tape where n is the argument	|
-| `int PrivateTape.seek(int);` 		| `secseek dst idx`	| return the nth word from private tape where n is the argument	|
+| `int PrivateTape.seek(int);` 		| `secseek dst, idx`| return the nth word from private tape where n is the argument	|
 
 
 Finally, ZeroJava supports the ternary operation (`( a ) ? b : c ;`) which evaluates to `b` if the value of `a` is true, and otherwise to `c`.
@@ -168,7 +168,7 @@ __main__:
         answer $t0
 ```
 
-Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimal code:
+Passing the `-opts` argument to enable the optimizer, our compiler generates the following optimized code:
 ```
         .text
         .globl main
