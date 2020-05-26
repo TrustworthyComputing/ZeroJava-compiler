@@ -107,11 +107,16 @@ Finally, ZeroJava supports the ternary operation (`( a ) ? b : c ;`) which evalu
 
 ## Build and Run Instructions
 
-To build the ZeroJava to zMIPS compiler you will need a Java Development Kit (JDK), such as [OpenJDK](https://openjdk.java.net/) >= 8 and [Apache Maven](https://maven.apache.org/).
+#### ZeroJava Dependencies:
+To build the ZeroJava to zMIPS compiler you will need a Java Development Kit (JDK), such as [OpenJDK](https://openjdk.java.net/) >= 8, [Apache Maven](https://maven.apache.org/) and [JavaCC](https://javacc.github.io/javacc/).
+
+```
+$ apt install openjdk-8-jdk maven javacc
+```
 
 Then simply type:
 ```
-$ mvn package
+$ mvn initialize package
 ```
 
 The above command will create a `target` directory with all the build files, as well as with the `zerojava-compiler-1.0.jar` inside the `target` directory.
@@ -122,10 +127,8 @@ To compile a ZeroJava program type:
 $ java -jar target/zerojava-compiler-1.0.jar /path-to-zerojava-example/example.java
 ```
 
-
 Our compiler supports IR static analysis and optimizations.
 In order to enable the optimizer pass the argument `--opts` command line argument.
-
 
 We provide various ZeroJava examples in the [src/test/resources/](./src/test/resources/) directory.
 Those examples include `if-else` statements, comparisons, `while` loops, examples with `int[]` accesses and others that will help get started with ZeroJava programming language.
