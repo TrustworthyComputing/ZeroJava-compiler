@@ -1,16 +1,17 @@
-# ![alt text][compiler-logo] ZeroJava to zMIPS compiler [![License MIT][badge-license]](LICENSE)
+<h1 align="center">ZeroJava to zMIPS compiler <a href="https://github.com/TrustworthyComputing/ZeroJava-compiler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a> </h1>
+<h3 align="center">A compiler to translate ZeroJava code to zMIPS assembly and create zero-knowledge proofs</h3>
+<p align="center">
+	<img src="./logos/compiler_logo.png" height="20%" width="20%">
+</p>
 
+## Overview
 A compiler to translate ZeroJava, a subset of Java designed for zero-knowledge arguments, to zMIPS.
 zMIPS assembly can in turn be consumed by the [Zilch framework](https://github.com/TrustworthyComputing/Zilch) to create zero-knowledge proofs.
 
 
-## ZeroJava Language
-ZeroJava is inspired by the MiniJava language and is a custom subset of Java tailored to zero-knowledge proofs.
-Thus, it is possible to compile ZeroJava programs to byte code with a Java compiler if the ZK-specific instructions are omitted.
+### ZeroJava Language
+ZeroJava is a custom subset of Java tailored to zero-knowledge proofs. It is possible to compile ZeroJava programs to byte code with a Java compiler if the ZK-specific instructions are omitted.
 ZeroJava abstains from features of Java that complicate the run-time system, such as exceptions and multi-threading.
-
-
-Below we briefly describe the language.
 
 
 ZeroJava is object-oriented, like Java.
@@ -23,12 +24,10 @@ All ZeroJava methods are `public` and all fields `protected`, which means that a
 A class's own methods can be called via `this`.
 Local variables are defined only at the beginning of a method and local variables shadow fields of the surrounding class with the same name.
 
-
 In ZeroJava, the `new` operator calls a default void constructor.
 In addition, there are no inner classes and there are no static methods or fields.
 A ZeroJava program begins with a special main class which does not have fields and methods and contains the `main` method (i.e., `public static void main(String[] args)`).
 After main class, other classes may be defined that can have fields and methods.
-
 
 For `int` arrays, ZeroJava supports the assignment and lookup (`[]`) operators, as well as the `array.length` expression, which returns the size of the array.
 ZeroJava supports `while`, `if` code blocks as well as ternary operators.
@@ -36,10 +35,9 @@ The assignment `A a = new B();` when `B extends A` is correct, and the same appl
 Finally, ZeroJava supports comments like Java, where the delimiter `//` is used for a single line comment and delimiters `/*` and `*/` are used for a block of lines.
 
 
-Below we present the various ZeroJava operators.
+### ZeroJava Operators
 
-
-### ZeroJava Arithmetic Operators
+#### Arithmetic
 | Operator | Description        											|
 |----------|----------------------------------------------------------------|
 | `+`      | Adds two operands			 									|
@@ -50,14 +48,14 @@ Below we present the various ZeroJava operators.
 | `++`     | Increment operator increases the integer value by one			|
 | `--`     | Decrement operator decreases the integer value by one			|
 
-### ZeroJava Logical Operators
+#### Logical
 | Operator | Description        	|
 |----------|------------------------|
 | `!`      | Logical `not`			|
 | `&&`     | Logical `and`			|
 | `\|\|`   | Logical `or`			|
 
-### ZeroJava Relational Operators
+#### Relational
 | Operator | Description        	|
 |----------|------------------------|
 | `==`     | Equal 					|
@@ -67,7 +65,7 @@ Below we present the various ZeroJava operators.
 | `<=`     | Less or Equal than		|
 | `>=`     | Greater or Equal than	|
 
-### ZeroJava Bitwise Operators
+#### Bitwise
 | Operator | Description        			|
 |----------|--------------------------------|
 | `&`      | Binary and 					|
@@ -76,7 +74,7 @@ Below we present the various ZeroJava operators.
 | `<<`     | Binary Left shift operator 	|
 | `>>`     | Binary Right shift operator 	|
 
-### ZeroJava Assignment Operators
+#### Assignment
 | Operator | Description        					|
 |----------|----------------------------------------|
 | `=`      | Simple assignment operator 			|
@@ -91,7 +89,7 @@ Below we present the various ZeroJava operators.
 | `^=`     | Bitwise xor and assignment operator	|
 | `\|=`    | Bitwise or and assignment operator 	|
 
-### Built in ZeroJava Functions
+### Built-in Functions
 | Built in ZeroJava Function Name   | zMIPS instruction | Description 		|
 |-----------------------------------|-------------------|---------------------------------------------------------------|
 | `Prover.answer(int);` 			| `answer`			| returns the result 											|
@@ -186,11 +184,8 @@ __main__:
 ```
 
 
-### ![alt text][twc-logo] An open-source project by Trustworthy Computing Group
+<p align="center">
+    <img src="./logos/twc.png" height="20%" width="20%">
+</p>
+<h4 align="center">Trustworthy Computing Group</h4>
 
-
-[compiler-logo]: ./logos/compiler_logo_sm.png
-
-[twc-logo]: ./logos/twc.png
-
-[badge-license]: https://img.shields.io/badge/license-MIT-green.svg?style=flat-square
