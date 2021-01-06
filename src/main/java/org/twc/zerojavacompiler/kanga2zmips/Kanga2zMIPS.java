@@ -75,7 +75,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         // final
         if (may_has_error_) {
             zmipsPrinter_.begin("Runtime_Error");
-            String[] finalLines = {"move $t0, 0xffffffffffffffff", "answer $t0"};
+            String[] finalLines = {"error 0"};
             for (String line : finalLines) {
                 zmipsPrinter_.println(line);
             }
