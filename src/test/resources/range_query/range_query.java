@@ -1,9 +1,7 @@
-class range_query {
+class RangeQuery {
 
 	public static void main(String[] a){
-		int min;
-		int max;
-		int val;
+		int min, max, val;
 		min = PublicTape.read();
 		max = PublicTape.read();
 		val = PrivateTape.read();
