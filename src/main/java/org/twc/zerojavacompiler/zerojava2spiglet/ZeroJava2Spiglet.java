@@ -155,27 +155,74 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 
     /**
      * f0 -> Type()
-     * f1 -> Identifier()
-     * f2 -> ";"
+     * f1 -> Variable()
+     * f2 -> ( VarDeclarationRest() )*
+     * f3 -> ";"
      */
     public Base_t visit(VarDeclaration n, Base_t argu) throws Exception {
         Method_t meth = (Method_t) argu;
-        String varName = n.f1.f0.toString();
-        if (meth.getFrom_class_() != null) { // is a variable of a function
-            String newTemp = newTemp();
-            if ((meth = meth.getFrom_class_().getMethod(meth.getName())) != null) {
-                meth.addRegToVar(varName, newTemp);
-            } else {
-                throw new Exception("VarDeclaration Error 1");
+        String varType = ((Variable_t) n.f0.accept(this, argu)).getType();
+        Variable_t first_var = (Variable_t) n.f1.accept(this, argu);
+
+        List<Variable_t> vars = new ArrayList<>();
+        vars.add(first_var);
+        if (n.f2.present()) {
+            for (int i = 0; i < n.f2.size(); i++) {
+                Variable_t var = (Variable_t) n.f2.nodes.get(i).accept(this, argu);
+                vars.add(new Variable_t(varType, var.getName(), var.getRegister()));
             }
-            this.asm_.append("MOVE ").append(newTemp).append(" 0\n");
-        } else { // is a field of a class
-            Class_t cl = st_.get(meth.getName());
-            if (cl == null) {
-                throw new Exception("VarDeclaration Error 2");
+        }
+        for (Variable_t var : vars) {
+            String varName = var.getName();
+            if (meth.getFrom_class_() != null) { // is a variable of a function
+                String tmp = (var.getRegister() == null) ? newTemp() : var.getRegister();
+                if ((meth = meth.getFrom_class_().getMethod(meth.getName())) != null) {
+                    meth.addRegToVar(varName, tmp);
+                } else {
+                    throw new Exception("VarDeclaration Error 1");
+                }
+                if (var.getRegister() == null) {
+                    if (varType == null) {
+                        this.asm_.append("MOVE ").append(tmp).append(" 0\n");
+                    }
+                }
+            } else { // is a field of a class
+                Class_t cl = st_.get(meth.getName());
+                if (cl == null) {
+                    throw new Exception("VarDeclaration Error 2");
+                }
             }
         }
         return null;
+    }
+
+    /**
+     * f0 -> Identifier()
+     * f1 -> ( VarInit() )?
+     */
+    public Base_t visit(Variable n, Base_t argu) throws Exception {
+        String varname = n.f0.accept(this, argu).getName();
+        String reg = null;
+        if (n.f1.present()) {
+            reg = ((Variable_t) n.f1.accept(this, argu)).getRegister();
+        }
+        return new Variable_t("", varname, reg);
+    }
+
+    /**
+     * f0 -> "="
+     * f1 -> Expression()
+     */
+    public Base_t visit(VarInit n, Base_t argu) throws Exception {
+        return n.f1.accept(this, argu);
+    }
+
+    /**
+     * f0 -> ","
+     * f1 -> Variable()
+     */
+    public Base_t visit(VarDeclarationRest n, Base_t argu) throws Exception {
+        return n.f1.accept(this, argu);
     }
 
     /**
@@ -257,24 +304,21 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
      * f2 -> "]"
      */
     public Base_t visit(ArrayType n, Base_t argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        return new Variable_t("int[]");
     }
 
     /**
      * f0 -> "boolean"
      */
     public Base_t visit(BooleanType n, Base_t argu) throws Exception {
-        return n.f0.accept(this, argu);
+        return new Variable_t("boolean");
     }
 
     /**
      * f0 -> "int"
      */
     public Base_t visit(IntegerType n, Base_t argu) throws Exception {
-        return n.f0.accept(this, argu);
+        return new Variable_t("int");
     }
 
     /**
@@ -500,7 +544,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
         this.asm_.append("MOVE ").append(temp_array).append(" PLUS ").append(temp_array).append(" ").append(idx).append("\n");
         String expr = ((Variable_t) n.f5.accept(this, argu)).getRegister();
         this.asm_.append("HSTORE ").append(temp_array).append(" 0 ").append(expr).append("\n");
-        return new Variable_t(temp_array, null);
+        return new Variable_t(temp_array);
     }
 
     /**

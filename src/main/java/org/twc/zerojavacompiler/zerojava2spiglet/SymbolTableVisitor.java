@@ -5,6 +5,8 @@ import org.twc.zerojavacompiler.zerojava2spiglet.zerojavavisitor.GJNoArguDepthFi
 import org.twc.zerojavacompiler.basetype.*;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 /* Second Visitor Pattern creates the Symbol Table */
 public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
@@ -55,7 +57,8 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
      */
     public Base_t visit(MainClass n) throws Exception {
         n.f0.accept(this);
-        n.f1.accept(this);
+        String classname = n.f1.accept(this).getName();
+        Class_t mainclass = st_.get(classname);
         n.f2.accept(this);
         n.f3.accept(this);
         n.f4.accept(this);
@@ -65,33 +68,42 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         n.f8.accept(this);
         n.f9.accept(this);
         n.f10.accept(this);
-        n.f11.accept(this);
-        n.f12.accept(this);
-        n.f13.accept(this);
-        n.f14.accept(this);
-        n.f15.accept(this);
-        n.f16.accept(this);
-        n.f17.accept(this);
         Variable_t v = new Variable_t("String[]", n.f11.accept(this).getName());
         Method_t m = new Method_t("void", "main");
         m.addParam(v);
-        String classname = n.f1.accept(this).getName();
-        Class_t mainclass = st_.get(classname);
         mainclass.setIsMain();
         if (!mainclass.addMethod(m)) {
             throw new Exception("Method " + m.getName() + " already exists");
         }
+        n.f12.accept(this);
+        n.f13.accept(this);
         if (n.f14.present()) {
             for (int i = 0; i < n.f14.size(); i++) {
-                if (!m.addVar((Variable_t) n.f14.nodes.get(i).accept(this))) {
-                    throw new Exception("Class " + classname + ": Variable " + n.f14.nodes.get(i).accept(this).getName() + " already exists");
-                }
-                String vartype = ((Variable_t) n.f14.nodes.get(i).accept(this)).getType();
-                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                Variable_t vars = (Variable_t) n.f14.nodes.get(i).accept(this);
+                if (vars.getHasMany()) {
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                    }
+                    for (String varname : vars.getVarList()) {
+                        if (!m.addVar(new Variable_t(vartype, varname))) {
+                            throw new Exception("Class " + classname + ": Variable " + varname + " already exists");
+                        }
+                    }
+                } else {
+                    if (!m.addVar((Variable_t) n.f14.nodes.get(i).accept(this))) {
+                        throw new Exception("Class " + classname + ": Variable " + n.f14.nodes.get(i).accept(this).getName() + " already exists");
+                    }
+                    String vartype = ((Variable_t) n.f14.nodes.get(i).accept(this)).getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                    }
                 }
             }
         }
+        n.f15.accept(this);
+        n.f16.accept(this);
+        n.f17.accept(this);
         return null;
     }
 
@@ -107,19 +119,29 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         n.f0.accept(this);
         String classname = n.f1.accept(this).getName();
         n.f2.accept(this);
-        n.f3.accept(this);
-        n.f4.accept(this);
-        n.f5.accept(this);
         // add Class Variables
         if (n.f3.present()) {
             for (int i = 0; i < n.f3.size(); i++) {   // for every variable
-                // if variable isnt unique
-                if (!st_.get(classname).addVar((Variable_t) n.f3.nodes.get(i).accept(this))) {
-                    throw new Exception("Class " + classname + ": Variable " + n.f3.nodes.get(i).accept(this).getName() + " already exists");
-                }
-                String vartype = ((Variable_t) n.f3.nodes.get(i).accept(this)).getType();
-                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                // if variable isn't unique
+                Variable_t vars = (Variable_t) n.f3.nodes.get(i).accept(this);
+                if (vars.getHasMany()) {
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                    }
+                    for (String varname : vars.getVarList()) {
+                        if (!st_.get(classname).addVar(new Variable_t(vartype, varname))) {
+                            throw new Exception("Class " + classname + ": Variable " + varname + " already exists");
+                        }
+                    }
+                } else {
+                    if (!st_.get(classname).addVar((Variable_t) n.f3.nodes.get(i).accept(this))) {
+                        throw new Exception("Class " + classname + ": Variable " + n.f3.nodes.get(i).accept(this).getName() + " already exists");
+                    }
+                    String vartype = ((Variable_t) n.f3.nodes.get(i).accept(this)).getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(classname + ": Cannot declare " + vartype + " does not exist");
+                    }
                 }
             }
         }
@@ -136,6 +158,7 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
                 }
             }
         }
+        n.f5.accept(this);
         return null;
     }
 
@@ -155,21 +178,30 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         n.f2.accept(this);
         String parent_id = n.f3.accept(this).getName();
         n.f4.accept(this);
-        n.f5.accept(this);
-        n.f6.accept(this);
-        n.f7.accept(this);
         Class_t newClass = st_.get(id);
         Class_t parentClass = st_.get(parent_id);
         // add Class Variables
         if (n.f5.present()) {
             for (int i = 0; i < n.f5.size(); i++) {
-                Variable_t var = (Variable_t) n.f5.nodes.get(i).accept(this);
-                if (!newClass.addVar(var)) { // if variable isnt unique
-                    throw new Exception("Class " + id + ": Variable " + var.getName() + " already exists.");
-                }
-                String vartype = var.getType();
-                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
+                Variable_t vars = (Variable_t) n.f5.nodes.get(i).accept(this);
+                if (vars.getHasMany()) {
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
+                    }
+                    for (String varname : vars.getVarList()) {
+                        if (!newClass.addVar(new Variable_t(vartype, varname))) { // if variable isnt unique
+                            throw new Exception("Class " + id + ": Variable " + varname + " already exists.");
+                        }
+                    }
+                } else {
+                    if (!newClass.addVar(vars)) { // if variable isnt unique
+                        throw new Exception("Class " + id + ": Variable " + vars.getName() + " already exists.");
+                    }
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(id + ": Cannot declare " + vartype + " does not exist.");
+                    }
                 }
             }
         }
@@ -216,19 +248,57 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
             newClass.addMethod(parentsMeth);
             newClass.setNumMethods(parentClass.getNumMethods());
         }
+        n.f7.accept(this);
         return null;
     }
 
     /**
      * f0 -> Type()
-     * f1 -> Identifier()
-     * f2 -> ";"
+     * f1 -> Variable()
+     * f2 -> ( VarDeclarationRest() )*
+     * f3 -> ";"
      */
     public Base_t visit(VarDeclaration n) throws Exception {
         String type_ = n.f0.accept(this).getName();
+        String varname = n.f1.accept(this).getName();
+        if (n.f2.present()) {
+            List<String> vars = new ArrayList<>();
+            vars.add(varname);
+            for (int i = 0; i < n.f2.size(); i++) {
+                Variable_t var = (Variable_t) n.f2.nodes.get(i).accept(this);
+                vars.add(var.getName());
+            }
+            return new Variable_t(type_, vars);
+        } else {
+            return new Variable_t(type_, varname);
+        }
+    }
+
+    /**
+     * f0 -> Identifier()
+     * f1 -> ( VarInit() )?
+     */
+    public Base_t visit(Variable n) throws Exception {
+        String varname = n.f0.accept(this).getName();
+        return new Variable_t("", varname);
+    }
+
+    /**
+     * f0 -> "="
+     * f1 -> Expression()
+     */
+    public Base_t visit(VarInit n) throws Exception {
+        return null;
+    }
+
+    /**
+     * f0 -> ","
+     * f1 -> Variable()
+     */
+    public Base_t visit(VarDeclarationRest n) throws Exception {
+        n.f0.accept(this);
         String var_id = n.f1.accept(this).getName();
-        n.f2.accept(this);
-        return new Variable_t(type_, var_id);
+        return new Variable_t("", var_id);
     }
 
     /**
@@ -270,12 +340,25 @@ public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
         if (n.f7.present()) {
             n.f7.accept(this);
             for (int i = 0; i < n.f7.size(); i++) {
-                if (!meth.addVar((Variable_t) n.f7.nodes.get(i).accept(this))) {
-                    throw new Exception("Method " + meth_name + ": Variable " + n.f7.nodes.get(i).accept(this).getName() + " already exists");
-                }
-                String vartype = ((Variable_t) n.f7.nodes.get(i).accept(this)).getType();
-                if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
-                    throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist");
+                Variable_t vars = (Variable_t) n.f7.nodes.get(i).accept(this);
+                if (vars.getHasMany()) {
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist");
+                    }
+                    for (String varname : vars.getVarList()) {
+                        if (!meth.addVar(new Variable_t(vartype, varname))) {
+                            throw new Exception("Method " + meth_name + ": Variable " + varname + " already exists");
+                        }
+                    }
+                } else {
+                    if (!meth.addVar(vars)) {
+                        throw new Exception("Method " + meth_name + ": Variable " + vars.getName() + " already exists");
+                    }
+                    String vartype = vars.getType();
+                    if (!(vartype.equals("int") || vartype.equals("boolean") || vartype.equals("int[]") || st_.containsKey(vartype))) {
+                        throw new Exception(meth_name + ": Cannot declare " + vartype + " does not exist");
+                    }
                 }
             }
         }
