@@ -124,6 +124,7 @@ public class OptimizerVisitor extends GJDepthFirst<OptimizationWrapper, String> 
      * | MoveStmt()
      * | PrintStmt()
      * | PrintlnStmt()
+     * | ExitStmt()
      * | AnswerStmt()
      */
     public OptimizationWrapper visit(Stmt n, String argu) throws Exception {
@@ -231,6 +232,17 @@ public class OptimizerVisitor extends GJDepthFirst<OptimizationWrapper, String> 
     public OptimizationWrapper visit(PrintlnStmt n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu).getOptimizedTemp();
         String instr = "PRINTLN " + exp + "\n";
+        checkIfDeadCode(argu, instr);
+        return new OptimizationWrapper(instr);
+    }
+
+    /**
+     * f0 -> "EXIT"
+     * f1 -> SimpleExp()
+     */
+    public OptimizationWrapper visit(ExitStmt n, String argu) throws Exception {
+        String exp = n.f1.accept(this, argu).getOptimizedTemp();
+        String instr = "EXIT " + exp + "\n";
         checkIfDeadCode(argu, instr);
         return new OptimizationWrapper(instr);
     }

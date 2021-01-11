@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Base_t {
 
-    private String name;
+    private final String name;
 
     public Base_t(String name) {
         this.name = name;

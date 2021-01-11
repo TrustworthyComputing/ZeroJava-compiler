@@ -10,7 +10,7 @@ import java.util.HashMap;
 /* Fisrt Visitor Pattern just collects the Classes in a Map */
 public class VisitClasses extends GJNoArguDepthFirst<Class_t> {
 
-    private Map<String, Class_t> st_;
+    private final Map<String, Class_t> st_;
 
     public VisitClasses() {
         st_ = new HashMap<>();

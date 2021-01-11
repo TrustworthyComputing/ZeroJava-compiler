@@ -61,6 +61,7 @@ TOKEN :
 | < ERROR : "ERROR" >
 | < PRINT: "PRINT" >
 | < PRINTLN: "PRINTLN" >
+| < EXIT: "EXIT" >
 | < PUBLIC_READ: "PUBREAD" >
 | < PRIVATE_READ: "SECREAD" >
 | < PUBLIC_SEEK: "PUBSEEK" >
@@ -160,6 +161,7 @@ void Stmt() :
 | MoveStmt()
 | PrintStmt()
 | PrintlnStmt()
+| ExitStmt()
 | AnswerStmt()
 | PublicReadStmt()
 | PrivateReadStmt()
@@ -219,6 +221,12 @@ void PrintlnStmt() :
 {}
 {
   "PRINTLN" SimpleExp()
+}
+
+void ExitStmt() :
+{}
+{
+  "EXIT" SimpleExp()
 }
 
 void AnswerStmt() :

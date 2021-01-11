@@ -118,6 +118,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * | MoveStmt()
      * | PrintStmt()
      * | PrintlnStmt()
+     * | ExitStmt()
      * | AnswerStmt()
      */
     public String visit(Stmt n, String argu) throws Exception {
@@ -243,6 +244,19 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     public String visit(PrintlnStmt n, String argu) throws Exception {
         String exp = n.f1.accept(this, argu);
         String instr = "PRINTLN " + exp;
+        if (exp != null && exp.matches("TEMP(.*)")) {
+            var_uses_.add(new VarUseType(argu, this.inst_num2_, exp));
+        }
+        return instr;
+    }
+
+    /**
+     * f0 -> "EXIT"
+     * f1 -> SimpleExp()
+     */
+    public String visit(ExitStmt n, String argu) throws Exception {
+        String exp = n.f1.accept(this, argu);
+        String instr = "EXIT " + exp;
         if (exp != null && exp.matches("TEMP(.*)")) {
             var_uses_.add(new VarUseType(argu, this.inst_num2_, exp));
         }

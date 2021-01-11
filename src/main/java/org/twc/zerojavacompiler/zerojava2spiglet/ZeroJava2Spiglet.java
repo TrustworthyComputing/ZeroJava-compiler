@@ -288,6 +288,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
      * | WhileStatement()
      * | PrintStatement()
      * | PrintLineStatement()
+     * | ExitStatement()
      * | AnswerStatement()
      */
     public Base_t visit(Statement n, Base_t argu) throws Exception {
@@ -588,6 +589,19 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
      */
     public Base_t visit(PrintLineStatement n, Base_t argu) throws Exception {
         this.asm_.append("PRINT TEMP 0\n");
+        return null;
+    }
+
+    /**
+     * f0 -> "System.exit"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+    public Base_t visit(ExitStatement n, Base_t argu) throws Exception {
+        String t = ((Variable_t) n.f2.accept(this, argu)).getRegister();
+        this.asm_.append("EXIT ").append(t).append("\n");
         return null;
     }
 

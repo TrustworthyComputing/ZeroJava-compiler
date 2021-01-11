@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
 
-    private Map<String, Class_t> st_;
+    private final Map<String, Class_t> st_;
     private boolean has_answer_;
 
     public TypeCheckVisitor(Map<String, Class_t> st_) {
@@ -263,6 +263,7 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
      * | WhileStatement()
      * | PrintStatement()
      * | PrintLineStatement()
+     * | ExitStatement()
      * | AnswerStatement()
      */
     public Base_t visit(Statement n, Base_t argu) throws Exception {
@@ -507,6 +508,28 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
         n.f2.accept(this, argu);
         n.f3.accept(this, argu);
         return null;
+    }
+
+    /**
+     * f0 -> "System.exit"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+    public Base_t visit(ExitStatement n, Base_t argu) throws Exception { //is int
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        Variable_t expr = (Variable_t) n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        if (expr.getType() == null) {
+            expr = findType(expr, (Method_t) argu);
+        }
+        if (expr.getType().equals("boolean") || expr.getType().equals("int")) {
+            return null;
+        }
+        throw new Exception("Print statement not boolean or int.");
     }
 
     /**

@@ -211,6 +211,17 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     }
 
     /**
+     * f0 -> "EXIT"
+     * f1 -> SimpleExp()
+     */
+    public String visit(ExitStmt n) throws Exception {
+        String reg = n.f1.accept(this);
+        zmipsPrinter_.println("exit " + reg);
+        return null;
+    }
+
+
+    /**
      * f0 -> "ANSWER"
      * f1 -> SimpleExp()
      */

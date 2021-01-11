@@ -7,7 +7,7 @@ public class Class_t extends Base_t {
     public Map<String, Method_t> class_methods_map;
     public Map<String, Variable_t> class_vars_map;
 
-    private String parent; // if extended
+    private final String parent; // if extended
     private int num_methods_;
     private int num_vars_;
     private boolean is_main;

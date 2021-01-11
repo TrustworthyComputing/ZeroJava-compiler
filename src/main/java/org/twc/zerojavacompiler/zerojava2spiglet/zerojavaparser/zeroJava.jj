@@ -73,6 +73,7 @@ TOKEN :
 	| < THIS: "this" >
 	| < TRUE: "true" >
 	| < PRINT: "System.out.println" >
+	| < EXIT: "System.exit" >
 	| < ANSWER: "Prover.answer" >
 	| < PUBLIC_READ: "PublicTape.read" >
 	| < PRIVATE_READ: "PrivateTape.read" >
@@ -266,6 +267,8 @@ void Statement() :
 	PrintStatement()
 | 	LOOKAHEAD(3)
 	PrintLineStatement()
+| 	LOOKAHEAD(3)
+	ExitStatement()
 | 	AnswerStatement()
 }
 
@@ -292,7 +295,6 @@ void DecrementAssignmentStatement() :
 {
   Identifier() "--" ";"
 }
-
 
 void CompoundAssignmentStatement() :
 {}
@@ -356,6 +358,12 @@ void PrintLineStatement() :
 {}
 {
 	<PRINT> "(" ")" ";"
+}
+
+void ExitStatement() :
+{}
+{
+	<EXIT> "(" Expression() ")" ";"
 }
 
 void AnswerStatement() :

@@ -75,6 +75,7 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
      * | MoveStmt()
      * | PrintStmt()
      * | PrintlnStmt()
+     * | ExitStmt()
      * | AnswerStmt()
      * | PublicReadStmt()
      * | PrivateReadStmt()

@@ -9,7 +9,7 @@ import java.util.Map;
 /* Second Visitor Pattern creates the Symbol Table */
 public class SymbolTableVisitor extends GJNoArguDepthFirst<Base_t> {
 
-    private Map<String, Class_t> st_;
+    private final Map<String, Class_t> st_;
     private int globals_;
 
     public SymbolTableVisitor(Map<String, Class_t> st) {

@@ -64,6 +64,7 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
      * | MoveStmt()
      * | PrintStmt()
      * | PrintlnStmt()
+     * | ExitStmt()
      * | AnswerStmt()
      * | PublicReadStmt()
      * | PrivateReadStmt()
@@ -193,6 +194,16 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
      * f1 -> SimpleExp()
      */
     public String visit(PrintlnStmt n) throws Exception {
+        n.f1.accept(this);
+        currMethod.flowGraph.addEdge(vid, vid + 1);
+        return null;
+    }
+
+    /**
+     * f0 -> "EXIT"
+     * f1 -> SimpleExp()
+     */
+    public String visit(ExitStmt n) throws Exception {
         n.f1.accept(this);
         currMethod.flowGraph.addEdge(vid, vid + 1);
         return null;

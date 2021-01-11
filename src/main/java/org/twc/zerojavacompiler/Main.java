@@ -35,9 +35,9 @@ public class Main {
         }
         ArrayList<String> input_files = new ArrayList<>();
         for (String arg : args) {
-            if (arg.toUpperCase().equals("-DEBUG") || arg.toUpperCase().equals("--DEBUG")) {
+            if (arg.equalsIgnoreCase("-DEBUG") || arg.equalsIgnoreCase("--DEBUG")) {
                 debug_ = true;
-            } else if (arg.toUpperCase().equals("-OPTS") || arg.toUpperCase().equals("--OPTS")) {
+            } else if (arg.equalsIgnoreCase("-OPTS") || arg.equalsIgnoreCase("--OPTS")) {
                 enable_opts_ = true;
             } else {
                 input_files.add(arg);

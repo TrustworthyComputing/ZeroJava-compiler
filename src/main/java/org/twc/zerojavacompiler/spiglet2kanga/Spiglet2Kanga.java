@@ -205,6 +205,15 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     }
 
     /**
+     * f0 -> "EXIT"
+     * f1 -> SimpleExp()
+     */
+    public String visit(ExitStmt n) throws Exception {
+        asm_.append("\t\tEXIT ").append(n.f1.accept(this)).append("\n");
+        return null;
+    }
+
+    /**
      * f0 -> "ANSWER"
      * f1 -> SimpleExp()
      */
