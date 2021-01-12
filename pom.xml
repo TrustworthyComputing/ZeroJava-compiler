@@ -309,11 +309,13 @@
                                 <include>**/*.spg</include>
                                 <include>**/*.kg</include>
                                 <include>**/*.zmips</include>
+                                <include>**/*.class</include>
                             </includes>
                             <excludes>
                                 <exclude>**/*.java</exclude>
                                 <exclude>**/*.pubtape</exclude>
                                 <exclude>**/*.auxtape</exclude>
+                                <exclude>**/*.txt</exclude>
                             </excludes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>

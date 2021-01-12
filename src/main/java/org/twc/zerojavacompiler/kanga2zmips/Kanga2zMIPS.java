@@ -415,12 +415,13 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
     /**
      * f0 -> Reg()
      * | IntegerLiteral()
+     * | NegIntegerLiteral()
      * | Label()
      */
     // returns a simple register
     public String visit(SimpleExp n) throws Exception {
         String str = n.f0.accept(this);
-        if (n.f0.which == 2) { // if label
+        if (n.f0.which == 3) { // if label
             return "__" + str + "__";
         } else {
             return str;
@@ -463,6 +464,13 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
      * f0 -> <INTEGER_LITERAL>
      */
     public String visit(IntegerLiteral n) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public String visit(NegIntegerLiteral n) throws Exception {
         return n.f0.toString();
     }
 

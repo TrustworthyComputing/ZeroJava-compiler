@@ -1020,6 +1020,7 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
 
     /**
      * f0 -> IntegerLiteral()
+     * | NegIntegerLiteral()
      * | TrueLiteral()
      * | FalseLiteral()
      * | Identifier()
@@ -1036,6 +1037,15 @@ public class ZeroJava2Spiglet extends GJDepthFirst<Base_t, Base_t> {
      * f0 -> <INTEGER_LITERAL>
      */
     public Base_t visit(IntegerLiteral n, Base_t argu) throws Exception {
+        String ret = newTemp();
+        this.asm_.append("MOVE ").append(ret).append(" ").append(n.f0.toString()).append("\n");
+        return new Variable_t(null, null, ret);
+    }
+
+    /**
+     * f0 -> <INTEGER_LITERAL>
+     */
+    public Base_t visit(NegIntegerLiteral n, Base_t argu) throws Exception {
         String ret = newTemp();
         this.asm_.append("MOVE ").append(ret).append(" ").append(n.f0.toString()).append("\n");
         return new Variable_t(null, null, ret);

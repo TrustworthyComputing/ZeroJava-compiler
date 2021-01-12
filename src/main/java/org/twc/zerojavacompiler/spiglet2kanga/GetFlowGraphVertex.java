@@ -154,6 +154,13 @@ public class GetFlowGraphVertex extends GJNoArguDepthFirst<String> {
     }
 
     /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public String visit(NegIntegerLiteral n) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
      * f0 -> <IDENTIFIER>
      */
     public String visit(Label n) throws Exception {

@@ -436,6 +436,7 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
     /**
      * f0 -> Temp()
      * | IntegerLiteral()
+     * | NegIntegerLiteral()
      * | Label()
      */
     public String visit(SimpleExp n, String argu) throws Exception {
@@ -471,6 +472,13 @@ public class FactGeneratorVisitor extends GJDepthFirst<String, String> {
      * f0 -> <INTEGER_LITERAL>
      */
     public String visit(IntegerLiteral n, String argu) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public String visit(NegIntegerLiteral n, String argu) throws Exception {
         return n.f0.toString();
     }
 

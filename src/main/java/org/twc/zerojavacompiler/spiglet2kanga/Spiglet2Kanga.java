@@ -395,7 +395,7 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
     }
 
     /**
-     * f0 -> Temp() | IntegerLiteral() | Label()
+     * f0 -> Temp() | IntegerLiteral() | NegIntegerLiteral() | Label()
      */
     public String visit(SimpleExp n) throws Exception {
         String _ret = n.f0.accept(this);
@@ -417,6 +417,13 @@ public class Spiglet2Kanga extends GJNoArguDepthFirst<String> {
      * f0 -> <INTEGER_LITERAL>
      */
     public String visit(IntegerLiteral n) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public String visit(NegIntegerLiteral n) throws Exception {
         return n.f0.toString();
     }
 

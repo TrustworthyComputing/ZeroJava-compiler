@@ -324,6 +324,7 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
     /**
      * f0 -> Temp()
      * | IntegerLiteral()
+     * | NegIntegerLiteral()
      * | Label()
      */
     public String visit(SimpleExp n) throws Exception {
@@ -347,6 +348,13 @@ public class GetFlowGraph extends GJNoArguDepthFirst<String> {
      * f0 -> <INTEGER_LITERAL>
      */
     public String visit(IntegerLiteral n) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public String visit(NegIntegerLiteral n) throws Exception {
         return n.f0.toString();
     }
 

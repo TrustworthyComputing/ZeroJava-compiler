@@ -951,6 +951,13 @@ public class TypeCheckVisitor extends GJDepthFirst<Base_t, Base_t> {
     }
 
     /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public Base_t visit(NegIntegerLiteral n, Base_t argu) throws Exception {
+        return new Variable_t("int");
+    }
+
+    /**
      * f0 -> "true"
      */
     public Base_t visit(TrueLiteral n, Base_t argu) throws Exception {

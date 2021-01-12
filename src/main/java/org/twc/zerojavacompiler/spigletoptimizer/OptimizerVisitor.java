@@ -413,6 +413,7 @@ public class OptimizerVisitor extends GJDepthFirst<OptimizationWrapper, String> 
     /**
      * f0 -> Temp()
      * | IntegerLiteral()
+     * | NegIntegerLiteral()
      * | Label()
      */
     public OptimizationWrapper visit(SimpleExp n, String argu) throws Exception {
@@ -452,6 +453,13 @@ public class OptimizerVisitor extends GJDepthFirst<OptimizationWrapper, String> 
      * f0 -> <INTEGER_LITERAL>
      */
     public OptimizationWrapper visit(IntegerLiteral n, String argu) throws Exception {
+        return new OptimizationWrapper(n.f0.toString());
+    }
+
+    /**
+     * f0 -> <NEG_INTEGER_LITERAL>
+     */
+    public OptimizationWrapper visit(NegIntegerLiteral n, String argu) throws Exception {
         return new OptimizationWrapper(n.f0.toString());
     }
 

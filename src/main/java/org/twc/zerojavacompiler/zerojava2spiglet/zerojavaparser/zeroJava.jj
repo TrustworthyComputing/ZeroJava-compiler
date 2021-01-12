@@ -85,6 +85,7 @@ TOKEN :
 TOKEN : /* LITERALS */
 {
 	< INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+	| < NEG_INTEGER_LITERAL: ( "-" ["1"-"9"] (["0"-"9"])* ) >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -542,6 +543,7 @@ void PrimaryExpression() :
 {}
 {
 	IntegerLiteral()
+|	NegIntegerLiteral()
 | 	TrueLiteral()
 | 	FalseLiteral()
 | 	Identifier()
@@ -558,6 +560,11 @@ void IntegerLiteral() :
 	<INTEGER_LITERAL>
 }
 
+void NegIntegerLiteral() :
+{}
+{
+	<NEG_INTEGER_LITERAL>
+}
 
 void TrueLiteral() :
 {}
