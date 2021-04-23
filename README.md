@@ -9,6 +9,14 @@ A compiler to translate ZeroJava, a subset of Java designed for zero-knowledge a
 zMIPS assembly can in turn be consumed by the [Zilch framework](https://github.com/TrustworthyComputing/Zilch) to create zero-knowledge proofs.
 
 
+### Cite this work
+If you find our work useful, please cite our publication ([IEEE Xplore](https://ieeexplore.ieee.org/document/9410618), [Cryptology ePrint Archive](https://eprint.iacr.org/2020/1155.pdf)):
+```
+D. Mouris and N. G. Tsoutsos, "Zilch: A Framework for Deploying Transparent Zero-Knowledge Proofs,"
+in IEEE Transactions on Information Forensics and Security (TIFS), 2021, DOI: 10.1109/TIFS.2021.3074869
+```
+
+
 ### ZeroJava Language
 ZeroJava is a custom subset of Java tailored to zero-knowledge proofs. It is possible to compile ZeroJava programs to byte code with a Java compiler if the ZK-specific instructions are omitted.
 ZeroJava abstains from features of Java that complicate the run-time system, such as exceptions and multi-threading.
