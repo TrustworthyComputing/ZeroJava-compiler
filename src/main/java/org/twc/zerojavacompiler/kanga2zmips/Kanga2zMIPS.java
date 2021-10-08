@@ -381,7 +381,7 @@ public class Kanga2zMIPS extends GJNoArguDepthFirst<String> {
         String[] retValue = {
                 "slt", "sle", "seq", "sne",         // comparison
                 "add", "sub", "mult", "div", "mod", // arithmetic
-                "and", "or", "xor", "sll", "slr"    // bitwise
+                "and", "or", "xor", "sll", "srl"    // bitwise
         };
         return retValue[n.f0.which];
     }
