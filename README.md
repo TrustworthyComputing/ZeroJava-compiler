@@ -122,7 +122,8 @@ $ apt install openjdk-8-jdk maven javacc
 
 Then simply type:
 ```
-$ mvn initialize package
+$ mvn initialize
+$ mvn package
 ```
 
 The above command will create a `target` directory with all the build files, as well as with the `zerojava-compiler-1.0.jar` inside the `target` directory.
